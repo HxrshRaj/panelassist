@@ -40,4 +40,5 @@ python eval/score.py --labels eval/handsort.csv \
 ## Notes
 `--plan-only` is used for the eval so nothing is moved. A real run drops
 `--plan-only`, prints the plan, waits for `y`, then moves files and writes
-`.tidydrop_undo.json`. `python src/tidydrop.py --undo` reverses the last run.
+an undo log next to them; `python src/tidydrop.py --undo` reverses the last
+run.
