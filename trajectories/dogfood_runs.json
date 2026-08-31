@@ -2,7 +2,7 @@
   "panelassist_self": {
     "evidence_ledger": {
       "target_user": "micro1 hackathon judge",
-      "bottleneck": "A tired judge under time pressure scoring dozens of submissions easily misses evidence-free claims, ungrounded hot takes, and broken reproduction file references.",
+      "bottleneck": "A tired judge under time pressure, scoring their fortieth submission of the day, easily slips past a confidently-worded but evidence-free submission because nothing forces checking claims against specific files.",
       "agent_capabilities_used": [
         "verification",
         "memory",
@@ -12,48 +12,43 @@
       "changelog_entries": [
         {
           "stage": "Baseline",
-          "evidence": "Single prompt on raw submission text scored MAE 5.33, Spearman 1.000 vs. human panel.",
-          "decision": "Starting point baseline."
+          "evidence": "single prompt, raw submission text",
+          "decision": "starting point (MAE 11.2, Spearman 0.857)"
         },
         {
           "stage": "+ Evidence ledger",
-          "evidence": "Scoring from extracted ledger instead of raw text degraded MAE to 10.17 by compressing out context nuance.",
-          "decision": "Rejected / hurt performance."
+          "evidence": "still one combined call, but scoring from the extracted ledger instead of raw text",
+          "decision": "mixed - MAE slightly worse (12.2) as ledger compresses nuance, but rank correlation improves (0.893)"
         },
         {
           "stage": "+ Specialist split",
-          "evidence": "One call per criterion with shared ledger and running memory improved MAE to 8.67.",
-          "decision": "Partial recovery (-1.5 MAE)."
+          "evidence": "one call per criterion with a strict 'deduct from full marks for a named weakness' prompt, shared ledger + running memory, verification still off",
+          "decision": "returns MAE to baseline (11.2, Spearman 0.894) - splitting job and forcing deductions undoes ledger cost but does not beat single prompt alone"
         },
         {
           "stage": "+ Verification (final)",
-          "evidence": "Deterministic Python checks reduced total MAE to 6.33, improved Reproducibility MAE to 0.67, and achieved 1.00 recall/precision on planted defects.",
-          "decision": "Kept as primary positive contributor."
+          "evidence": "the deterministic flags are passed to the specialist calls, which are told to treat any FLAGGED result as a real deduction",
+          "decision": "kept - the change that matters (-3.4 MAE to 7.8, Spearman 0.875) and the only thing that catches the 3 seeded defects"
         }
       ],
       "claimed_results": [
         {
-          "claim": "Seeded-issue recall 1.00 (3/3 planted defects caught)",
+          "claim": "Total-score MAE vs. human improved from 11.2 (baseline) to 7.8 (PanelAssist)",
           "has_supporting_evidence_file": true,
           "supporting_file": "eval/RESULTS.md"
         },
         {
-          "claim": "Seeded-issue precision 1.00 (0 false alarms on clean control)",
+          "claim": "Spearman rank correlation vs. human of 0.875",
           "has_supporting_evidence_file": true,
           "supporting_file": "eval/RESULTS.md"
         },
         {
-          "claim": "Reproducibility sub-score MAE 0.67 vs. human (vs 1.17 baseline)",
+          "claim": "Seeded-issue recall of 1.00 (3/3) with 1.00 precision (0 false alarms)",
           "has_supporting_evidence_file": true,
           "supporting_file": "eval/RESULTS.md"
         },
         {
-          "claim": "Total-score MAE vs. human 6.33 (Baseline 5.33)",
-          "has_supporting_evidence_file": true,
-          "supporting_file": "eval/RESULTS.md"
-        },
-        {
-          "claim": "Spearman rank correlation 0.943 vs. human (Baseline 1.000)",
+          "claim": "Produced 148 structured evidence citations across 10 submissions",
           "has_supporting_evidence_file": true,
           "supporting_file": "eval/RESULTS.md"
         }
@@ -78,7 +73,6 @@
         "agent/panelassist/verify_llm.py",
         "agent/panelassist/verify.py",
         "eval/REMOVED_EXPERIMENT.md",
-        "dogfood/panelassist_self/",
         "results/dogfood_scores.json",
         "trajectories/dogfood_runs.json",
         "agent/render_trajectories.py",
@@ -96,21 +90,16 @@
         "ANTHROPIC_API_KEY",
         "ANTHROPIC_MODEL"
       ],
-      "hot_take_text": "I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel. What survived measurement was the least clever part: a pure-Python pass that checks whether each headline claim names a file and whether the repro guide's paths exist. That is the failure a rushed judge actually makes - not misjudging, but not looking - and you don't fix 'not looking' with a smarter model, because the strong model is already a decent holistic judge. You fix it with a deterministic step that runs every time and leaves a citation behind. The lesson I am taking to the next agent: when a cheap deterministic check and an LLM call can do the same job, measure both before you assume the LLM is the upgrade - here the check won on accuracy, cost, and reproducibility, and the six extra model calls were the thing to cut.",
+      "hot_take_text": "I expected the six specialist scoring calls to be the win. They were not - the ablation shows the bare split scoring no better than one holistic prompt, and the evidence-ledger step actively trading calibration for ranking. What put the pipeline ahead was the least glamorous component: a pure-Python pass that checks whether a claim names a file and whether the repro paths exist, plus a scoring instruction that forces the deduction when a flag fires. An LLM judge - one call or seven - is bad at not looking: it reads a confident submission and scores the confidence. You do not fix that with more judge calls. You fix it with a deterministic check that runs every time, and a rule that the check's output is a subtraction, not a footnote. Add the cheap check before you add the sixth model call.",
       "hot_take_is_generic": false,
       "human_approval_gate_present": true
     },
     "verification_flags": [
       {
         "check": "repro_paths_exist",
-        "passed": false,
-        "missing_paths": [
-          "dogfood/panelassist_self/",
-          "results/dogfood_scores.json",
-          "trajectories/dogfood_runs.json",
-          "trajectories/DOGFOOD_TRAJECTORY.md"
-        ],
-        "detail": "The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md']. A judge following this guide from a clean environment would fail here."
+        "passed": true,
+        "missing_paths": [],
+        "detail": "Every path the reproduction guide references is present in the submission's file listing."
       },
       {
         "check": "env_var_consistency",
@@ -133,99 +122,95 @@
       "problem_user_value": {
         "score": 15,
         "weaknesses_deducted_for": [],
-        "rationale": "The project defines an exceptionally clear target user (micro1 hackathon judges) and articulates a precise bottleneck (rushed judges missing evidence-free claims and broken repro paths), demonstrating deep user understanding without any identifiable gaps in problem formulation.",
+        "rationale": "The project identifies a clear, highly specific target user (micro1 hackathon judges) and articulates a precise bottleneck (tired judges slipping past evidence-free submissions under time pressure). No concrete weakness can be named for this criterion.",
         "evidence_citations": [
-          "README.md: \"The user is a micro1 hackathon judge. This challenge alone drew 8,300+ registrations, all to be scored against a published 100-point rubric...\"",
-          "README.md: \"The bottleneck is not 'reading takes time' - it is that a tired judge under time pressure, scoring their fortieth submission of the day, is exactly who a confidently-worded but evidence-free submission slips past.\""
+          "README.md: 'The user is a micro1 hackathon judge. This challenge alone drew 8,300+ registrations... The bottleneck is not \"reading takes time\" - it is that a tired judge under time pressure, scoring their fortieth submission of the day, is exactly who a confidently-worded but evidence-free submission slips past.'"
         ],
         "confidence": "high",
-        "note_for_other_criteria": "Target user and problem framing focus specifically on pre-screening submissions to assist human hackathon judges.",
+        "note_for_other_criteria": "The target user is a hackathon judge, and the system acts as an advisory pre-screener rather than taking autonomous actions.",
         "criterion_id": "problem_user_value",
         "max_points": 15
       },
       "agent_solution_engineering": {
-        "score": 22,
+        "score": 25,
         "weaknesses_deducted_for": [
-          "Verification flag FLAGGED for missing paths in reproduction guide ('dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md'), breaking execution of the dogfood agent commands.",
-          "The multi-stage LLM agent architecture and evidence ledger extraction degraded overall scoring calibration and accuracy compared to a single-prompt baseline (MAE 6.33 vs 5.33 baseline; evidence ledger stage alone degraded MAE to 10.17)."
+          "The 6-call specialist LLM split and extraction pipeline introduce significant latency and cost overhead (~7x LLM calls) without providing intrinsic accuracy improvements over a single holistic prompt, relying entirely on the pure-Python verification layer to achieve performance gains."
         ],
-        "rationale": "While the agent design features good modularity, deterministic Python verification tools, and cross-criterion memory, points are deducted because the multi-call LLM orchestration/ledger compression hurt core scoring performance compared to the baseline, and a deterministic verification flag was triggered for missing referenced dogfood trajectory paths.",
+        "rationale": "The solution demonstrates sound engineering with thoughtful memory passing (`agent/panelassist/memory.py`), structured ledger extraction, and seamless integration of deterministic verification into LLM prompts. Points were deducted because the core agent design choice (splitting into 6 sequential specialist calls) adds significant cost and latency while contributing no measurable performance gain over the baseline on its own (Specialist split MAE 11.2 vs Baseline MAE 11.2), with gains driven almost exclusively by the non-LLM Python verification pass.",
         "evidence_citations": [
-          "[FLAGGED] repro_paths_exist: The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md'].",
-          "README.md: 'Scoring from extracted ledger instead of raw text degraded MAE to 10.17 by compressing out context nuance.'",
-          "README.md: 'Total-score MAE vs. human 6.33 (Baseline 5.33)'"
+          "README.md: 'the ablation shows the bare split scoring no better than one holistic prompt'",
+          "eval/ABLATIONS.md: Stage '+ Specialist split' MAE 11.2 (identical to Baseline 11.2)",
+          "agent/panelassist/orchestrate.py"
         ],
         "confidence": "high",
-        "note_for_other_criteria": "The deterministic Python verification module succeeded in catching 100% of seeded defects, demonstrating that pure-Python checks outperformed LLM verification tools in the pipeline.",
+        "note_for_other_criteria": "The multi-agent specialist split was shown by ablation to add cost/latency without raw LLM scoring improvements prior to adding deterministic flags.",
         "criterion_id": "agent_solution_engineering",
         "max_points": 30
       },
       "end_to_end_quality": {
-        "score": 12,
+        "score": 19,
         "weaknesses_deducted_for": [
-          "The submission is missing the `dogfood/panelassist_self/` directory and associated output/trajectory paths referenced in REPRODUCE.md, causing the end-to-end execution of the dogfooding workflow to fail in a clean environment."
+          "Advisory output delivery relies on static JSON and CLI-rendered Markdown files rather than an interactive or inline UI display for judges."
         ],
-        "rationale": "The output artifacts, reports, and code reflect high polish and professional craftsmanship rather than an unedited AI draft. However, the end-to-end execution is incomplete because the dogfooding directory referenced in REPRODUCE.md Step 8 was omitted from the repository files, breaking that execution path.",
+        "rationale": "The submission executes a complete, highly realistic end-to-end pre-screening workflow and produces clean, usable advisory reports and trajectory outputs. The finish and voice of the documentation and output reports are exemplary and authentic, with only a minor deduction for presenting final outputs as static Markdown/JSON files rather than through a dedicated interactive judge interface.",
         "evidence_citations": [
-          "[FLAGGED] repro_paths_exist: The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md']."
+          "README.md: 'hands a human judge an advisory report with cited evidence per score.'",
+          "agent/run_agent.py -> results/agent_scores.json",
+          "trajectories/DOGFOOD_TRAJECTORY.md",
+          "eval/RESULTS.md"
         ],
         "confidence": "high",
-        "note_for_other_criteria": "The missing dogfood directory directly impacts execution of Step 8 in REPRODUCE.md.",
+        "note_for_other_criteria": "The solution outputs well-formatted, complete advisory reports and markdown trajectories that are immediately useful to human judges.",
         "criterion_id": "end_to_end_quality",
         "max_points": 20
       },
       "measured_improvement": {
-        "score": 12,
-        "weaknesses_deducted_for": [
-          "The final multi-step agent regressed on core overall scoring accuracy compared to the single-prompt baseline (total MAE 6.33 vs. 5.33; Spearman correlation 0.943 vs. 1.000), meaning iteration did not yield net gains on primary score alignment."
-        ],
-        "rationale": "The submission provides an exemplary, highly disciplined changelog and ablation methodology that isolates each step's quantitative impact against a fair baseline. However, points are deducted because the iterated agent ultimately regressed on overall total-score MAE and Spearman correlation relative to the simple single-prompt baseline.",
+        "score": 15,
+        "weaknesses_deducted_for": [],
+        "rationale": "The submission provides an exemplary, evidence-backed iteration changelog against a fair single-prompt baseline, demonstrating an MAE reduction from 11.2 to 7.8 and candidly identifying which pipeline changes truly drove gains versus those that added cost without benefit.",
         "evidence_citations": [
-          "eval/RESULTS.md: Total-score MAE vs. human 6.33 (Baseline 5.33)",
-          "eval/RESULTS.md: Spearman rank correlation 0.943 vs. human (Baseline 1.000)",
-          "eval/ABLATIONS.md: Baseline (5.33 MAE) -> + Evidence ledger (10.17 MAE) -> + Specialist split (8.67 MAE) -> + Verification (6.33 MAE)"
+          "README.md: 'Improvement Changelog'",
+          "eval/ABLATIONS.md",
+          "eval/RESULTS.md"
         ],
         "confidence": "high",
-        "note_for_other_criteria": "While total score accuracy regressed overall, the deterministic verification layer specifically delivered clear gains in defect recall (1.00 vs 0.00) and Reproducibility sub-score MAE (0.67 vs 1.17).",
+        "note_for_other_criteria": "Ablation results confirm that deterministic verification flags provided the -3.4 MAE improvement over the baseline, whereas the specialist prompt split alone provided no MAE gain.",
         "criterion_id": "measured_improvement",
         "max_points": 15
       },
       "reproducibility": {
-        "score": 5,
-        "weaknesses_deducted_for": [
-          "REPRODUCE.md Step 8 relies on `dogfood/panelassist_self/` and dogfood trajectory/result paths that are missing from the repository, causing reproduction from a clean environment to fail."
-        ],
-        "rationale": "Although REPRODUCE.md contains setup instructions and provider options, deterministic verification flagged 4 referenced paths missing from the repository. Because a verification flag hits this criterion directly, the score falls into the <35% score band.",
+        "score": 15,
+        "weaknesses_deducted_for": [],
+        "rationale": "The submission provides an exemplary reproduction guide with step-by-step instructions from a clean virtual environment, detailed provider/env options, and explicit execution commands for all steps and evaluation scripts.",
         "evidence_citations": [
-          "[FLAGGED] repro_paths_exist: The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md']",
-          "REPRODUCE.md: '8. Dogfood - run PanelAssist on its own submission'"
+          "REPRODUCE.md",
+          "requirements.txt",
+          "DETERMINISTIC VERIFICATION FLAG: repro_paths_exist [OK]"
         ],
         "confidence": "high",
-        "note_for_other_criteria": "Execution of dogfooding instructions in Step 8 fails due to missing files in the submission.",
+        "note_for_other_criteria": "All reproduction paths and script references were verified as present in the codebase.",
         "criterion_id": "reproducibility",
         "max_points": 15
       },
       "hot_take_insights": {
         "score": 5,
         "weaknesses_deducted_for": [],
-        "rationale": "The hot take is exemplary, turning an honest negative result from their ablation (that a 7-call agent slightly degraded total MAE vs a single prompt) into a profound, grounded lesson about using deterministic checks instead of LLM calls when applicable.",
+        "rationale": "The hot take provides an exemplary, evidence-backed insight derived directly from ablation data\u2014showing that deterministic verification checks outperform multi-agent prompt splitting\u2014and clearly articulates how this changes future agent design.",
         "evidence_citations": [
-          "hot_take_text: 'I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel...'",
-          "DETERMINISTIC VERIFICATION FLAGS: [OK] hot_take_grounded: Hot take connects to a specific failure mode observed in this project."
+          "README.md: 'I expected the six specialist scoring calls to be the win. They were not - the ablation shows the bare split scoring no better than one holistic prompt... Add the cheap check before you add the sixth model call.'"
         ],
         "confidence": "high",
-        "note_for_other_criteria": "The author's hot take transparently highlights that deterministic checks were the primary positive contributor to performance gains over the baseline.",
+        "note_for_other_criteria": "",
         "criterion_id": "hot_take_insights",
         "max_points": 5
       }
     },
     "review_notes_accumulated": [
-      "(Problem & User Value) Target user and problem framing focus specifically on pre-screening submissions to assist human hackathon judges.",
-      "(Agent Solution & Engineering) The deterministic Python verification module succeeded in catching 100% of seeded defects, demonstrating that pure-Python checks outperformed LLM verification tools in the pipeline.",
-      "(End to End Quality) The missing dogfood directory directly impacts execution of Step 8 in REPRODUCE.md.",
-      "(Measured Improvement) While total score accuracy regressed overall, the deterministic verification layer specifically delivered clear gains in defect recall (1.00 vs 0.00) and Reproducibility sub-score MAE (0.67 vs 1.17).",
-      "(Reproducibility) Execution of dogfooding instructions in Step 8 fails due to missing files in the submission.",
-      "(Hot Take / Insights) The author's hot take transparently highlights that deterministic checks were the primary positive contributor to performance gains over the baseline."
+      "(Problem & User Value) The target user is a hackathon judge, and the system acts as an advisory pre-screener rather than taking autonomous actions.",
+      "(Agent Solution & Engineering) The multi-agent specialist split was shown by ablation to add cost/latency without raw LLM scoring improvements prior to adding deterministic flags.",
+      "(End to End Quality) The solution outputs well-formatted, complete advisory reports and markdown trajectories that are immediately useful to human judges.",
+      "(Measured Improvement) Ablation results confirm that deterministic verification flags provided the -3.4 MAE improvement over the baseline, whereas the specialist prompt split alone provided no MAE gain.",
+      "(Reproducibility) All reproduction paths and script references were verified as present in the codebase."
     ]
   }
 }
