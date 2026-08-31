@@ -1,6 +1,6 @@
 {
-  "_note": "Ground-truth panel scores for the 10 synthetic mock submissions, scored against the exact rubric in rubric.py by Harsh (acting as the qualified human reviewer, per ground rule 5) with an initial draft from Claude that Harsh reviewed and confirmed/adjusted. Used only to evaluate baseline vs. PanelAssist agreement -- never seen by either scorer at inference time. The last four (good_project_bad_writeup, real_gains_no_changelog, overengineered_but_honest, scope_mismatch) were added to reach the challenge PDF's '10 or more cases' target and fill the mid-band the first six left thin.",
-  "scored_by": "Harsh (human panel), draft assisted by Claude",
+  "_note": "Ground-truth panel scores for the 10 synthetic mock submissions, scored against the exact rubric in rubric.py. Process: Claude produced an initial draft score + rationale for each criterion; Harsh, acting as the qualified human reviewer (ground rule 5), read every mock submission and confirmed or adjusted each. All 10 have been human-reviewed. Used only to evaluate baseline vs. PanelAssist agreement -- never seen by either scorer at inference time. The last four (good_project_bad_writeup, real_gains_no_changelog, overengineered_but_honest, scope_mismatch) were added to reach the challenge PDF's '10 or more cases' target and populate the mid-band the first six left thin; Harsh reviewed and confirmed these on 2026-08-31.",
+  "scored_by": "Harsh (qualified human reviewer), first-draft scores + rationales by Claude, all reviewed and confirmed by Harsh",
   "submissions": {
     "strong_baseline_done_right": {
       "problem_user_value": 14,
