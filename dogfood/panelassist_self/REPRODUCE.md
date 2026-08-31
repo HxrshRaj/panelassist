@@ -11,15 +11,16 @@ AI Studio Gemini API or against Anthropic Claude by editing `.env` (see
 
 **Why the gateway and not the Gemini API directly:** the direct AI Studio
 free tier caps `gemini-3.6-flash` at **20 requests/day**, and a full run of
-this project is ~110 LLM calls. The gateway removes that cap; it routes to
+this project is ~180 LLM calls (10 baseline + 70 agent + ~66 ablation + 30
+removed-experiment + 7 dogfood). The gateway removes that cap; it routes to
 the same model. Nothing about the method depends on the gateway - point
 `.env` at the direct API (with billing enabled) and the numbers reproduce.
 
 Full end-to-end wall-clock for all scripts via the gateway: roughly
-**25-35 minutes** (~110 sequential LLM calls, ~9-15s each; the model spends
-part of each response on hidden reasoning). Measured API cost for the whole
-run: **~$1-2** (the gateway returns a `cost_usd` per call; the eval sums
-the token counts).
+**40-55 minutes** (sequential LLM calls, ~9-15s each; the model spends part
+of each response on hidden reasoning). Measured API cost for the whole run:
+**well under $1** (the gateway returns a `cost_usd` per call; `eval/RESULTS.md`
+reports $0.006 for the baseline and $0.057 for the agent over all 10 cases).
 
 ---
 
@@ -92,8 +93,8 @@ python baseline/baseline_scorer.py
 ```
 
 Writes `results/baseline_scores.json` - one score object per mock
-submission (`data/submissions/`, 6 synthetic cases) plus a call log with
-per-call token counts and latency. ~5 minutes.
+submission (`data/submissions/`, 10 synthetic cases) plus a call log with
+per-call token counts and latency. ~2 minutes.
 
 ## 4. Run PanelAssist (the agent)
 
@@ -109,7 +110,7 @@ Writes:
 - `trajectories/panelassist_runs.json` - the machine-readable trajectory
   for every run.
 
-~8-10 minutes (7 LLM calls per submission x 6, ~10-15s each via the gateway).
+~13-16 minutes (7 LLM calls per submission x 10, ~10-15s each via the gateway).
 
 ## 5. Compare baseline vs. PanelAssist vs. the human panel
 
@@ -138,7 +139,7 @@ call; specialist split with verification disabled) and writes
 `eval/ABLATIONS.md` - the table showing what each design step contributed,
 scored against the same human panel. It reuses `results/baseline_scores.json`,
 `results/agent_scores.json`, and the saved evidence ledgers for the other
-rows. ~8-10 minutes.
+rows. ~13-16 minutes.
 
 ## 7. Reproduce the removed experiment (LLM vs. deterministic verification)
 
@@ -150,7 +151,7 @@ Runs `agent/panelassist/verify_llm.py` (the removed LLM-based verification)
 3x per submission against the deterministic `verify.py`, and writes
 `eval/REMOVED_EXPERIMENT.md`: did each catch the seeded issues, false
 positives on the clean control, run-to-run stability, extra call cost.
-~5 minutes (18 LLM calls).
+~8-10 minutes (30 LLM calls, 3 per submission x 10).
 
 ## 8. Dogfood - run PanelAssist on its own submission
 
@@ -175,7 +176,7 @@ python agent/render_trajectories.py
 
 Turns `results/agent_scores.json` into `trajectories/TRAJECTORIES.md` - a
 step-by-step walk-through (instruction given -> evidence seen -> output
-produced) for three representative submissions. No LLM calls. Pass
+produced) for four representative submissions. No LLM calls. Pass
 `--slugs a,b,c` to choose which submissions to render.
 
 ---
@@ -184,30 +185,32 @@ produced) for three representative submissions. No LLM calls. Pass
 
 `eval/RESULTS.md`, specifically:
 
-1. **Seeded-issue detection.** Three of the six mock submissions each
+1. **Seeded-issue detection.** Three of the ten mock submissions each
    contain one deliberately planted, rubric-violating defect (an
    evidence-free headline claim; a reproduction guide that points at files
    that do not exist; a hot take that is generic filler). PanelAssist's
    deterministic verification layer is built to catch exactly these. The
    single-prompt baseline has no mechanism to, by construction - that is
    the comparison.
-2. **Agreement with the human panel** (total-score MAE and Spearman rank
-   correlation) for baseline vs. PanelAssist. Reported honestly: on this
-   run the single-prompt baseline is *better* on both. PanelAssist's win is
-   confined to seeded-issue detection and the Reproducibility sub-score.
-3. **Cost/latency delta** - PanelAssist is ~7x the calls of the baseline;
-   `eval/RESULTS.md` states the measured token and wall-clock cost of that.
+2. **Agreement with the human panel** - total-score MAE (baseline 11.2,
+   PanelAssist 7.8) and Spearman rank correlation (0.857 vs 0.875).
+   PanelAssist is closer on both, driven by the six mid-band submissions
+   that have one localized rubric flaw a holistic single pass scores over.
+3. **Cost/latency delta** - PanelAssist is 7x the calls of the baseline
+   ($0.006 -> $0.057, 112s -> 932s over all 10). `eval/RESULTS.md` has the
+   measured token counts.
 4. **The ablation** (`eval/ABLATIONS.md`) - which design step helped and
-   which hurt. Here the evidence-ledger stage *hurt*, and the deterministic
-   verification stage is the largest positive contributor.
+   which did not. The evidence-ledger stage trades calibration for ranking,
+   the bare specialist split scores no better than the baseline, and the
+   deterministic verification flags feeding the scorers are the -3.4 MAE
+   that puts the pipeline ahead.
 
 ## Troubleshooting
 
 - **`No LLM API key found`** - the `.env` file is missing or in the wrong
   directory. It must be in the project root, next to `rubric.py`.
 - **`Gemini API 429 ... GenerateRequestsPerDayPerProjectPerModel-FreeTier`**
-  - the direct AI Studio free tier is 20 requests/day; a full run needs
-  ~110. Enable billing on the API project, or use `LLM_PROVIDER=latentstack`
+  - the direct AI Studio free tier is 20 requests/day; a full run needs ~180. Enable billing on the API project, or use `LLM_PROVIDER=latentstack`
   / `LLM_PROVIDER=anthropic`.
 - **`Gemini API error 404 ... no longer available`** - the pinned model
   was retired. Set the model id in `.env` to a current one.
@@ -219,6 +222,8 @@ produced) for three representative submissions. No LLM calls. Pass
   reinstall, or use a different provider.
 - **Scores differ from `README.md`** - expected. Live LLM calls at
   `temperature=0` are not perfectly deterministic, and model versions move.
-  The *shape* of the result (verification catches the 3 seeded issues; the
-  ablation says the ledger stage hurt and verification helped most; the
-  baseline is competitive on total MAE) is what should reproduce.
+  The *shape* of the result - verification catches the 3 seeded issues with
+  no false alarms; the ablation shows the bare specialist split scoring no
+  better than the single prompt and the verification flags being the step
+  that puts the agent ahead on MAE - is what should reproduce, not any exact
+  score. The baseline in particular is unstable run-to-run.

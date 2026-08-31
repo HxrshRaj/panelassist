@@ -27,7 +27,7 @@
 | Total cost, all 10 submissions (est., see common/llm.py rates) | $0.0059 | $0.0571 | +$0.0512 |
 | Wall-clock time, all 10 submissions | 111.7s | 932.1s | +820.4s |
 
-Human time per task is not directly measured here (that needs a real judging session to time). As a proxy: the baseline returns one rationale paragraph with zero structured citations per submission, so a human still has to go re-find the evidence themselves before trusting a score; PanelAssist returns 148 total cited pieces of evidence across the 6 criteria x 6 submissions, one per sub-score. We're stating that as a citation count, not converting it into a minutes-saved number we can't actually back up.
+Human time per task is not directly measured here (that needs a real judging session to time). As a proxy: the baseline returns one rationale paragraph with zero structured citations per submission, so a human still has to go re-find the evidence themselves before trusting a score; PanelAssist returns 148 total cited pieces of evidence across the 6 criteria x 10 submissions, one per sub-score. We're stating that as a citation count, not converting it into a minutes-saved number we can't actually back up.
 
 ## Per-criterion mean absolute error vs. human (lower is better)
 

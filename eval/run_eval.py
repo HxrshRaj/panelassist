@@ -192,9 +192,9 @@ def render_markdown(r: dict, slugs: list) -> str:
         "submission, so a human still has to go re-find the evidence "
         "themselves before trusting a score; PanelAssist returns "
         f"{sum(r['evidence_citations_per_submission'].values())} total cited "
-        "pieces of evidence across the 6 criteria x 6 submissions, one per "
-        "sub-score. We're stating that as a citation count, not converting "
-        "it into a minutes-saved number we can't actually back up.\n"
+        f"pieces of evidence across the 6 criteria x {len(slugs)} submissions, "
+        "one per sub-score. We're stating that as a citation count, not "
+        "converting it into a minutes-saved number we can't actually back up.\n"
     )
 
     lines.append("## Per-criterion mean absolute error vs. human (lower is better)\n")
