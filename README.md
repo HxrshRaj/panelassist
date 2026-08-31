@@ -332,7 +332,19 @@ agent/panelassist/verify_llm.py    REMOVED experiment: LLM verification (off the
 eval/run_eval.py                   baseline vs. agent vs. human ground truth
 eval/run_ablation.py               the measured improvement changelog
 eval/run_removed_experiment.py     deterministic vs. LLM verification, head-to-head
+tests/                             pytest over the deterministic pieces (verify, stats, loader, JSON parse)
 data/submissions/                  10 synthetic mock submissions
 data/human_scores.json             human-panel ground truth
 dogfood/panelassist_self/          this project packaged as its own input, for the self-review
+TOOLS.md                           coding-agent-use disclosure (Claude Code)
+agent_build_trace/                 key-redacted transcript of the build session + BUILD_LOG.md
 ```
+
+**Tests:** `pip install pytest && python -m pytest tests/ -q` - 28 tests
+over `verify.py` (the four checks, incl. the seeded-issue catches and the
+directory-prefix / create-not-ship logic), `stats.py` (MAE / Spearman vs
+hand-computed values), `loader.py`, and `common/llm._extract_json_object`.
+No LLM, no network.
+
+**How this was built:** see [TOOLS.md](TOOLS.md) and
+[`agent_build_trace/BUILD_LOG.md`](agent_build_trace/BUILD_LOG.md).

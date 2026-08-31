@@ -168,7 +168,20 @@ python agent/render_trajectories.py \
 own inputs. See the "Dogfooding" section of `README.md` for what the first
 pass caught. ~2 minutes (7 LLM calls).
 
-## 9. Render the readable agent trajectories
+## 9. Run the test suite
+
+```bash
+pip install pytest
+python -m pytest tests/ -q
+```
+
+28 tests over the deterministic code paths - `verify.py` (all four
+checks, including the three seeded-issue catches and the directory /
+`.env` handling), `stats.py` (MAE and Spearman against hand-computed
+values), `loader.py`, and the JSON extractor in `common/llm.py`. No LLM,
+no network; runs in well under a second.
+
+## 10. Render the readable agent trajectories
 
 ```bash
 python agent/render_trajectories.py
