@@ -38,17 +38,18 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
 
 ```json
 {
-  "target_user": "Mara runs a 4-person support team at a mid-size SaaS company.",
-  "bottleneck": "Triage is difficult at volume consistently without senior staff; junior agents under-flag urgency because they don't know phrases correlating with churn risk, resulting in mis-triaged tickets taking 3.1x longer time-to-first-response.",
+  "target_user": "Mara, who runs a 4-person support team at a mid-size SaaS company handling ~140 daily tickets.",
+  "bottleneck": "Triage is difficult at volume without senior agents. Junior agents frequently under-flag urgency because they do not recognize phrases associated with churn risk, resulting in mis-triaged tickets taking 3.1x longer for first response.",
   "agent_capabilities_used": [
     "tool_use",
     "verification",
+    "orchestration",
     "human_checkpoint"
   ],
   "changelog_entries": [
     {
       "stage": "Baseline",
-      "evidence": "61% urgency accuracy vs. our 40-ticket labeled set (eval/labels.csv)",
+      "evidence": "61% urgency accuracy vs. our 40-ticket labeled set (`eval/labels.csv`)",
       "decision": "Established starting point"
     },
     {
@@ -79,14 +80,9 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
       "supporting_file": "eval/results.md"
     },
     {
-      "claim": "P0/P1 recall increased from 71% to 96%",
+      "claim": "96% P0/P1 recall (up from 71%)",
       "has_supporting_evidence_file": true,
       "supporting_file": "eval/results.md"
-    },
-    {
-      "claim": "Mis-triaged tickets have a 3.1x longer median time-to-first-response",
-      "has_supporting_evidence_file": true,
-      "supporting_file": "data/historical_triage_delay.csv"
     }
   ],
   "repro_referenced_paths": [
@@ -147,12 +143,11 @@ _(none)_
 
 - **Score:** 15 / 15
 - **Confidence:** high
-- **Rationale:** The submission identifies a highly specific target user (Mara, a support team lead at a mid-size SaaS company) and articulates a clear, quantified bottleneck (junior agents under-flagging urgency leading to a 3.1x response delay on mis-triaged tickets) with no identifiable weaknesses in problem definition or user value.
+- **Rationale:** The project articulates an exemplary problem and target user, clearly defining Mara's 4-person support team context and quantifying the bottleneck cost (3.1x longer response time for mis-triaged tickets). No concrete weaknesses were found for this criterion.
 - **Evidence cited:**
-- README.md: 'Mara runs a 4-person support team at a mid-size SaaS company.'
-- README.md: 'the median time-to-first-response on tickets that were initially mis-triaged is 3.1x longer than tickets triaged correctly'
-- data/historical_triage_delay.csv
-- **Note passed forward:** The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
+- README.md: 'Mara runs a 4-person support team at a mid-size SaaS company. Roughly 140 tickets land in the shared inbox each day.'
+- README.md: 'the median time-to-first-response on tickets that were initially mis-triaged is 3.1x longer than tickets triaged correctly on the first pass (measured from our own support tool's ticket history, data/historical_triage_delay.csv).'
+- **Note passed forward:** The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
 
 ### Step 4 - Agent Solution & Engineering (max 30)
 
@@ -162,18 +157,18 @@ _(none)_
 - _Ask yourself:_ Which design choices helped the agent solve the problem?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
+- (Problem & User Value) The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
 
 **Output:**
 
-- **Score:** 25 / 30
+- **Score:** 30 / 30
 - **Confidence:** high
-- **Rationale:** The solution incorporates effective verification, low latency/cost, and human-in-the-loop safeguards, but deducts slightly because the agent flow is implemented as a rigid sequential script rather than dynamic tool invocation.
+- **Rationale:** The agent engineering is exemplary, featuring a crisp multi-step architecture combining few-shot classification, deterministic local tool verification (src/verify_urgency.py), conditional LLM revision, and a human approval gate. Every agent capability used is purpose-built, verified, and backed by execution trajectory logs and repository files.
 - **Evidence cited:**
-- src/agent_triage.py
 - src/verify_urgency.py
 - Agent trajectory log steps 1-5
-- **Note passed forward:** _(none)_
+- README.md Improvement Changelog
+- **Note passed forward:** The explicit removal of the sentiment analysis LLM call in Iteration 3 shows strong discipline in optimizing cost-efficiency alongside performance.
 
 ### Step 5 - End to End Quality (max 20)
 
@@ -183,18 +178,18 @@ _(none)_
 - _Ask yourself:_ Would the intended user consider this output high quality, or does it read as clearly AI generated?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
+- (Problem & User Value) The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
+- (Agent Solution & Engineering) The explicit removal of the sentiment analysis LLM call in Iteration 3 shows strong discipline in optimizing cost-efficiency alongside performance.
 
 **Output:**
 
 - **Score:** 17 / 20
 - **Confidence:** high
-- **Rationale:** The solution completes a fully functional, self-contained execution loop—incorporating automated classification, deterministic red-flag phrase verification (src/verify_urgency.py), response drafting, and a human approval gate. A single minor deduction is made because the execution quality is demonstrated only against a modest 40-ticket synthetic sample written by the creators.
+- **Rationale:** The agent delivers a complete, realistic pipeline that accurately triages tickets, extracts customer claims, flags churn risk, and generates human-gated draft responses. A minor deduction is made because the output is delivered as flat JSONL files via CLI, which requires further integration to be directly usable by Mara's support team.
 - **Evidence cited:**
-- REPRODUCE.md: 'data/tickets.jsonl — 40 synthetic support tickets we wrote ourselves'
-- src/agent_triage.py
-- Agent trajectory log steps 1-5
-- **Note passed forward:** The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.
+- REPRODUCE.md: python src/agent_triage.py --input data/tickets.jsonl --out results/agent.jsonl
+- README.md: Mara runs a 4-person support team at a mid-size SaaS company.
+- **Note passed forward:** _(none)_
 
 ### Step 6 - Measured Improvement (max 15)
 
@@ -204,19 +199,20 @@ _(none)_
 - _Ask yourself:_ Which changes truly improved the outcome?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
-- (End to End Quality) The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.
+- (Problem & User Value) The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
+- (Agent Solution & Engineering) The explicit removal of the sentiment analysis LLM call in Iteration 3 shows strong discipline in optimizing cost-efficiency alongside performance.
 
 **Output:**
 
 - **Score:** 13 / 15
 - **Confidence:** high
-- **Rationale:** The submission excels at connecting iteration steps directly to quantitative metric changes, including explicitly removing an iteration that added cost without improvement (Iteration 3). A minor point deduction is applied because the gains are evaluated entirely on a small 40-ticket synthetic set, slightly weakening the statistical robustness of the claimed improvements.
+- **Rationale:** The submission provides an exemplary iteration changelog that explicitly links every architectural change (few-shot prompting, verification tool pass, and the explicit removal of ineffective sentiment analysis) to clear quantitative metrics (accuracy, P0/P1 recall, cost, and latency). A minor deduction was made for the limited size of the 40-ticket evaluation set.
 - **Evidence cited:**
 - README.md Improvement Changelog
 - eval/labels.csv
 - eval/results.md
-- **Note passed forward:** The iteration log provides an exemplary model for showing rejected changes alongside successful ones.
+- [OK] claims_have_evidence
+- **Note passed forward:** The explicit rejection of Iteration 3 based on cost-per-ticket metrics also reinforces strong engineering discipline.
 
 ### Step 7 - Reproducibility (max 15)
 
@@ -226,18 +222,18 @@ _(none)_
 - _Ask yourself:_ Could they do it from a clean environment?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
-- (End to End Quality) The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.
-- (Measured Improvement) The iteration log provides an exemplary model for showing rejected changes alongside successful ones.
+- (Problem & User Value) The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
+- (Agent Solution & Engineering) The explicit removal of the sentiment analysis LLM call in Iteration 3 shows strong discipline in optimizing cost-efficiency alongside performance.
+- (Measured Improvement) The explicit rejection of Iteration 3 based on cost-per-ticket metrics also reinforces strong engineering discipline.
 
 **Output:**
 
 - **Score:** 15 / 15
 - **Confidence:** high
-- **Rationale:** The project provides exemplary reproduction documentation in REPRODUCE.md, including precise commands for setup, baseline, agent execution, and evaluation, along with cost/time estimates and all required files present in the repository.
+- **Rationale:** The reproduction guide provides complete step-by-step setup and execution instructions with cost and time estimates, clear commands for baseline, agent, and evaluation, and all referenced files exist in the repository.
 - **Evidence cited:**
 - REPRODUCE.md
-- [OK] repro_paths_exist
+- DETERMINISTIC VERIFICATION FLAGS: [OK] repro_paths_exist
 - **Note passed forward:** _(none)_
 
 ### Step 8 - Hot Take / Insights (max 5)
@@ -248,31 +244,31 @@ _(none)_
 - _Ask yourself:_ What did you learn and how would it change what you build next?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
-- (End to End Quality) The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.
-- (Measured Improvement) The iteration log provides an exemplary model for showing rejected changes alongside successful ones.
+- (Problem & User Value) The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
+- (Agent Solution & Engineering) The explicit removal of the sentiment analysis LLM call in Iteration 3 shows strong discipline in optimizing cost-efficiency alongside performance.
+- (Measured Improvement) The explicit rejection of Iteration 3 based on cost-per-ticket metrics also reinforces strong engineering discipline.
 
 **Output:**
 
 - **Score:** 5 / 5
 - **Confidence:** high
-- **Rationale:** The hot take is exemplary: it clearly identifies a subtle failure mode (signals of urgency missing from single-ticket text), derives a practical generalizable lesson ('re-reading the same ticket harder won't find signal outside the artifact'), and outlines a concrete architectural pivot for future versions.
+- **Rationale:** The hot take provides an exemplary architectural insight derived directly from an observed failure mode ('wrong silence' vs 'wrong tone'), clearly explaining why prompt engineering fails when key context exists outside the immediate artifact and outlining a practical tool-based solution for the next version.
 - **Evidence cited:**
-- README.md: 'Our hot take: verification passes built to catch wrong tone won't catch wrong silence — if the real signal lives outside the artifact you're reviewing (ticket history, not ticket text), no amount of re-reading the same ticket harder will find it.'
-- Verification flag: [OK] hot_take_grounded
+- README.md: 'Our hot take: verification passes built to catch wrong tone won't catch wrong silence — if the real signal lives outside the artifact...'
+- flag: hot_take_grounded
 - **Note passed forward:** _(none)_
 
 ## Final aggregation
 
-- **Total (sum of the six specialist scores):** 90 / 100
+- **Total (sum of the six specialist scores):** 95 / 100
 - **Needs human attention:** False
 - **Low-confidence criteria:** _(none)_
 - **Failed verification checks:** _(none)_
 
 **Accumulated review notes:**
-- (Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.
-- (End to End Quality) The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.
-- (Measured Improvement) The iteration log provides an exemplary model for showing rejected changes alongside successful ones.
+- (Problem & User Value) The target user definition is tied directly to a measured baseline dataset (`data/historical_triage_delay.csv`).
+- (Agent Solution & Engineering) The explicit removal of the sentiment analysis LLM call in Iteration 3 shows strong discipline in optimizing cost-efficiency alongside performance.
+- (Measured Improvement) The explicit rejection of Iteration 3 based on cost-per-ticket metrics also reinforces strong engineering discipline.
 
 > Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision.
 
@@ -306,15 +302,15 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
 ```json
 {
   "target_user": "Support operations leads at high-growth B2B companies processing more than 500 tickets/day",
-  "bottleneck": "Manual triage is slow, inconsistent, and doesn't scale.",
+  "bottleneck": "Manual triage is slow, inconsistent, and doesn't scale, creating mis-routed tickets and delayed escalations.",
   "agent_capabilities_used": [
-    "orchestration",
-    "verification"
+    "verification",
+    "orchestration"
   ],
   "changelog_entries": [
     {
       "stage": "Baseline",
-      "evidence": "~71% accuracy",
+      "evidence": "71% accuracy",
       "decision": "Simple prompt approach"
     },
     {
@@ -329,13 +325,13 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
     },
     {
       "stage": "Final",
-      "evidence": "Delivering massive ROI",
-      "decision": "Production-ready system"
+      "evidence": "Production-ready system delivering massive ROI",
+      "decision": "Final production release"
     }
   ],
   "claimed_results": [
     {
-      "claim": "94.7% classification accuracy (+33% increase over 71% baseline)",
+      "claim": "94.7% classification accuracy (+33% over baseline)",
       "has_supporting_evidence_file": false,
       "supporting_file": ""
     }
@@ -359,7 +355,7 @@ Pure-Python checks run against the ledger from Step 1. These are the checks a si
 |---|---|---|
 | `repro_paths_exist` | PASS | Every path the reproduction guide references is present in the submission's file listing. |
 | `env_var_consistency` | PASS | No env-var/provider mismatch detected. |
-| `claims_have_evidence` | **FLAGGED** | 1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% increase over 71% baseline)']. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value. |
+| `claims_have_evidence` | **FLAGGED** | 1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% over baseline)']. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value. |
 | `hot_take_grounded` | **FLAGGED** | Hot take reads as generic AI-hype rather than a lesson tied to an observed failure in this specific project: "Multi-agent orchestration is clearly superior to single-prompt approaches. The data speaks for itself — more agents working together produces dramatically bette..." |
 
 ## Steps 3-8 - Specialist scoring, one call per criterion
@@ -389,10 +385,10 @@ _(none)_
 
 - **Score:** 13 / 15
 - **Confidence:** high
-- **Rationale:** The submission clearly defines a specific target user (Support operations leads at B2B companies processing >500 tickets/day) and a clear operational bottleneck (slow, inconsistent manual ticket triage). However, the stated financial magnitude ($2.3M lost annually) is asserted without supporting domain citations or user research.
+- **Rationale:** The project clearly identifies a specific user persona (support ops leads at B2B companies handling >500 tickets/day) and articulates a compelling bottleneck around manual ticket triage. A minor point is deducted because the high financial impact claim ($2.3M) lacks basic methodology or context.
 - **Evidence cited:**
-- README.md: 'Support operations leads at high-growth B2B companies lose an estimated $2.3M annually to mis-routed tickets and delayed escalations. Any team processing more than 500 tickets/day faces this exact bottleneck.'
-- **Note passed forward:** The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
+- README.md: 'Support operations leads at high-growth B2B companies lose an estimated $2.3M annually to mis-routed tickets and delayed escalations.'
+- **Note passed forward:** Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
 
 ### Step 4 - Agent Solution & Engineering (max 30)
 
@@ -402,17 +398,17 @@ _(none)_
 - _Ask yourself:_ Which design choices helped the agent solve the problem?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
+- (Problem & User Value) Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
 
 **Output:**
 
 - **Score:** 17 / 30
 - **Confidence:** high
-- **Rationale:** Although the submission organizes agent roles into dedicated modules, the technical engineering is shallow. The pipeline relies on four static sequential prompts without tool integration or dynamic planning, and the QA verification step lacks rigorous checks.
+- **Rationale:** While the project modularizes agents into separate files and runs an orchestration workflow, the agent engineering relies on basic sequential prompt chaining. As noted in the trajectory log, the planner provides a static plan and the QA agent merely re-asks the LLM without performing structured validation, tool usage, or evidence-based verification.
 - **Evidence cited:**
-- Agent trajectory log step 2: 'Single LLM call per role; 'multi-agent' here means four sequential prompts, not four independently useful capabilities.'
-- Agent trajectory log step 3: 'The QA step does not verify anything against ground truth or re-derived evidence -- it just re-asks the model if it's confident.'
-- **Note passed forward:** The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.
+- Agent trajectory log Step 2 note: 'Single LLM call per role; 'multi-agent' here means four sequential prompts, not four independently useful capabilities.'
+- Agent trajectory log Step 3 note: 'The QA step does not verify anything against ground truth or re-derived evidence -- it just re-asks the model if it's confident.'
+- **Note passed forward:** The codebase implements 4 sequential prompt files (planner, classifier, router, qa) in run_triagex.py but lacks actual tool calls or dataset verification in the trajectory logs.
 
 ### Step 5 - End to End Quality (max 20)
 
@@ -422,20 +418,18 @@ _(none)_
 - _Ask yourself:_ Would the intended user consider this output high quality, or does it read as clearly AI generated?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
-- (Agent Solution & Engineering) The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.
+- (Problem & User Value) Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
+- (Agent Solution & Engineering) The codebase implements 4 sequential prompt files (planner, classifier, router, qa) in run_triagex.py but lacks actual tool calls or dataset verification in the trajectory logs.
 
 **Output:**
 
-- **Score:** 6 / 20
+- **Score:** 10 / 20
 - **Confidence:** high
-- **Rationale:** The submission fails to demonstrate end-to-end quality because evaluation outputs and sample ticket runs were omitted entirely, and the project documentation retains visible encoding glitches and generic AI claims.
+- **Rationale:** The submission fails to provide a complete, usable end-to-end experience because no test tickets or datasets are included, as acknowledged in REPRODUCE.md. Additionally, the execution steps in the trajectory log show minimal, unverified outputs (such as the QA step simply outputting ''looks good''), making the solution read like an unpolished draft rather than a production-ready tool.
 - **Evidence cited:**
-- REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons'
-- README.md: 'TriageX â€” enterprise-grade agentic support triage'
-- [FLAGGED] claims_have_evidence: 1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% increase over 71% baseline)']
-- [FLAGGED] hot_take_grounded: Hot take reads as generic AI-hype rather than a lesson tied to an observed failure in this specific project
-- **Note passed forward:** The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.
+- REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'
+- Agent trajectory log: 'output: ''looks good'' (no structured check, no evidence citation, no comparison against any label)'
+- **Note passed forward:** The lack of provided datasets also directly impacts the verifiability of the claimed accuracy improvements.
 
 ### Step 6 - Measured Improvement (max 15)
 
@@ -445,19 +439,19 @@ _(none)_
 - _Ask yourself:_ Which changes truly improved the outcome?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
-- (Agent Solution & Engineering) The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.
-- (End to End Quality) The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.
+- (Problem & User Value) Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
+- (Agent Solution & Engineering) The codebase implements 4 sequential prompt files (planner, classifier, router, qa) in run_triagex.py but lacks actual tool calls or dataset verification in the trajectory logs.
+- (End to End Quality) The lack of provided datasets also directly impacts the verifiability of the claimed accuracy improvements.
 
 **Output:**
 
-- **Score:** 3 / 15
+- **Score:** 4 / 15
 - **Confidence:** high
-- **Rationale:** Although the submission lists an iteration changelog, all accuracy gains are purely claimed text with no evaluation scripts or test datasets submitted in the repo to verify them.
+- **Rationale:** While the changelog outlines a sequence of iterations, the reported metric gains are entirely unverified because the team omitted the evaluation dataset and per-ticket results. Under ground rules, unbacked claims cannot be taken at face value, putting this criterion in the <35% score band.
 - **Evidence cited:**
-- [FLAGGED] claims_have_evidence
+- FLAGGED: claims_have_evidence
 - REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'
-- **Note passed forward:** The lack of evaluation dataset and test results directly undermines all reported quantitative accuracy improvements.
+- **Note passed forward:** The evaluation dataset and test execution code are completely absent from the repository.
 
 ### Step 7 - Reproducibility (max 15)
 
@@ -467,20 +461,20 @@ _(none)_
 - _Ask yourself:_ Could they do it from a clean environment?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
-- (Agent Solution & Engineering) The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.
-- (End to End Quality) The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.
-- (Measured Improvement) The lack of evaluation dataset and test results directly undermines all reported quantitative accuracy improvements.
+- (Problem & User Value) Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
+- (Agent Solution & Engineering) The codebase implements 4 sequential prompt files (planner, classifier, router, qa) in run_triagex.py but lacks actual tool calls or dataset verification in the trajectory logs.
+- (End to End Quality) The lack of provided datasets also directly impacts the verifiability of the claimed accuracy improvements.
+- (Measured Improvement) The evaluation dataset and test execution code are completely absent from the repository.
 
 **Output:**
 
-- **Score:** 4 / 15
+- **Score:** 5 / 15
 - **Confidence:** high
-- **Rationale:** The criterion is largely unmet because a reviewer cannot reproduce the baseline or main accuracy findings from a clean environment. REPRODUCE.md explicitly notes that the evaluation set and test results were omitted for confidentiality reasons, leaving no dataset or test harness to replicate the claimed results.
+- **Rationale:** Although basic setup steps exist to execute run_triagex.py, REPRODUCE.md explicitly acknowledges that the labeled evaluation dataset and per-ticket benchmark results are omitted, leaving judges unable to reproduce or verify the main result.
 - **Evidence cited:**
-- REPRODUCE.md: 'Note: the 94.7% accuracy figure and the 500-ticket benchmark referenced in the README were measured internally; the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'
-- FLAGGED: claims_have_evidence (1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% increase over 71% baseline)'])
-- **Note passed forward:** The evaluation dataset and baseline execution scripts are completely absent from the repository.
+- REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'
+- FLAGGED: claims_have_evidence
+- **Note passed forward:** The explicit omission of test datasets in REPRODUCE.md severely limits the verifiable claims across all evaluation dimensions.
 
 ### Step 8 - Hot Take / Insights (max 5)
 
@@ -490,36 +484,36 @@ _(none)_
 - _Ask yourself:_ What did you learn and how would it change what you build next?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
-- (Agent Solution & Engineering) The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.
-- (End to End Quality) The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.
-- (Measured Improvement) The lack of evaluation dataset and test results directly undermines all reported quantitative accuracy improvements.
-- (Reproducibility) The evaluation dataset and baseline execution scripts are completely absent from the repository.
+- (Problem & User Value) Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
+- (Agent Solution & Engineering) The codebase implements 4 sequential prompt files (planner, classifier, router, qa) in run_triagex.py but lacks actual tool calls or dataset verification in the trajectory logs.
+- (End to End Quality) The lack of provided datasets also directly impacts the verifiability of the claimed accuracy improvements.
+- (Measured Improvement) The evaluation dataset and test execution code are completely absent from the repository.
+- (Reproducibility) The explicit omission of test datasets in REPRODUCE.md severely limits the verifiable claims across all evaluation dimensions.
 
 **Output:**
 
 - **Score:** 1 / 5
 - **Confidence:** high
-- **Rationale:** The hot take lacks any practical learning from failure modes, offering only generic AI hype that multi-agent systems are superior. This directly violates the criterion guidelines and triggers the deterministic verification flag for ungrounded hot takes.
+- **Rationale:** Deducted heavily because the hot take consists of generic hype ('Multi-agent orchestration is clearly superior...') rather than explaining what specific failure mode was observed and how it changes future architecture, directly triggering the FLAGGED verification check.
 - **Evidence cited:**
-- [FLAGGED] hot_take_grounded
+- FLAGGED: hot_take_grounded
 - README.md: 'Multi-agent orchestration is clearly superior to single-prompt approaches. The data speaks for itself — more agents working together produces dramatically better outcomes across the board.'
-- **Note passed forward:** The submission offers no specific failure analysis or empirical insights from building the system.
+- **Note passed forward:** The hot take relies entirely on internal benchmark claims that were not provided in the submission repo.
 
 ## Final aggregation
 
-- **Total (sum of the six specialist scores):** 44 / 100
+- **Total (sum of the six specialist scores):** 50 / 100
 - **Needs human attention:** True
 - **Low-confidence criteria:** _(none)_
 - **Failed verification checks:** `claims_have_evidence`, `hot_take_grounded`
 
 **Accumulated review notes:**
-- (Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.
-- (Agent Solution & Engineering) The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.
-- (End to End Quality) The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.
-- (Measured Improvement) The lack of evaluation dataset and test results directly undermines all reported quantitative accuracy improvements.
-- (Reproducibility) The evaluation dataset and baseline execution scripts are completely absent from the repository.
-- (Hot Take / Insights) The submission offers no specific failure analysis or empirical insights from building the system.
+- (Problem & User Value) Problem and user target are well-defined, though validation metrics/evaluations are missing in evidence ledger for other criteria.
+- (Agent Solution & Engineering) The codebase implements 4 sequential prompt files (planner, classifier, router, qa) in run_triagex.py but lacks actual tool calls or dataset verification in the trajectory logs.
+- (End to End Quality) The lack of provided datasets also directly impacts the verifiability of the claimed accuracy improvements.
+- (Measured Improvement) The evaluation dataset and test execution code are completely absent from the repository.
+- (Reproducibility) The explicit omission of test datasets in REPRODUCE.md severely limits the verifiable claims across all evaluation dimensions.
+- (Hot Take / Insights) The hot take relies entirely on internal benchmark claims that were not provided in the submission repo.
 
 > Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision.
 
@@ -551,7 +545,7 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
 
 ```json
 {
-  "target_user": "Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet",
+  "target_user": "Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet but still need some way to sort incoming tickets by urgency before they start replying.",
   "bottleneck": "Without any tooling, a 2-person team just replies to tickets in the order they arrive, which means an angry churn-risk ticket can sit behind five routine password resets for hours.",
   "agent_capabilities_used": [],
   "changelog_entries": [
@@ -573,19 +567,9 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
   ],
   "claimed_results": [
     {
-      "claim": "Baseline independent scoring achieved 68% agreement with manual ranking",
+      "claim": "81% agreement with manual ranking (up from 68% baseline)",
       "has_supporting_evidence_file": true,
-      "supporting_file": "data/manual_ranking.json"
-    },
-    {
-      "claim": "Batch-level re-ranking achieved 81% agreement with manual ranking",
-      "has_supporting_evidence_file": true,
-      "supporting_file": "data/manual_ranking.json"
-    },
-    {
-      "claim": "Justifications rated 'useful' by 4/5 reviewers",
-      "has_supporting_evidence_file": false,
-      "supporting_file": ""
+      "supporting_file": "evaluate.py"
     }
   ],
   "repro_referenced_paths": [
@@ -615,7 +599,7 @@ Pure-Python checks run against the ledger from Step 1. These are the checks a si
 |---|---|---|
 | `repro_paths_exist` | **FLAGGED** | The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']. A judge following this guide from a clean environment would fail here. |
 | `env_var_consistency` | PASS | No env-var/provider mismatch detected. |
-| `claims_have_evidence` | **FLAGGED** | 1 claim(s) have no specific file/dataset a judge could check: ["Justifications rated 'useful' by 4/5 reviewers"]. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value. |
+| `claims_have_evidence` | PASS | Every headline claim points to a specific, checkable file. |
 | `hot_take_grounded` | PASS | Hot take connects to a specific failure mode observed in this project. |
 
 ## Steps 3-8 - Specialist scoring, one call per criterion
@@ -645,11 +629,11 @@ _(none)_
 
 - **Score:** 15 / 15
 - **Confidence:** high
-- **Rationale:** The submission clearly defines a specific target user (2-3 person support teams at early-stage startups) and a concrete, impactful bottleneck (FIFO ticket ordering causing urgent churn-risk tickets to sit behind routine requests). No weaknesses were identified for this criterion.
+- **Rationale:** The target user (2-3 person support teams at early-stage startups) and the bottleneck (FIFO queue processing causing high-urgency churn risks to sit behind password resets) are clearly defined, highly realistic, and well-motivated. I found no concrete weaknesses for this criterion.
 - **Evidence cited:**
-- README.md: 'Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet'
+- README.md: 'Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet...'
 - README.md: 'Without any tooling, a 2-person team just replies to tickets in the order they arrive, which means an angry churn-risk ticket can sit behind five routine password resets for hours.'
-- **Note passed forward:** _(none)_
+- **Note passed forward:** While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
 
 ### Step 4 - Agent Solution & Engineering (max 30)
 
@@ -659,18 +643,17 @@ _(none)_
 - _Ask yourself:_ Which design choices helped the agent solve the problem?
 
 **Running notes inherited from earlier criteria:**
-_(none)_
+- (Problem & User Value) While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
 
 **Output:**
 
-- **Score:** 21 / 30
+- **Score:** 22 / 30
 - **Confidence:** high
-- **Rationale:** The design choice to use batch context rather than per-ticket isolated scoring is purposeful and well-motivated for relative ticket urgency. However, points were deducted because the required 'config/reranker.yaml' file is missing from the submission repo, and the agent framework remains minimal with no verification or dynamic tools.
+- **Rationale:** The batch re-ranking architecture is a thoughtful design choice that leverages full queue context over isolated prompting. However, points are deducted because the agent relies on a missing configuration file (config/reranker.yaml) to run, and the architecture is a basic two-pass linear chain with no self-verification mechanism.
 - **Evidence cited:**
-- FLAGGED repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']
+- FLAGGED: repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']
 - REPRODUCE.md: python agent/batch_reranker.py --input data/batch1.json --config config/reranker.yaml
-- Agent trajectory log: step 1 (score_each_ticket_independently) -> step 2 (batch_rerank_with_full_context)
-- **Note passed forward:** The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.
+- **Note passed forward:** The missing configuration file config/reranker.yaml directly prevents executing the agent script.
 
 ### Step 5 - End to End Quality (max 20)
 
@@ -680,16 +663,18 @@ _(none)_
 - _Ask yourself:_ Would the intended user consider this output high quality, or does it read as clearly AI generated?
 
 **Running notes inherited from earlier criteria:**
-- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.
+- (Problem & User Value) While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
+- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml directly prevents executing the agent script.
 
 **Output:**
 
 - **Score:** 6 / 20
 - **Confidence:** high
-- **Rationale:** End to End Quality is largely unmet because key execution dependencies like 'config/reranker.yaml' are missing from the repository listing, making it impossible to complete a clean execution of the agent script. Furthermore, no sample output predictions or saved justifications are provided to evaluate if the end result is something a user could directly consume.
+- **Rationale:** The submission fails to provide a complete, executable end-to-end package as key files required for execution (config/reranker.yaml and requirements.txt) are absent, directly triggering a verification flag.
 - **Evidence cited:**
-- [FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json'].
-- **Note passed forward:** The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.
+- FLAGGED repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json'].
+- python agent/batch_reranker.py --input data/batch1.json --config config/reranker.yaml
+- **Note passed forward:** End-to-end execution cannot be verified from scratch because required config and setup files are missing from the repo.
 
 ### Step 6 - Measured Improvement (max 15)
 
@@ -699,19 +684,20 @@ _(none)_
 - _Ask yourself:_ Which changes truly improved the outcome?
 
 **Running notes inherited from earlier criteria:**
-- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.
-- (End to End Quality) The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.
+- (Problem & User Value) While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
+- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml directly prevents executing the agent script.
+- (End to End Quality) End-to-end execution cannot be verified from scratch because required config and setup files are missing from the repo.
 
 **Output:**
 
-- **Score:** 9 / 15
+- **Score:** 8 / 15
 - **Confidence:** high
-- **Rationale:** While the project presents a clear baseline and iterative improvement from 68% to 81% agreement using batch re-ranking, the qualitative human evaluation claim is unsupported by files and the evaluation code cannot be run to verify results.
+- **Rationale:** The project presents a clear baseline (68%) and iteration gain (81%) tied to batch context in its changelog, but missing repo files block full evaluation reproduction, and the test dataset is limited to just 12 tickets.
 - **Evidence cited:**
-- FLAGGED claims_have_evidence: 1 claim(s) have no specific file/dataset a judge could check: ["Justifications rated 'useful' by 4/5 reviewers"]
-- FLAGGED repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']
-- === README.md === Improvement Changelog
-- **Note passed forward:** _(none)_
+- - [FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json'].
+- README.md Improvement Changelog: 'Iteration 1 | Added batch-level re-ranking pass | 81% agreement'
+- Agent trajectory log: 'input': 'batch of 12 tickets'
+- **Note passed forward:** The iteration narrative and hypothesis (batch context > independent scoring) are clear, but evaluation setup is incomplete due to missing config files.
 
 ### Step 7 - Reproducibility (max 15)
 
@@ -721,19 +707,21 @@ _(none)_
 - _Ask yourself:_ Could they do it from a clean environment?
 
 **Running notes inherited from earlier criteria:**
-- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.
-- (End to End Quality) The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.
+- (Problem & User Value) While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
+- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml directly prevents executing the agent script.
+- (End to End Quality) End-to-end execution cannot be verified from scratch because required config and setup files are missing from the repo.
+- (Measured Improvement) The iteration narrative and hypothesis (batch context > independent scoring) are clear, but evaluation setup is incomplete due to missing config files.
 
 **Output:**
 
 - **Score:** 4 / 15
 - **Confidence:** high
-- **Rationale:** A judge attempting to reproduce the submission from a clean environment cannot install dependencies or run the agent script due to missing referenced files (`requirements.txt` and `config/reranker.yaml`). Per rubric rules, severe failure in runnable paths triggers the <35% score band.
+- **Rationale:** A evaluator attempting to reproduce the results from a clean environment will fail during dependency installation and agent execution because `requirements.txt` and `config/reranker.yaml` are missing from the submission.
 - **Evidence cited:**
 - [FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json'].
-- REPRODUCE.md: pip install -r requirements.txt
-- REPRODUCE.md: python agent/batch_reranker.py --input data/batch1.json --config config/reranker.yaml
-- **Note passed forward:** Reproducibility fails immediately at setup due to missing requirements.txt and config/reranker.yaml.
+- REPRODUCE.md: `pip install -r requirements.txt`
+- REPRODUCE.md: `python agent/batch_reranker.py --input data/batch1.json --config config/reranker.yaml`
+- **Note passed forward:** The missing config file blocks running the agent script and evaluation script entirely.
 
 ### Step 8 - Hot Take / Insights (max 5)
 
@@ -743,30 +731,36 @@ _(none)_
 - _Ask yourself:_ What did you learn and how would it change what you build next?
 
 **Running notes inherited from earlier criteria:**
-- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.
-- (End to End Quality) The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.
-- (Reproducibility) Reproducibility fails immediately at setup due to missing requirements.txt and config/reranker.yaml.
+- (Problem & User Value) While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
+- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml directly prevents executing the agent script.
+- (End to End Quality) End-to-end execution cannot be verified from scratch because required config and setup files are missing from the repo.
+- (Measured Improvement) The iteration narrative and hypothesis (batch context > independent scoring) are clear, but evaluation setup is incomplete due to missing config files.
+- (Reproducibility) The missing config file blocks running the agent script and evaluation script entirely.
 
 **Output:**
 
 - **Score:** 5 / 5
 - **Confidence:** high
-- **Rationale:** The hot take offers a sharp, practical lesson directly tied to the experiment's findings, highlighting that ticket urgency is relative to queue context rather than an absolute property of individual ticket text.
+- **Rationale:** The hot take provides a clear, grounded, and practical architectural insight—that urgency is relative to queue context rather than an absolute ticket property—directly derived from observed failure modes in their baseline vs. batch re-ranking iteration.
 - **Evidence cited:**
-- README.md: 'Scoring tickets independently throws away information — urgency is relative to what else is in the queue right now, not an absolute property of the ticket text. Batch context mattered more than better per-ticket prompting.'
-- **Note passed forward:** _(none)_
+- README.md: 'Scoring tickets independently throws away information — urgency is relative to what else is in the queue right now, not an absolute property of the ticket text.'
+- [OK] hot_take_grounded
+- **Note passed forward:** The insight is exceptionally strong and well-supported by the project's iteration trajectory.
 
 ## Final aggregation
 
 - **Total (sum of the six specialist scores):** 60 / 100
 - **Needs human attention:** True
 - **Low-confidence criteria:** _(none)_
-- **Failed verification checks:** `repro_paths_exist`, `claims_have_evidence`
+- **Failed verification checks:** `repro_paths_exist`
 
 **Accumulated review notes:**
-- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.
-- (End to End Quality) The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.
-- (Reproducibility) Reproducibility fails immediately at setup due to missing requirements.txt and config/reranker.yaml.
+- (Problem & User Value) While Problem & User Value is clear, note that reproduction paths are missing files (requirements.txt, config/reranker.yaml, out/predictions.json), which should be penalized under execution/reproducibility criteria.
+- (Agent Solution & Engineering) The missing configuration file config/reranker.yaml directly prevents executing the agent script.
+- (End to End Quality) End-to-end execution cannot be verified from scratch because required config and setup files are missing from the repo.
+- (Measured Improvement) The iteration narrative and hypothesis (batch context > independent scoring) are clear, but evaluation setup is incomplete due to missing config files.
+- (Reproducibility) The missing config file blocks running the agent script and evaluation script entirely.
+- (Hot Take / Insights) The insight is exceptionally strong and well-supported by the project's iteration trajectory.
 
 > Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision.
 
@@ -809,7 +803,7 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
 
 ```json
 {
-  "target_user": "Research-development officers at small university departments",
+  "target_user": "Research-development officers at small university departments.",
   "bottleneck": "A funding call is 3-8 pages of eligibility rules, scope language, and priorities. Matching it to a faculty member means holding the call's constraints in your head while reading someone's publication list and deciding whether the fit is real or superficial. It's a comparison task across two long, messy documents, done 60 times per call, and the officer's attention degrades after the first fifteen.",
   "agent_capabilities_used": [
     "verification",
@@ -850,7 +844,7 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
   ],
   "claimed_results": [
     {
-      "claim": "nDCG@10 vs. officer ranking improved from 0.58 (baseline) to 0.76 (GrantMatch) across 8 calls",
+      "claim": "nDCG@10 vs officer ranking improved from 0.58 (baseline) to 0.76 (GrantMatch)",
       "has_supporting_evidence_file": true,
       "supporting_file": "eval/officer_rankings.json"
     },
@@ -873,6 +867,7 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
     "results/baseline.json",
     "src/grantmatch.py",
     "results/agent.json",
+    "results/agent_trace/",
     "eval/score.py",
     "eval/officer_rankings.json",
     "eval/results.md",
@@ -881,7 +876,7 @@ PanelAssist processes one submission as a fixed pipeline: **1** evidence extract
   "repro_referenced_env_vars": [
     "ANTHROPIC_API_KEY"
   ],
-  "hot_take_text": "The remaining errors are near-misses on interdisciplinary faculty: someone whose work genuinely spans two areas gets a middling score in both instead of a high score for the combination, because each step evaluates fit one dimension at a time. The checker doesn't help here - the reason is supported, it's just underweight. Hot take: every agent in this pipeline had to earn its place in the metric, not the diagram. Three of the four steps moved nDCG or the constraint-violation count; the fourth (the removed advocate) moved neither and we cut it even though it made the architecture diagram look more thorough. The lesson we're taking forward: add the step, measure, and be willing to delete it the same day if the number doesn't move - 'it seems like it should help' is how you end up paying 35% more for a loop.",
+  "hot_take_text": "The remaining errors are near-misses on interdisciplinary faculty: someone whose work genuinely spans two areas gets a middling score in both instead of a high score for the combination, because each step evaluates fit one dimension at a time. The checker doesn't help here - the reason is supported, it's just underweight. Hot take: every agent in this pipeline had to earn its place in the metric, not the diagram. Three of the four steps moved nDCG or the constraint-violation count; the fourth (the removed advocate) moved neither and we cut it even though it made the architecture diagram look more thorough. The lesson we're taking forward: add the step, measure, and be willing to delete it the same day if the number doesn't move - \"it seems like it should help\" is how you end up paying 35% more for a loop.",
   "hot_take_is_generic": false,
   "human_approval_gate_present": true
 }
@@ -923,14 +918,13 @@ _(none)_
 
 **Output:**
 
-- **Score:** 14 / 15
+- **Score:** 15 / 15
 - **Confidence:** high
-- **Rationale:** calculated deduction for using synthetic faculty profiles instead of live department data. Otherwise, the project defines an extremely clear, real-world user persona and concrete bottleneck with high impact.
+- **Rationale:** The submission identifies an exceptionally clear, specific target user (RD officers at small university departments) and a well-defined operational bottleneck (cross-referencing complex grant calls against 60 faculty profiles in ~90 minutes per call). The value proposition is concrete and directly validated with ground-truth rankings from an actual RD officer.
 - **Evidence cited:**
-- README.md: 'Research-development officers at small university departments.'
-- README.md: 'The officer we worked with spends about 90 minutes per call cross-referencing the call text against faculty pages and past awards.'
-- REPRODUCE.md: 'data/faculty.json - 60 synthetic faculty profiles we generated'
-- **Note passed forward:** The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
+- README.md ('Who has this problem', 'The bottleneck')
+- target_user: Research-development officers at small university departments.
+- **Note passed forward:** Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
 
 ### Step 4 - Agent Solution & Engineering (max 30)
 
@@ -940,17 +934,18 @@ _(none)_
 - _Ask yourself:_ Which design choices helped the agent solve the problem?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
+- (Problem & User Value) Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
 
 **Output:**
 
 - **Score:** 26 / 30
 - **Confidence:** high
-- **Rationale:** GrantMatch demonstrates strong engineering with a purposeful four-agent pipeline (parser, researcher, matcher, checker) featuring verification and explicit human-in-the-loop checkpoints. A minor weakness is the reliance on a fixed sequential workflow that evaluates candidates independently along isolated dimensions, limiting its ability to resolve complex interdisciplinary fits.
+- **Rationale:** The solution demonstrates outstanding agent engineering with a modular 4-stage pipeline, explicit hard-constraint parsing, a dedicated verification step, and evidence-driven architectural pruning (removing the advocate agent when it added 35% cost without nDCG gains). A minor deduction is made for the single-dimensional scoring logic in the matcher step that fails to effectively handle interdisciplinary profiles.
 - **Evidence cited:**
-- README.md: 'The remaining errors are near-misses on interdisciplinary faculty... because each step evaluates fit one dimension at a time.'
-- Agent trajectory log: steps 1-5 detail a static pipeline (call_parser -> faculty_researcher -> matcher -> checker).
-- **Note passed forward:** The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.
+- README.md ('Main failure mode and hot take: The remaining errors are near-misses on interdisciplinary faculty...')
+- Iteration 4 (removed) entry in README.md changelog
+- Agent trajectory log (steps 1-6)
+- **Note passed forward:** _(none)_
 
 ### Step 5 - End to End Quality (max 20)
 
@@ -960,17 +955,17 @@ _(none)_
 - _Ask yourself:_ Would the intended user consider this output high quality, or does it read as clearly AI generated?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
-- (Agent Solution & Engineering) The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.
+- (Problem & User Value) Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
 
 **Output:**
 
 - **Score:** 17 / 20
 - **Confidence:** high
-- **Rationale:** The pipeline delivers a complete, highly practical, and self-contained workflow that generates clean, actionable shortlists (`shortlist.md`) with explicit verification checks and reasonings tailored directly for research-development officers. A minor deduction is made because the output degrades on interdisciplinary candidates, who receive suboptimal rankings due to single-dimension scoring logic.
+- **Rationale:** The solution produces a complete, highly usable, verified shortlist formatted cleanly for RD officers with hard-constraint flags and factual reasons. A minor quality limitation remains where interdisciplinary candidates receive middling scores because evaluation occurs along one topic dimension at a time.
 - **Evidence cited:**
 - README.md: 'The remaining errors are near-misses on interdisciplinary faculty: someone whose work genuinely spans two areas gets a middling score in both instead of a high score for the combination, because each step evaluates fit one dimension at a time.'
-- **Note passed forward:** _(none)_
+- REPRODUCE.md: Writes results/agent.json (ranked shortlist + reasons + hard-constraint flags per call)
+- **Note passed forward:** Faculty dataset consists of 60 synthetic profiles matched against 8 real agency grant calls.
 
 ### Step 6 - Measured Improvement (max 15)
 
@@ -980,19 +975,20 @@ _(none)_
 - _Ask yourself:_ Which changes truly improved the outcome?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
-- (Agent Solution & Engineering) The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.
+- (Problem & User Value) Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
+- (End to End Quality) Faculty dataset consists of 60 synthetic profiles matched against 8 real agency grant calls.
 
 **Output:**
 
 - **Score:** 15 / 15
 - **Confidence:** high
-- **Rationale:** The submission provides an exemplary evaluation with a fair baseline, granular iteration tracking across multiple quantitative metrics (nDCG@10, hard-constraint violations, unsupported reason rate), full trade-off reporting (cost and latency), and empirical justification for removing an unproductive agent step.
+- **Rationale:** The submission demonstrates exemplary measured improvement, starting from a clear baseline (0.58 nDCG@10) and connecting every iteration step to quantitative evaluation metrics. Notably, it includes a negative result (Iteration 4 advocate agent cut due to 0 nDCG gain and +35% cost), proving metric-driven rigor.
 - **Evidence cited:**
-- eval/officer_rankings.json
+- README.md Improvement Changelog
 - eval/score.py
-- README.md (Improvement Changelog)
-- **Note passed forward:** _(none)_
+- eval/officer_rankings.json
+- [OK] claims_have_evidence
+- **Note passed forward:** The evaluation relies on 60 synthetic faculty profiles matched against 8 real public grant calls, but human officer ground-truth rankings were established prior to testing.
 
 ### Step 7 - Reproducibility (max 15)
 
@@ -1002,19 +998,19 @@ _(none)_
 - _Ask yourself:_ Could they do it from a clean environment?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
-- (Agent Solution & Engineering) The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.
+- (Problem & User Value) Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
+- (End to End Quality) Faculty dataset consists of 60 synthetic profiles matched against 8 real agency grant calls.
+- (Measured Improvement) The evaluation relies on 60 synthetic faculty profiles matched against 8 real public grant calls, but human officer ground-truth rankings were established prior to testing.
 
 **Output:**
 
 - **Score:** 15 / 15
 - **Confidence:** high
-- **Rationale:** The submission provides an exemplary, complete reproduction guide in REPRODUCE.md, including exact environment dependencies, cost/runtime expectations, clean step-by-step commands for running the baseline, agent, and evaluation script, and all referenced files and paths exist.
+- **Rationale:** The reproduction guide in REPRODUCE.md is exceptionally thorough and clear, providing exact CLI commands, environment setup, API keys, runtime/cost expectations, and verification paths that all match the repository listing.
 - **Evidence cited:**
 - REPRODUCE.md
-- [OK] repro_paths_exist
-- [OK] env_var_consistency
-- [OK] claims_have_evidence
+- DETERMINISTIC VERIFICATION FLAGS: [OK] repro_paths_exist
+- DETERMINISTIC VERIFICATION FLAGS: [OK] env_var_consistency
 - **Note passed forward:** _(none)_
 
 ### Step 8 - Hot Take / Insights (max 5)
@@ -1025,19 +1021,19 @@ _(none)_
 - _Ask yourself:_ What did you learn and how would it change what you build next?
 
 **Running notes inherited from earlier criteria:**
-- (Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
-- (Agent Solution & Engineering) The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.
+- (Problem & User Value) Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
+- (End to End Quality) Faculty dataset consists of 60 synthetic profiles matched against 8 real agency grant calls.
+- (Measured Improvement) The evaluation relies on 60 synthetic faculty profiles matched against 8 real public grant calls, but human officer ground-truth rankings were established prior to testing.
 
 **Output:**
 
-- **Score:** 5 / 5
+- **Score:** 4 / 5
 - **Confidence:** high
-- **Rationale:** The submission articulates an exemplary insight grounded in empirical observation: analyzing why interdisciplinary faculty are mis-scored and deriving a concrete architectural rule that every agent step must empirically move metrics rather than just populate architecture diagrams.
+- **Rationale:** The submission offers a very strong, grounded insight into agent system design, specifically highlighting how an advocate agent loop added 35% cost without improving nDCG and was cut. A minor deduction is applied because the write-up identifies a key failure mode (interdisciplinary fit being underweighted) without detailing how they would alter the pipeline to solve it next.
 - **Evidence cited:**
-- README.md: 'Hot take: every agent in this pipeline had to earn its place in the metric, not the diagram.'
-- README.md: 'The remaining errors are near-misses on interdisciplinary faculty... because each step evaluates fit one dimension at a time.'
-- DETERMINISTIC VERIFICATION FLAGS: [OK] hot_take_grounded
-- **Note passed forward:** The pruning of the 5th 'advocate' agent (Iteration 4) serves as both an iteration win and the basis for a strong hot take.
+- README.md ('Main failure mode and hot take')
+- DETERMINISTIC VERIFICATION FLAGS ([OK] hot_take_grounded)
+- **Note passed forward:** _(none)_
 
 ## Final aggregation
 
@@ -1047,9 +1043,9 @@ _(none)_
 - **Failed verification checks:** _(none)_
 
 **Accumulated review notes:**
-- (Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.
-- (Agent Solution & Engineering) The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.
-- (Hot Take / Insights) The pruning of the 5th 'advocate' agent (Iteration 4) serves as both an iteration win and the basis for a strong hot take.
+- (Problem & User Value) Ground truth is based on synthetic faculty profiles (`data/faculty.json`), though matched against 8 real public grant calls.
+- (End to End Quality) Faculty dataset consists of 60 synthetic profiles matched against 8 real agency grant calls.
+- (Measured Improvement) The evaluation relies on 60 synthetic faculty profiles matched against 8 real public grant calls, but human officer ground-truth rankings were established prior to testing.
 
 > Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision.
 
