@@ -85,7 +85,7 @@ def main():
         f"approaches). Deterministic checks run once (they are pure functions). "
         f"LLM checks run {args.llm_runs}x per submission to measure "
         f"reproducibility. Extra cost of the LLM approach over the full "
-        f"6-submission set: **{llm_verify_calls} LLM calls** "
+        f"{len(subs)}-submission set: **{llm_verify_calls} LLM calls** "
         f"({llm_verify_calls // len(subs)} per submission x {len(subs)}), "
         f"vs. **0** for the deterministic checks.\n"
     )

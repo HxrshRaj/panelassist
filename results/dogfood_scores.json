@@ -4,7 +4,7 @@
       "slug": "panelassist_self",
       "evidence_ledger": {
         "target_user": "micro1 hackathon judge",
-        "bottleneck": "A tired judge under time pressure scoring dozens of submissions misses evidence-free claims, unverified file paths, and generic AI-hype insights.",
+        "bottleneck": "A tired judge under time pressure scoring dozens of submissions easily misses evidence-free claims, ungrounded hot takes, and broken reproduction file references.",
         "agent_capabilities_used": [
           "verification",
           "memory",
@@ -14,83 +14,105 @@
         "changelog_entries": [
           {
             "stage": "Baseline",
-            "evidence": "Single prompt on raw submission text scored MAE 5.33 and Spearman 1.000 vs human panel",
-            "decision": "Starting point baseline"
+            "evidence": "Single prompt on raw submission text scored MAE 5.33, Spearman 1.000 vs. human panel.",
+            "decision": "Starting point baseline."
           },
           {
             "stage": "+ Evidence ledger",
-            "evidence": "Scoring from extracted ledger instead of raw text increased MAE to 10.17",
-            "decision": "Hurt performance by compressing out nuance and making incomplete submissions look tidy; rejected as standalone change"
+            "evidence": "Scoring from extracted ledger instead of raw text degraded MAE to 10.17 by compressing out context nuance.",
+            "decision": "Rejected / hurt performance."
           },
           {
             "stage": "+ Specialist split",
-            "evidence": "One call per criterion with cross-criterion memory brought MAE down to 8.67",
-            "decision": "Partial recovery by splitting tasks and carrying notes across criteria"
+            "evidence": "One call per criterion with shared ledger and running memory improved MAE to 8.67.",
+            "decision": "Partial recovery (-1.5 MAE)."
           },
           {
             "stage": "+ Verification (final)",
-            "evidence": "Deterministic checks fed specialist calls, lowering MAE to 6.33 and achieving 3/3 seeded defect recall with 0 false alarms",
-            "decision": "Kept - biggest positive contributor and only stage that catches planted defects"
+            "evidence": "Deterministic Python checks reduced total MAE to 6.33, improved Reproducibility MAE to 0.67, and achieved 1.00 recall/precision on planted defects.",
+            "decision": "Kept as primary positive contributor."
           }
         ],
         "claimed_results": [
           {
-            "claim": "1.00 (3/3) seeded-issue recall vs 0.00 for baseline",
+            "claim": "Seeded-issue recall 1.00 (3/3 planted defects caught)",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/RESULTS.md"
           },
           {
-            "claim": "1.00 seeded-issue precision with 0 false alarms on clean control",
+            "claim": "Seeded-issue precision 1.00 (0 false alarms on clean control)",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/RESULTS.md"
           },
           {
-            "claim": "0.67 Reproducibility sub-score MAE vs 1.17 baseline MAE",
+            "claim": "Reproducibility sub-score MAE 0.67 vs. human (vs 1.17 baseline)",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/RESULTS.md"
           },
           {
-            "claim": "Deterministic verification pass reduced total score MAE by 2.34 points over specialist split",
+            "claim": "Total-score MAE vs. human 6.33 (Baseline 5.33)",
             "has_supporting_evidence_file": true,
-            "supporting_file": "eval/ABLATIONS.md"
+            "supporting_file": "eval/RESULTS.md"
+          },
+          {
+            "claim": "Spearman rank correlation 0.943 vs. human (Baseline 1.000)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/RESULTS.md"
           }
         ],
         "repro_referenced_paths": [
           "requirements.txt",
           ".env",
+          "common/llm.py",
           "baseline/baseline_scorer.py",
-          "agent/run_agent.py",
-          "eval/run_eval.py",
-          "eval/run_ablation.py",
-          "eval/run_removed_experiment.py",
-          "agent/render_trajectories.py",
-          "rubric.py",
-          "data/human_scores.json",
           "results/baseline_scores.json",
+          "data/submissions/",
+          "agent/run_agent.py",
           "results/agent_scores.json",
           "trajectories/panelassist_runs.json",
+          "eval/run_eval.py",
+          "data/human_scores.json",
           "eval/results.json",
           "eval/RESULTS.md",
+          "eval/run_ablation.py",
           "eval/ABLATIONS.md",
-          "trajectories/TRAJECTORIES.md"
+          "eval/run_removed_experiment.py",
+          "agent/panelassist/verify_llm.py",
+          "agent/panelassist/verify.py",
+          "eval/REMOVED_EXPERIMENT.md",
+          "dogfood/panelassist_self/",
+          "results/dogfood_scores.json",
+          "trajectories/dogfood_runs.json",
+          "agent/render_trajectories.py",
+          "trajectories/DOGFOOD_TRAJECTORY.md",
+          "trajectories/TRAJECTORIES.md",
+          "rubric.py"
         ],
         "repro_referenced_env_vars": [
           "LLM_PROVIDER",
+          "LATENTSTACK_API_KEY",
+          "LATENTSTACK_MODEL",
+          "LATENTSTACK_BASE_URL",
           "GEMINI_API_KEY",
           "GEMINI_MODEL",
           "ANTHROPIC_API_KEY",
           "ANTHROPIC_MODEL"
         ],
-        "hot_take_text": "I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel. What survived measurement was the least clever part: a pure-Python pass that checks whether each headline claim names a file and whether the repro guide's paths exist. You don't fix 'not looking' with a smarter model; you fix it with a deterministic step that runs every time and leaves a citation behind.",
+        "hot_take_text": "I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel. What survived measurement was the least clever part: a pure-Python pass that checks whether each headline claim names a file and whether the repro guide's paths exist. That is the failure a rushed judge actually makes - not misjudging, but not looking - and you don't fix 'not looking' with a smarter model, because the strong model is already a decent holistic judge. You fix it with a deterministic step that runs every time and leaves a citation behind. The lesson I am taking to the next agent: when a cheap deterministic check and an LLM call can do the same job, measure both before you assume the LLM is the upgrade - here the check won on accuracy, cost, and reproducibility, and the six extra model calls were the thing to cut.",
         "hot_take_is_generic": false,
         "human_approval_gate_present": true
       },
       "verification_flags": [
         {
           "check": "repro_paths_exist",
-          "passed": true,
-          "missing_paths": [],
-          "detail": "Every path the reproduction guide references is present in the submission's file listing."
+          "passed": false,
+          "missing_paths": [
+            "dogfood/panelassist_self/",
+            "results/dogfood_scores.json",
+            "trajectories/dogfood_runs.json",
+            "trajectories/DOGFOOD_TRAJECTORY.md"
+          ],
+          "detail": "The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md']. A judge following this guide from a clean environment would fail here."
         },
         {
           "check": "env_var_consistency",
@@ -112,91 +134,106 @@
       "per_criterion": {
         "problem_user_value": {
           "score": 15,
-          "rationale": "The submission identifies an exceptionally clear target user (a micro1 hackathon judge) and solves a compelling bottleneck: tired judges under time pressure overlooking unverified claims and broken reproduction guides.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The project defines an exceptionally clear target user (micro1 hackathon judges) and articulates a precise bottleneck (rushed judges missing evidence-free claims and broken repro paths), demonstrating deep user understanding without any identifiable gaps in problem formulation.",
           "evidence_citations": [
             "README.md: \"The user is a micro1 hackathon judge. This challenge alone drew 8,300+ registrations, all to be scored against a published 100-point rubric...\"",
             "README.md: \"The bottleneck is not 'reading takes time' - it is that a tired judge under time pressure, scoring their fortieth submission of the day, is exactly who a confidently-worded but evidence-free submission slips past.\""
           ],
           "confidence": "high",
-          "note_for_other_criteria": "Target user (micro1 hackathon judge) and bottleneck (scoring pressure leading to unverified claims) are clearly defined and directly motivate the tool's evidence-verification design.",
+          "note_for_other_criteria": "Target user and problem framing focus specifically on pre-screening submissions to assist human hackathon judges.",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 29,
-          "rationale": "PanelAssist demonstrates strong, purposeful agent engineering by combining deterministic Python verification tools with specialist scoring calls and cross-criterion memory, backed by rigorous ablation testing of each design choice.",
+          "score": 22,
+          "weaknesses_deducted_for": [
+            "Verification flag FLAGGED for missing paths in reproduction guide ('dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md'), breaking execution of the dogfood agent commands.",
+            "The multi-stage LLM agent architecture and evidence ledger extraction degraded overall scoring calibration and accuracy compared to a single-prompt baseline (MAE 6.33 vs 5.33 baseline; evidence ledger stage alone degraded MAE to 10.17)."
+          ],
+          "rationale": "While the agent design features good modularity, deterministic Python verification tools, and cross-criterion memory, points are deducted because the multi-call LLM orchestration/ledger compression hurt core scoring performance compared to the baseline, and a deterministic verification flag was triggered for missing referenced dogfood trajectory paths.",
           "evidence_citations": [
-            "agent/panelassist/verify.py",
-            "agent/panelassist/memory.py",
-            "eval/ABLATIONS.md"
+            "[FLAGGED] repro_paths_exist: The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md'].",
+            "README.md: 'Scoring from extracted ledger instead of raw text degraded MAE to 10.17 by compressing out context nuance.'",
+            "README.md: 'Total-score MAE vs. human 6.33 (Baseline 5.33)'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The deterministic verification tool was the single biggest positive engineering contributor, achieving 100% recall on seeded defects where standard LLM calls failed.",
+          "note_for_other_criteria": "The deterministic Python verification module succeeded in catching 100% of seeded defects, demonstrating that pure-Python checks outperformed LLM verification tools in the pipeline.",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
-          "score": 20,
-          "rationale": "PanelAssist executes a complete end-to-end evaluation pipeline that produces usable, highly polished advisory reports with verifiable evidence citations and honest ablation trade-offs that a human judge would confidently sign off on.",
+          "score": 12,
+          "weaknesses_deducted_for": [
+            "The submission is missing the `dogfood/panelassist_self/` directory and associated output/trajectory paths referenced in REPRODUCE.md, causing the end-to-end execution of the dogfooding workflow to fail in a clean environment."
+          ],
+          "rationale": "The output artifacts, reports, and code reflect high polish and professional craftsmanship rather than an unedited AI draft. However, the end-to-end execution is incomplete because the dogfooding directory referenced in REPRODUCE.md Step 8 was omitted from the repository files, breaking that execution path.",
           "evidence_citations": [
-            "eval/RESULTS.md",
-            "trajectories/TRAJECTORIES.md",
-            "results/agent_scores.json",
-            "[OK] claims_have_evidence"
+            "[FLAGGED] repro_paths_exist: The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md']."
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The solution demonstrates complete end-to-end quality, producing fully structured advisory reports and human attention flags with high finish and transparency.",
+          "note_for_other_criteria": "The missing dogfood directory directly impacts execution of Step 8 in REPRODUCE.md.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
-          "score": 15,
-          "rationale": "The submission demonstrates exceptional rigor in measured improvement, providing a detailed four-stage ablation study against a fair single-prompt baseline with clear empirical evidence for every change. It transparently reports negative results where architectural additions degraded performance alongside the deterministic verification change that provided the greatest positive gain.",
+          "score": 12,
+          "weaknesses_deducted_for": [
+            "The final multi-step agent regressed on core overall scoring accuracy compared to the single-prompt baseline (total MAE 6.33 vs. 5.33; Spearman correlation 0.943 vs. 1.000), meaning iteration did not yield net gains on primary score alignment."
+          ],
+          "rationale": "The submission provides an exemplary, highly disciplined changelog and ablation methodology that isolates each step's quantitative impact against a fair baseline. However, points are deducted because the iterated agent ultimately regressed on overall total-score MAE and Spearman correlation relative to the simple single-prompt baseline.",
           "evidence_citations": [
-            "README.md: 'Improvement Changelog' table and ablation breakdown",
-            "eval/ABLATIONS.md",
-            "Claim: 'Deterministic verification pass reduced total score MAE by 2.34 points over specialist split'"
+            "eval/RESULTS.md: Total-score MAE vs. human 6.33 (Baseline 5.33)",
+            "eval/RESULTS.md: Spearman rank correlation 0.943 vs. human (Baseline 1.000)",
+            "eval/ABLATIONS.md: Baseline (5.33 MAE) -> + Evidence ledger (10.17 MAE) -> + Specialist split (8.67 MAE) -> + Verification (6.33 MAE)"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "Transparently documented that deterministic verification was the single biggest positive contributor to defect detection and Reproducibility score improvement.",
+          "note_for_other_criteria": "While total score accuracy regressed overall, the deterministic verification layer specifically delivered clear gains in defect recall (1.00 vs 0.00) and Reproducibility sub-score MAE (0.67 vs 1.17).",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
-          "score": 15,
-          "rationale": "REPRODUCE.md provides complete step-by-step setup instructions, environment variable configurations, and exact command sequences to reproduce the baseline, main agent, evaluations, and ablations from a clean environment. Deterministic checks confirm that every path referenced in the reproduction guide exists in the repository.",
+          "score": 5,
+          "weaknesses_deducted_for": [
+            "REPRODUCE.md Step 8 relies on `dogfood/panelassist_self/` and dogfood trajectory/result paths that are missing from the repository, causing reproduction from a clean environment to fail."
+          ],
+          "rationale": "Although REPRODUCE.md contains setup instructions and provider options, deterministic verification flagged 4 referenced paths missing from the repository. Because a verification flag hits this criterion directly, the score falls into the <35% score band.",
           "evidence_citations": [
-            "REPRODUCE.md",
-            "[OK] repro_paths_exist: Every path the reproduction guide references is present in the submission's file listing."
+            "[FLAGGED] repro_paths_exist: The reproduction guide references 4 path(s) not present anywhere in the submission: ['dogfood/panelassist_self/', 'results/dogfood_scores.json', 'trajectories/dogfood_runs.json', 'trajectories/DOGFOOD_TRAJECTORY.md']",
+            "REPRODUCE.md: '8. Dogfood - run PanelAssist on its own submission'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The setup and reproduction workflow is fully documented and confirmed working against existing repo paths.",
+          "note_for_other_criteria": "Execution of dogfooding instructions in Step 8 fails due to missing files in the submission.",
           "criterion_id": "reproducibility",
           "max_points": 15
         },
         "hot_take_insights": {
           "score": 5,
-          "rationale": "The hot take directly turns an observed failure mode\u2014that complex multi-call orchestration slightly worsened scoring calibration compared to a single prompt\u2014into an actionable practical lesson on favoring deterministic checks over extra LLM machinery. It clearly states what was learned from ablations and how it directly changes what the author will build next.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The hot take is exemplary, turning an honest negative result from their ablation (that a 7-call agent slightly degraded total MAE vs a single prompt) into a profound, grounded lesson about using deterministic checks instead of LLM calls when applicable.",
           "evidence_citations": [
-            "README.md: \"I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel.\"",
-            "DETERMINISTIC VERIFICATION FLAG: [OK] hot_take_grounded"
+            "hot_take_text: 'I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel...'",
+            "DETERMINISTIC VERIFICATION FLAGS: [OK] hot_take_grounded: Hot take connects to a specific failure mode observed in this project."
           ],
           "confidence": "high",
-          "note_for_other_criteria": "",
+          "note_for_other_criteria": "The author's hot take transparently highlights that deterministic checks were the primary positive contributor to performance gains over the baseline.",
           "criterion_id": "hot_take_insights",
           "max_points": 5
         }
       },
-      "total": 99,
-      "needs_human_attention": false,
+      "total": 71,
+      "needs_human_attention": true,
       "low_confidence_criteria": [],
-      "flagged_checks": [],
+      "flagged_checks": [
+        "repro_paths_exist"
+      ],
       "review_notes": [
-        "(Problem & User Value) Target user (micro1 hackathon judge) and bottleneck (scoring pressure leading to unverified claims) are clearly defined and directly motivate the tool's evidence-verification design.",
-        "(Agent Solution & Engineering) The deterministic verification tool was the single biggest positive engineering contributor, achieving 100% recall on seeded defects where standard LLM calls failed.",
-        "(End to End Quality) The solution demonstrates complete end-to-end quality, producing fully structured advisory reports and human attention flags with high finish and transparency.",
-        "(Measured Improvement) Transparently documented that deterministic verification was the single biggest positive contributor to defect detection and Reproducibility score improvement.",
-        "(Reproducibility) The setup and reproduction workflow is fully documented and confirmed working against existing repo paths."
+        "(Problem & User Value) Target user and problem framing focus specifically on pre-screening submissions to assist human hackathon judges.",
+        "(Agent Solution & Engineering) The deterministic Python verification module succeeded in catching 100% of seeded defects, demonstrating that pure-Python checks outperformed LLM verification tools in the pipeline.",
+        "(End to End Quality) The missing dogfood directory directly impacts execution of Step 8 in REPRODUCE.md.",
+        "(Measured Improvement) While total score accuracy regressed overall, the deterministic verification layer specifically delivered clear gains in defect recall (1.00 vs 0.00) and Reproducibility sub-score MAE (0.67 vs 1.17).",
+        "(Reproducibility) Execution of dogfooding instructions in Step 8 fails due to missing files in the submission.",
+        "(Hot Take / Insights) The author's hot take transparently highlights that deterministic checks were the primary positive contributor to performance gains over the baseline."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     }
@@ -205,51 +242,51 @@
     {
       "label": "extract:panelassist_self",
       "provider": "latentstack",
-      "input_tokens": 8148,
-      "output_tokens": 3999,
-      "seconds": 23.537
+      "input_tokens": 9667,
+      "output_tokens": 3110,
+      "seconds": 19.706
     },
     {
       "label": "score:panelassist_self:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 8924,
-      "output_tokens": 908,
-      "seconds": 9.117
+      "input_tokens": 10945,
+      "output_tokens": 1575,
+      "seconds": 15.362
     },
     {
       "label": "score:panelassist_self:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 8980,
-      "output_tokens": 1112,
-      "seconds": 13.002
+      "input_tokens": 10985,
+      "output_tokens": 1990,
+      "seconds": 15.991
     },
     {
       "label": "score:panelassist_self:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 9034,
-      "output_tokens": 765,
-      "seconds": 11.364
+      "input_tokens": 11042,
+      "output_tokens": 2137,
+      "seconds": 17.467
     },
     {
       "label": "score:panelassist_self:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 9035,
-      "output_tokens": 923,
-      "seconds": 12.704
+      "input_tokens": 11037,
+      "output_tokens": 2080,
+      "seconds": 16.813
     },
     {
       "label": "score:panelassist_self:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 9066,
-      "output_tokens": 684,
-      "seconds": 9.561
+      "input_tokens": 11098,
+      "output_tokens": 1775,
+      "seconds": 13.884
     },
     {
       "label": "score:panelassist_self:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 9090,
-      "output_tokens": 749,
-      "seconds": 7.908
+      "input_tokens": 11125,
+      "output_tokens": 1016,
+      "seconds": 11.493
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Removed experiment: LLM-based verification vs. deterministic verification
 
-Setup: evidence ledger built once per submission (shared by both approaches). Deterministic checks run once (they are pure functions). LLM checks run 3x per submission to measure reproducibility. Extra cost of the LLM approach over the full 6-submission set: **18 LLM calls** (3 per submission x 6), vs. **0** for the deterministic checks.
+Setup: evidence ledger built once per submission (shared by both approaches). Deterministic checks run once (they are pure functions). LLM checks run 3x per submission to measure reproducibility. Extra cost of the LLM approach over the full 10-submission set: **30 LLM calls** (3 per submission x 10), vs. **0** for the deterministic checks.
 
 ## Did each approach catch the seeded issue?
 
