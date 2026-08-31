@@ -1,0 +1,23 @@
+{
+  "slug": "cosmetic_orchestration",
+  "label_for_eval": "cosmetic_orchestration",
+  "seeded_issues": [
+    "orchestration_adds_cost_and_latency_with_no_real_accuracy_gain",
+    "consensus_agent_does_not_actually_change_outcomes_vs_single_agent",
+    "vague_user_and_bottleneck_description"
+  ],
+  "files": [
+    "requirements.txt",
+    "baseline/single_prompt.py",
+    "swarm/controller.py",
+    "swarm/intake_agent.py",
+    "swarm/sentiment_agent.py",
+    "swarm/category_agent.py",
+    "swarm/priority_agent.py",
+    "swarm/consensus_agent.py",
+    "swarm/output_formatter_agent.py",
+    "data/tickets20.json",
+    "data/labels20.json",
+    "eval/score.py"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "fabricated_claims",
+  "label_for_eval": "fabricated_claims",
+  "seeded_issues": [
+    "numeric_claims_with_no_underlying_eval_data_or_script",
+    "no_labels_file_referenced",
+    "confident_tone_masking_lack_of_evidence",
+    "baseline_not_actually_shown_only_asserted"
+  ],
+  "files": [
+    "requirements.txt",
+    "run_triagex.py",
+    "agents/planner.py",
+    "agents/classifier.py",
+    "agents/router.py",
+    "agents/qa.py"
+  ]
+}

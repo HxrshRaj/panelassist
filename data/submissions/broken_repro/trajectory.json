@@ -1,0 +1,21 @@
+{
+  "agent": "agent/batch_reranker.py",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "score_each_ticket_independently",
+      "input": "batch of 12 tickets",
+      "output": "raw urgency scores per ticket",
+      "note": "Matches baseline step, reused as input to re-ranking."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "batch_rerank_with_full_context",
+      "input": "all 12 raw scores + full ticket texts together",
+      "output": "final ranked order + one-line justification per ticket",
+      "note": "This is the one added capability versus baseline; genuinely uses the whole batch as context rather than one ticket at a time."
+    }
+  ]
+}

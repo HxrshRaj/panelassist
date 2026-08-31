@@ -1,0 +1,150 @@
+{
+  "agent": "agent/run_agent.py -> agent/panelassist/orchestrate.review_submission",
+  "reviewed_submission": "fabricated_claims (one of the 6 eval cases)",
+  "note": "One real PanelAssist run, copied from trajectories/panelassist_runs.json, included so the self-review has a trajectory to read.",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "extract.build_evidence_ledger",
+      "output_summary": {
+        "target_user": "Support operations leads at high-growth B2B companies processing more than 500 tickets/day",
+        "claimed_results": [
+          {
+            "claim": "94.7% classification accuracy",
+            "has_supporting_evidence_file": false,
+            "supporting_file": ""
+          },
+          {
+            "claim": "12.4x speedup over manual triage (3.6s/ticket)",
+            "has_supporting_evidence_file": false,
+            "supporting_file": ""
+          },
+          {
+            "claim": "63% reduction in support costs",
+            "has_supporting_evidence_file": false,
+            "supporting_file": ""
+          }
+        ],
+        "hot_take_is_generic": true
+      }
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "verify.run_all_checks (deterministic, no LLM)",
+      "output": [
+        {
+          "check": "repro_paths_exist",
+          "passed": true
+        },
+        {
+          "check": "env_var_consistency",
+          "passed": true
+        },
+        {
+          "check": "claims_have_evidence",
+          "passed": false
+        },
+        {
+          "check": "hot_take_grounded",
+          "passed": false
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "score.score_criterion[problem_user_value]",
+      "output": {
+        "score": 13,
+        "max": 15,
+        "confidence": "high",
+        "evidence_citations": [
+          "README.md: \"Support operations leads at high-growth B2B companies lose an estimated $2.3M annually to mis-routed tickets and delayed escalations.\"",
+          "[FLAGGED] claims_have_evidence: 3 claim(s) have no specific file/dataset a judge could check"
+        ]
+      }
+    },
+    {
+      "step": 4,
+      "actor": "agent",
+      "action": "score.score_criterion[agent_solution_engineering]",
+      "output": {
+        "score": 12,
+        "max": 30,
+        "confidence": "high",
+        "evidence_citations": [
+          "[FLAGGED] claims_have_evidence: 3 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy', '12.4x speedup over manual triage (3.6s/ticket)', '63% reduction in support costs']",
+          "Agent trajectory log: Step 2 note: 'Single LLM call per role; 'multi-agent' here means four sequential prompts, not four independently useful capabilities.'"
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "actor": "agent",
+      "action": "score.score_criterion[end_to_end_quality]",
+      "output": {
+        "score": 5,
+        "max": 20,
+        "confidence": "high",
+        "evidence_citations": [
+          "[FLAGGED] claims_have_evidence",
+          "REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'"
+        ]
+      }
+    },
+    {
+      "step": 6,
+      "actor": "agent",
+      "action": "score.score_criterion[measured_improvement]",
+      "output": {
+        "score": 4,
+        "max": 15,
+        "confidence": "high",
+        "evidence_citations": [
+          "[FLAGGED] claims_have_evidence",
+          "REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'"
+        ]
+      }
+    },
+    {
+      "step": 7,
+      "actor": "agent",
+      "action": "score.score_criterion[reproducibility]",
+      "output": {
+        "score": 4,
+        "max": 15,
+        "confidence": "high",
+        "evidence_citations": [
+          "REPRODUCE.md",
+          "[FLAGGED] claims_have_evidence: 3 claim(s) have no specific file/dataset a judge could check"
+        ]
+      }
+    },
+    {
+      "step": 8,
+      "actor": "agent",
+      "action": "score.score_criterion[hot_take_insights]",
+      "output": {
+        "score": 1,
+        "max": 5,
+        "confidence": "high",
+        "evidence_citations": [
+          "[FLAGGED] hot_take_grounded",
+          "README.md: 'Multi-agent orchestration is clearly superior to single-prompt approaches. The data speaks for itself \u2014 more agents working together produces dramatically better outcomes across the board.'"
+        ]
+      }
+    },
+    {
+      "step": 9,
+      "actor": "agent",
+      "action": "orchestrate.aggregate",
+      "output": {
+        "total": 39,
+        "needs_human_attention": true,
+        "disclaimer": "Advisory pre-screen only. A qualified human judge confirms every score."
+      }
+    }
+  ]
+}

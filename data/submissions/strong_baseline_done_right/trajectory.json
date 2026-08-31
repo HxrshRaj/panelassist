@@ -1,0 +1,47 @@
+{
+  "agent": "src/agent_triage.py",
+  "ticket_id": "T-0417",
+  "ticket_text": "Hi, this is the third time I'm emailing about being charged twice for my Pro plan on Aug 14. I'm honestly considering canceling if this isn't fixed today.",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "classify_category_and_urgency",
+      "input": "ticket_text",
+      "output": "{category: billing, urgency: P2, claim: 'charged twice on Aug 14'}",
+      "note": "First-pass classification, no tools yet."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "verify_urgency.check_red_flag_phrases",
+      "input": "ticket_text",
+      "output": "['third time', 'considering canceling'] -> churn_risk_signal=True",
+      "note": "Deterministic phrase check, not another LLM call."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "revise_urgency_given_flag",
+      "input": "{initial_urgency: P2, churn_risk_signal: True}",
+      "output": "{urgency: P0, reason: 'repeated unresolved billing issue + explicit cancellation language'}",
+      "note": "Urgency revised upward after the verification tool flagged churn language the first pass under-weighted."
+    },
+    {
+      "step": 4,
+      "actor": "agent",
+      "action": "draft_first_response",
+      "input": "{category: billing, urgency: P0, claim: 'charged twice on Aug 14'}",
+      "output": "Draft response acknowledging the duplicate charge and escalating to billing, held for human review.",
+      "note": "No message sent automatically — queued for a human agent to approve/edit/send."
+    },
+    {
+      "step": 5,
+      "actor": "human_checkpoint",
+      "action": "review_and_approve",
+      "input": "draft_first_response",
+      "output": "approved with one wording edit",
+      "note": "Human-in-the-loop checkpoint before any customer-facing action."
+    }
+  ]
+}

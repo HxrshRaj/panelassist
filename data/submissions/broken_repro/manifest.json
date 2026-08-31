@@ -1,0 +1,17 @@
+{
+  "slug": "broken_repro",
+  "label_for_eval": "broken_repro",
+  "seeded_issues": [
+    "reproduce_references_files_not_in_manifest",
+    "env_var_name_mismatch_openai_vs_anthropic",
+    "no_requirements_txt_actually_present"
+  ],
+  "files": [
+    "baseline/independent_scorer.py",
+    "agent/batch_reranker.py",
+    "data/batch1.json",
+    "data/manual_ranking.json",
+    "evaluate.py"
+  ],
+  "note_for_verifier": "REPRODUCE.md references requirements.txt and config/reranker.yaml, neither of which appear in the files list above. It also asks for OPENAI_API_KEY but the agent code imports the anthropic SDK. A judge following this guide from a clean environment would fail at 'pip install -r requirements.txt' and again at the agent step."
+}

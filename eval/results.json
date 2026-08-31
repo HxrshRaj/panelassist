@@ -1,0 +1,106 @@
+{
+  "slugs": [
+    "broken_repro",
+    "cosmetic_orchestration",
+    "fabricated_claims",
+    "strong_baseline_done_right",
+    "thin_hot_take",
+    "weak_single_prompt"
+  ],
+  "human_totals": {
+    "broken_repro": 63,
+    "cosmetic_orchestration": 38,
+    "fabricated_claims": 36,
+    "strong_baseline_done_right": 92,
+    "thin_hot_take": 82,
+    "weak_single_prompt": 25
+  },
+  "baseline_totals": {
+    "broken_repro": 73,
+    "cosmetic_orchestration": 44,
+    "fabricated_claims": 38,
+    "strong_baseline_done_right": 98,
+    "thin_hot_take": 84,
+    "weak_single_prompt": 19
+  },
+  "agent_totals": {
+    "broken_repro": 72,
+    "cosmetic_orchestration": 35,
+    "fabricated_claims": 39,
+    "strong_baseline_done_right": 99,
+    "thin_hot_take": 91,
+    "weak_single_prompt": 18
+  },
+  "total_score_mae_vs_human": {
+    "baseline_vs_human": 5.33,
+    "agent_vs_human": 6.33
+  },
+  "ranking_correlation_vs_human": {
+    "baseline_vs_human_spearman": 1.0,
+    "agent_vs_human_spearman": 0.943
+  },
+  "per_criterion_mae_vs_human": {
+    "baseline": {
+      "problem_user_value": 1.33,
+      "agent_solution_engineering": 1.5,
+      "end_to_end_quality": 1.33,
+      "measured_improvement": 0.83,
+      "reproducibility": 1.17,
+      "hot_take_insights": 0.5
+    },
+    "agent": {
+      "problem_user_value": 2.5,
+      "agent_solution_engineering": 2.17,
+      "end_to_end_quality": 1.83,
+      "measured_improvement": 1.33,
+      "reproducibility": 0.67,
+      "hot_take_insights": 0.83
+    }
+  },
+  "seeded_issue_detection": {
+    "per_submission": {
+      "fabricated_claims": {
+        "expected_check": "claims_have_evidence",
+        "caught_by_agent": true
+      },
+      "broken_repro": {
+        "expected_check": "repro_paths_exist",
+        "caught_by_agent": true
+      },
+      "thin_hot_take": {
+        "expected_check": "hot_take_grounded",
+        "caught_by_agent": true
+      },
+      "strong_baseline_done_right": {
+        "expected_check": null,
+        "false_positive_flags": []
+      }
+    },
+    "agent_recall_on_seeded_issues": 1.0,
+    "agent_precision_on_seeded_issues": 1.0,
+    "baseline_recall": 0.0,
+    "baseline_note": "Single-prompt baseline has no verification mechanism to catch these by construction."
+  },
+  "evidence_citations_per_submission": {
+    "broken_repro": 12,
+    "cosmetic_orchestration": 16,
+    "fabricated_claims": 13,
+    "strong_baseline_done_right": 17,
+    "thin_hot_take": 18,
+    "weak_single_prompt": 15
+  },
+  "baseline_cost": {
+    "num_calls": 6,
+    "input_tokens": 9609,
+    "output_tokens": 6082,
+    "seconds": 73.6,
+    "cost_usd": 0.0034
+  },
+  "agent_cost": {
+    "num_calls": 42,
+    "input_tokens": 83205,
+    "output_tokens": 43984,
+    "seconds": 482.2,
+    "cost_usd": 0.0259
+  }
+}

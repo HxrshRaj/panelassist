@@ -1,0 +1,29 @@
+{
+  "agent": "run_triagex.py",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "planner_agent_plans",
+      "input": "ticket text",
+      "output": "plan: classify -> route -> QA check",
+      "note": "No tool calls, no test data, no ground-truth comparison anywhere in the trajectory logs provided."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "classifier_agent_classifies",
+      "input": "ticket text",
+      "output": "category label",
+      "note": "Single LLM call per role; 'multi-agent' here means four sequential prompts, not four independently useful capabilities."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "qa_agent_reviews",
+      "input": "classifier output",
+      "output": "'looks good' (no structured check, no evidence citation, no comparison against any label)",
+      "note": "The QA step does not verify anything against ground truth or re-derived evidence -- it just re-asks the model if it's confident."
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "scores": {
+    "broken_repro": {
+      "problem_user_value": 13,
+      "agent_solution_engineering": 23,
+      "end_to_end_quality": 14,
+      "measured_improvement": 12,
+      "reproducibility": 6,
+      "hot_take_insights": 5,
+      "total": 73,
+      "rationale": "QuickTriage addresses a well-defined pain point for small support teams by prioritizing incoming support tickets relative to the rest of the queue. The architectural choice to introduce a batch re-ranking step demonstrates strong agent engineering logic, yielding a measured jump from 68% to 81% agreement with human rankings. The hot take regarding relative vs. absolute ticket urgency is insightful and directly influenced their design. However, reproducibility is hindered because key files specified in the setup commands\u2014such as requirements.txt and config/reranker.yaml\u2014are missing from the submission repository.",
+      "slug": "broken_repro"
+    },
+    "cosmetic_orchestration": {
+      "problem_user_value": 7,
+      "agent_solution_engineering": 8,
+      "end_to_end_quality": 10,
+      "measured_improvement": 4,
+      "reproducibility": 14,
+      "hot_take_insights": 1,
+      "total": 44,
+      "rationale": "This submission demonstrates cosmetic orchestration, splitting simple ticket triage across six separate LLM calls (intake pass-through, unused sentiment scoring, single-vote 'consensus', and formatting) that add 4.1x latency and 45x cost while improving accuracy by only a single ticket (82% to 83% on a 20-ticket sample). The problem framing is generic, and the team's hot take uncritically claims multi-agent swarms are inherently superior despite their own telemetry proving massive over-engineering. The submission's main strength is its clean, fully reproducible evaluation script and clear setup instructions.",
+      "slug": "cosmetic_orchestration"
+    },
+    "fabricated_claims": {
+      "problem_user_value": 11,
+      "agent_solution_engineering": 10,
+      "end_to_end_quality": 9,
+      "measured_improvement": 3,
+      "reproducibility": 4,
+      "hot_take_insights": 1,
+      "total": 38,
+      "rationale": "The project addresses a real B2B support triage bottleneck, but suffers heavily from unsubstantiated claims and minimal agent implementation. The 'multi-agent' system is essentially four sequential LLM calls without dynamic tools, ground-truth verification, or structured checks (e.g., the QA agent merely returns 'looks good'). Crucially, the claimed 94.7% accuracy improvement cannot be verified because the evaluation dataset and test code are omitted from the repo for 'confidentiality reasons', rendering the submission non-reproducible and the benchmarks unsupported. Lastly, the hot take is a shallow statement about multi-agent superiority rather than a nuanced technical lesson learned from failure modes.",
+      "slug": "fabricated_claims"
+    },
+    "strong_baseline_done_right": {
+      "problem_user_value": 15,
+      "agent_solution_engineering": 29,
+      "end_to_end_quality": 19,
+      "measured_improvement": 15,
+      "reproducibility": 15,
+      "hot_take_insights": 5,
+      "total": 98,
+      "rationale": "This submission is exemplary across all dimensions. It identifies a highly practical problem faced by support teams, supported by concrete historical metrics (3.1x longer first response time on mis-triaged tickets). The agent design combines deterministic phrase-checking tools with LLM reasoning and human-in-the-loop safeguards. The measured improvement section stands out by documenting iterative experiments\u2014including a negative result with sentiment analysis that was appropriately rolled back\u2014supported by a clear dataset and metric improvements (P0/P1 recall jumping from 71% to 96%). Reproducibility instructions are clean, complete, and include cost/time estimates. The hot take offers an insightful lesson about the limitations of single-artifact verification vs. historical state context.",
+      "slug": "strong_baseline_done_right"
+    },
+    "thin_hot_take": {
+      "problem_user_value": 13,
+      "agent_solution_engineering": 25,
+      "end_to_end_quality": 16,
+      "measured_improvement": 14,
+      "reproducibility": 15,
+      "hot_take_insights": 1,
+      "total": 84,
+      "rationale": "SortDesk addresses a well-defined bottleneck for small support teams with a clear agent design that uses deterministic keyword checks on low-urgency outputs to prevent critical misses. The submission excels in reproducibility with explicit execution commands and dataset files provided, as well as a solid evaluation table demonstrating progress from 70% to 88% agreement with 0 critical misses. However, the 'hot take' section consists entirely of generic AI fluff and platitudes rather than sharing specific technical insights or failure mode lessons learned from building the project.",
+      "slug": "thin_hot_take"
+    },
+    "weak_single_prompt": {
+      "problem_user_value": 5,
+      "agent_solution_engineering": 3,
+      "end_to_end_quality": 4,
+      "measured_improvement": 1,
+      "reproducibility": 5,
+      "hot_take_insights": 1,
+      "total": 19,
+      "rationale": "This submission represents a minimal single-prompt wrapper rather than a true agentic workflow. While ticket classification addresses a real support pain point, the implementation consists of only a single LLM call on hardcoded input text without orchestration, tools, memory, or verification mechanisms. The project lacks empirical evaluation or baseline comparisons beyond a superficial changelog, and the provided hot take relies on generic platitudes rather than technical insights into failure modes.",
+      "slug": "weak_single_prompt"
+    }
+  },
+  "call_log": [
+    {
+      "label": "baseline:broken_repro",
+      "provider": "latentstack",
+      "input_tokens": 1302,
+      "output_tokens": 1104,
+      "seconds": 13.445
+    },
+    {
+      "label": "baseline:cosmetic_orchestration",
+      "provider": "latentstack",
+      "input_tokens": 1626,
+      "output_tokens": 1116,
+      "seconds": 13.507
+    },
+    {
+      "label": "baseline:fabricated_claims",
+      "provider": "latentstack",
+      "input_tokens": 1421,
+      "output_tokens": 1085,
+      "seconds": 10.755
+    },
+    {
+      "label": "baseline:strong_baseline_done_right",
+      "provider": "latentstack",
+      "input_tokens": 2615,
+      "output_tokens": 1142,
+      "seconds": 11.173
+    },
+    {
+      "label": "baseline:thin_hot_take",
+      "provider": "latentstack",
+      "input_tokens": 1599,
+      "output_tokens": 835,
+      "seconds": 8.739
+    },
+    {
+      "label": "baseline:weak_single_prompt",
+      "provider": "latentstack",
+      "input_tokens": 1046,
+      "output_tokens": 800,
+      "seconds": 16.024
+    }
+  ]
+}

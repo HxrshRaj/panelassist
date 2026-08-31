@@ -1,0 +1,8 @@
+# Hard dependency -- the only one the LatentStack / Gemini paths and every
+# eval script need.
+python-dotenv>=1.0.0
+
+# Optional: only needed if you set LLM_PROVIDER=anthropic. common/llm.py
+# imports it lazily, so the default (LatentStack -> gemini-3.6-flash) path
+# runs without it. Uncomment to use Claude as the provider.
+# anthropic>=0.40.0

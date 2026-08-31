@@ -1,0 +1,18 @@
+{
+  "slug": "strong_baseline_done_right",
+  "label_for_eval": "strong",
+  "seeded_issues": [],
+  "files": [
+    "requirements.txt",
+    "baseline/baseline_triage.py",
+    "src/agent_triage.py",
+    "src/verify_urgency.py",
+    "data/tickets.jsonl",
+    "data/historical_triage_delay.csv",
+    "eval/labels.csv",
+    "eval/score_against_labels.py",
+    "eval/results.md",
+    "results/baseline.jsonl",
+    "results/agent.jsonl"
+  ]
+}

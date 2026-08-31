@@ -1,0 +1,13 @@
+{
+  "agent": "classify.py",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "single_llm_call",
+      "input": "ticket text hardcoded in script",
+      "output": "category and urgency string printed to console",
+      "note": "No tools, no verification, no memory, no comparison to any baseline or ground truth. This is the entire trajectory."
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "_note": "Ground-truth panel scores for the 6 synthetic mock submissions, scored against the exact rubric in rubric.py by Harsh (acting as the qualified human reviewer, per ground rule 5) with an initial draft from Claude that Harsh reviewed and confirmed/adjusted. Used only to evaluate baseline vs. PanelAssist agreement -- never seen by either scorer at inference time.",
+  "scored_by": "Harsh (human panel), draft assisted by Claude",
+  "submissions": {
+    "strong_baseline_done_right": {
+      "problem_user_value": 14,
+      "agent_solution_engineering": 27,
+      "end_to_end_quality": 18,
+      "measured_improvement": 14,
+      "reproducibility": 14,
+      "hot_take_insights": 5,
+      "total": 92,
+      "rationale": "Specific named user, quantified bottleneck, a verification pass tied to a real metric, an explicitly removed experiment, clean fair-baseline comparison, and a hot take that identifies a genuine class of failure (signal outside the artifact) rather than restating the results."
+    },
+    "weak_single_prompt": {
+      "problem_user_value": 4,
+      "agent_solution_engineering": 5,
+      "end_to_end_quality": 6,
+      "measured_improvement": 2,
+      "reproducibility": 6,
+      "hot_take_insights": 2,
+      "total": 25,
+      "rationale": "Vague user, one LLM call with no tools/memory/verification, no baseline comparison or evaluation data at all, generic hot take."
+    },
+    "fabricated_claims": {
+      "problem_user_value": 8,
+      "agent_solution_engineering": 10,
+      "end_to_end_quality": 9,
+      "measured_improvement": 3,
+      "reproducibility": 4,
+      "hot_take_insights": 2,
+      "total": 36,
+      "rationale": "Confident tone and impressive headline numbers (94.7%, 12.4x, 63%) with an explicit admission that the underlying evaluation data is withheld -- this is the rubric's 'connect every claim to evidence' requirement violated directly, and a judge cannot reproduce the main result. The 'multi-agent' framing also doesn't hold up against its own trajectory log."
+    },
+    "broken_repro": {
+      "problem_user_value": 12,
+      "agent_solution_engineering": 20,
+      "end_to_end_quality": 12,
+      "measured_improvement": 11,
+      "reproducibility": 4,
+      "hot_take_insights": 4,
+      "total": 63,
+      "rationale": "Genuinely purposeful two-step design (independent scoring, then batch-context re-ranking) with real evidence, but the reproduction guide references a requirements.txt and config file that don't exist in the submission and the wrong API-key env var -- a judge starting clean cannot get past setup."
+    },
+    "thin_hot_take": {
+      "problem_user_value": 13,
+      "agent_solution_engineering": 24,
+      "end_to_end_quality": 17,
+      "measured_improvement": 13,
+      "reproducibility": 14,
+      "hot_take_insights": 1,
+      "total": 82,
+      "rationale": "Strong everywhere -- specific user, a verification step purposefully targeted at the costliest failure mode, clean fair comparison, clean reproduction -- except the hot take is generic AI-hype boilerplate with no connection to anything actually observed in this project."
+    },
+    "cosmetic_orchestration": {
+      "problem_user_value": 5,
+      "agent_solution_engineering": 9,
+      "end_to_end_quality": 8,
+      "measured_improvement": 3,
+      "reproducibility": 12,
+      "hot_take_insights": 1,
+      "total": 38,
+      "rationale": "Six labeled 'agents' but the trajectory shows an unused sentiment score, a pass-through intake step, and a consensus step with nothing to reconcile -- 5.8x the cost and ~1 point of accuracy over baseline. Vague user description. Honestly reproducible, to its credit, and honestly discloses the cost blowup -- but the hot take draws the opposite conclusion its own data supports."
+    }
+  }
+}

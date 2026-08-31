@@ -1,0 +1,16 @@
+{
+  "slug": "thin_hot_take",
+  "label_for_eval": "thin_hot_take",
+  "seeded_issues": ["hot_take_is_generic_boilerplate_not_tied_to_an_observed_failure"],
+  "files": [
+    "requirements.txt",
+    "baseline/single_pass_sort.py",
+    "agent/three_bucket_sort.py",
+    "agent/red_flag_check.py",
+    "data/overnight_queue.json",
+    "data/manual_sort.json",
+    "eval/compare_to_manual.py",
+    "out/baseline.json",
+    "out/agent.json"
+  ]
+}

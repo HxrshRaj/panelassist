@@ -1,0 +1,196 @@
+{
+  "panelassist_self": {
+    "evidence_ledger": {
+      "target_user": "micro1 hackathon judge",
+      "bottleneck": "A tired judge under time pressure scoring dozens of submissions misses evidence-free claims, unverified file paths, and generic AI-hype insights.",
+      "agent_capabilities_used": [
+        "verification",
+        "memory",
+        "orchestration",
+        "human_checkpoint"
+      ],
+      "changelog_entries": [
+        {
+          "stage": "Baseline",
+          "evidence": "Single prompt on raw submission text scored MAE 5.33 and Spearman 1.000 vs human panel",
+          "decision": "Starting point baseline"
+        },
+        {
+          "stage": "+ Evidence ledger",
+          "evidence": "Scoring from extracted ledger instead of raw text increased MAE to 10.17",
+          "decision": "Hurt performance by compressing out nuance and making incomplete submissions look tidy; rejected as standalone change"
+        },
+        {
+          "stage": "+ Specialist split",
+          "evidence": "One call per criterion with cross-criterion memory brought MAE down to 8.67",
+          "decision": "Partial recovery by splitting tasks and carrying notes across criteria"
+        },
+        {
+          "stage": "+ Verification (final)",
+          "evidence": "Deterministic checks fed specialist calls, lowering MAE to 6.33 and achieving 3/3 seeded defect recall with 0 false alarms",
+          "decision": "Kept - biggest positive contributor and only stage that catches planted defects"
+        }
+      ],
+      "claimed_results": [
+        {
+          "claim": "1.00 (3/3) seeded-issue recall vs 0.00 for baseline",
+          "has_supporting_evidence_file": true,
+          "supporting_file": "eval/RESULTS.md"
+        },
+        {
+          "claim": "1.00 seeded-issue precision with 0 false alarms on clean control",
+          "has_supporting_evidence_file": true,
+          "supporting_file": "eval/RESULTS.md"
+        },
+        {
+          "claim": "0.67 Reproducibility sub-score MAE vs 1.17 baseline MAE",
+          "has_supporting_evidence_file": true,
+          "supporting_file": "eval/RESULTS.md"
+        },
+        {
+          "claim": "Deterministic verification pass reduced total score MAE by 2.34 points over specialist split",
+          "has_supporting_evidence_file": true,
+          "supporting_file": "eval/ABLATIONS.md"
+        }
+      ],
+      "repro_referenced_paths": [
+        "requirements.txt",
+        ".env",
+        "baseline/baseline_scorer.py",
+        "agent/run_agent.py",
+        "eval/run_eval.py",
+        "eval/run_ablation.py",
+        "eval/run_removed_experiment.py",
+        "agent/render_trajectories.py",
+        "rubric.py",
+        "data/human_scores.json",
+        "results/baseline_scores.json",
+        "results/agent_scores.json",
+        "trajectories/panelassist_runs.json",
+        "eval/results.json",
+        "eval/RESULTS.md",
+        "eval/ABLATIONS.md",
+        "trajectories/TRAJECTORIES.md"
+      ],
+      "repro_referenced_env_vars": [
+        "LLM_PROVIDER",
+        "GEMINI_API_KEY",
+        "GEMINI_MODEL",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_MODEL"
+      ],
+      "hot_take_text": "I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel. What survived measurement was the least clever part: a pure-Python pass that checks whether each headline claim names a file and whether the repro guide's paths exist. You don't fix 'not looking' with a smarter model; you fix it with a deterministic step that runs every time and leaves a citation behind.",
+      "hot_take_is_generic": false,
+      "human_approval_gate_present": true
+    },
+    "verification_flags": [
+      {
+        "check": "repro_paths_exist",
+        "passed": true,
+        "missing_paths": [],
+        "detail": "Every path the reproduction guide references is present in the submission's file listing."
+      },
+      {
+        "check": "env_var_consistency",
+        "passed": true,
+        "detail": "No env-var/provider mismatch detected."
+      },
+      {
+        "check": "claims_have_evidence",
+        "passed": true,
+        "unsupported_claims": [],
+        "detail": "Every headline claim points to a specific, checkable file."
+      },
+      {
+        "check": "hot_take_grounded",
+        "passed": true,
+        "detail": "Hot take connects to a specific failure mode observed in this project."
+      }
+    ],
+    "per_criterion_calls": {
+      "problem_user_value": {
+        "score": 15,
+        "rationale": "The submission identifies an exceptionally clear target user (a micro1 hackathon judge) and solves a compelling bottleneck: tired judges under time pressure overlooking unverified claims and broken reproduction guides.",
+        "evidence_citations": [
+          "README.md: \"The user is a micro1 hackathon judge. This challenge alone drew 8,300+ registrations, all to be scored against a published 100-point rubric...\"",
+          "README.md: \"The bottleneck is not 'reading takes time' - it is that a tired judge under time pressure, scoring their fortieth submission of the day, is exactly who a confidently-worded but evidence-free submission slips past.\""
+        ],
+        "confidence": "high",
+        "note_for_other_criteria": "Target user (micro1 hackathon judge) and bottleneck (scoring pressure leading to unverified claims) are clearly defined and directly motivate the tool's evidence-verification design.",
+        "criterion_id": "problem_user_value",
+        "max_points": 15
+      },
+      "agent_solution_engineering": {
+        "score": 29,
+        "rationale": "PanelAssist demonstrates strong, purposeful agent engineering by combining deterministic Python verification tools with specialist scoring calls and cross-criterion memory, backed by rigorous ablation testing of each design choice.",
+        "evidence_citations": [
+          "agent/panelassist/verify.py",
+          "agent/panelassist/memory.py",
+          "eval/ABLATIONS.md"
+        ],
+        "confidence": "high",
+        "note_for_other_criteria": "The deterministic verification tool was the single biggest positive engineering contributor, achieving 100% recall on seeded defects where standard LLM calls failed.",
+        "criterion_id": "agent_solution_engineering",
+        "max_points": 30
+      },
+      "end_to_end_quality": {
+        "score": 20,
+        "rationale": "PanelAssist executes a complete end-to-end evaluation pipeline that produces usable, highly polished advisory reports with verifiable evidence citations and honest ablation trade-offs that a human judge would confidently sign off on.",
+        "evidence_citations": [
+          "eval/RESULTS.md",
+          "trajectories/TRAJECTORIES.md",
+          "results/agent_scores.json",
+          "[OK] claims_have_evidence"
+        ],
+        "confidence": "high",
+        "note_for_other_criteria": "The solution demonstrates complete end-to-end quality, producing fully structured advisory reports and human attention flags with high finish and transparency.",
+        "criterion_id": "end_to_end_quality",
+        "max_points": 20
+      },
+      "measured_improvement": {
+        "score": 15,
+        "rationale": "The submission demonstrates exceptional rigor in measured improvement, providing a detailed four-stage ablation study against a fair single-prompt baseline with clear empirical evidence for every change. It transparently reports negative results where architectural additions degraded performance alongside the deterministic verification change that provided the greatest positive gain.",
+        "evidence_citations": [
+          "README.md: 'Improvement Changelog' table and ablation breakdown",
+          "eval/ABLATIONS.md",
+          "Claim: 'Deterministic verification pass reduced total score MAE by 2.34 points over specialist split'"
+        ],
+        "confidence": "high",
+        "note_for_other_criteria": "Transparently documented that deterministic verification was the single biggest positive contributor to defect detection and Reproducibility score improvement.",
+        "criterion_id": "measured_improvement",
+        "max_points": 15
+      },
+      "reproducibility": {
+        "score": 15,
+        "rationale": "REPRODUCE.md provides complete step-by-step setup instructions, environment variable configurations, and exact command sequences to reproduce the baseline, main agent, evaluations, and ablations from a clean environment. Deterministic checks confirm that every path referenced in the reproduction guide exists in the repository.",
+        "evidence_citations": [
+          "REPRODUCE.md",
+          "[OK] repro_paths_exist: Every path the reproduction guide references is present in the submission's file listing."
+        ],
+        "confidence": "high",
+        "note_for_other_criteria": "The setup and reproduction workflow is fully documented and confirmed working against existing repo paths.",
+        "criterion_id": "reproducibility",
+        "max_points": 15
+      },
+      "hot_take_insights": {
+        "score": 5,
+        "rationale": "The hot take directly turns an observed failure mode\u2014that complex multi-call orchestration slightly worsened scoring calibration compared to a single prompt\u2014into an actionable practical lesson on favoring deterministic checks over extra LLM machinery. It clearly states what was learned from ablations and how it directly changes what the author will build next.",
+        "evidence_citations": [
+          "README.md: \"I built a seven-call agent to out-judge one careful prompt, and on the score itself it didn't - the honest ablation says the extra machinery slightly hurt agreement with the human panel.\"",
+          "DETERMINISTIC VERIFICATION FLAG: [OK] hot_take_grounded"
+        ],
+        "confidence": "high",
+        "note_for_other_criteria": "",
+        "criterion_id": "hot_take_insights",
+        "max_points": 5
+      }
+    },
+    "review_notes_accumulated": [
+      "(Problem & User Value) Target user (micro1 hackathon judge) and bottleneck (scoring pressure leading to unverified claims) are clearly defined and directly motivate the tool's evidence-verification design.",
+      "(Agent Solution & Engineering) The deterministic verification tool was the single biggest positive engineering contributor, achieving 100% recall on seeded defects where standard LLM calls failed.",
+      "(End to End Quality) The solution demonstrates complete end-to-end quality, producing fully structured advisory reports and human attention flags with high finish and transparency.",
+      "(Measured Improvement) Transparently documented that deterministic verification was the single biggest positive contributor to defect detection and Reproducibility score improvement.",
+      "(Reproducibility) The setup and reproduction workflow is fully documented and confirmed working against existing repo paths."
+    ]
+  }
+}

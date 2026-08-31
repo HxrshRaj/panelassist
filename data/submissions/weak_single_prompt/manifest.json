@@ -1,0 +1,8 @@
+{
+  "slug": "weak_single_prompt",
+  "label_for_eval": "weak",
+  "seeded_issues": ["no_real_baseline_comparison", "no_evaluation_data", "vague_user"],
+  "files": [
+    "classify.py"
+  ]
+}

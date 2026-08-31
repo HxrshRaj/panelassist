@@ -1,0 +1,11 @@
+{
+  "agent": "swarm/controller.py",
+  "steps": [
+    {"step": 1, "actor": "agent", "action": "intake_agent.parse", "input": "raw ticket", "output": "cleaned ticket text", "note": "Trivial pass-through; no meaningful transformation observed versus using the raw text directly."},
+    {"step": 2, "actor": "agent", "action": "sentiment_agent.score", "input": "cleaned ticket text", "output": "sentiment score 1-10", "note": "Sentiment score is computed but never referenced by any downstream agent's output or the final classification."},
+    {"step": 3, "actor": "agent", "action": "category_agent.classify", "input": "cleaned ticket text", "output": "category label"},
+    {"step": 4, "actor": "agent", "action": "priority_agent.classify", "input": "cleaned ticket text", "output": "urgency label"},
+    {"step": 5, "actor": "agent", "action": "consensus_agent.vote", "input": "category + priority outputs (only one vote of each, nothing to actually reach consensus over)", "output": "same category + priority, unchanged", "note": "Consensus step has nothing to reconcile since only one agent produced each field; it relabels the same output."},
+    {"step": 6, "actor": "agent", "action": "output_formatter_agent.format", "input": "final labels", "output": "formatted JSON", "note": "Six labeled steps, five LLM calls, one substantive decision (category+priority) — the rest is formatting and an unused sentiment score."}
+  ]
+}

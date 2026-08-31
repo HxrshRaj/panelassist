@@ -1,0 +1,8 @@
+{
+  "agent": "agent/three_bucket_sort.py",
+  "steps": [
+    {"step": 1, "actor": "agent", "action": "sort_into_three_buckets", "input": "overnight queue (18 tickets)", "output": "bucket assignments + one-line reasons", "note": "Three separate calls, one per bucket, to avoid cross-bucket confusion seen at baseline."},
+    {"step": 2, "actor": "tool", "action": "red_flag_check.scan", "input": "tickets placed in 'can wait'", "output": "0 flagged this run", "note": "Deterministic keyword scan re-applied specifically to the low-urgency bucket, since that's where a miss is costliest."},
+    {"step": 3, "actor": "human_checkpoint", "action": "morning_review", "input": "bucketed queue", "output": "team lead spot-checks 'needs immediate reply' bucket only, ~3 minutes instead of 25", "note": "Human still makes the call on what to actually do; agent just removes the blank-page sorting step."}
+  ]
+}
