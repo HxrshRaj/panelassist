@@ -34,7 +34,11 @@ def build_evidence_ledger(sub: dict) -> dict:
         '  "agent_capabilities_used": [<subset of: "tool_use","verification","memory","orchestration","human_checkpoint">],\n'
         '  "changelog_entries": [{"stage": "...", "evidence": "...", "decision": "..."}],\n'
         '  "claimed_results": [\n'
-        '    {"claim": "<the specific number or improvement claimed>", '
+        '    {"claim": "<a HEADLINE RESULT claim only -- an accuracy / quality / '
+        'improvement / effectiveness metric the submission rests its case on '
+        '(e.g. \\"F1 0.52 -> 0.81\\", \\"89% urgency accuracy\\", \\"3/3 defects '
+        'caught\\"). Do NOT list incidental operational figures like cost-per-task '
+        'or latency-per-task; those are not results claims.>", '
         '"has_supporting_evidence_file": <true/false, true only if a specific file/dataset/script in the files list would let someone check this>, '
         '"supporting_file": "<filename or empty string>"}\n'
         "  ],\n"

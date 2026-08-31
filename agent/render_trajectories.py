@@ -146,8 +146,10 @@ def main():
     ap.add_argument("--submissions-dir", default="data/submissions")
     ap.add_argument("--out", default="trajectories/TRAJECTORIES.md")
     ap.add_argument(
-        "--slugs", default="strong_baseline_done_right,fabricated_claims,broken_repro",
-        help="comma-separated submission slugs to render (default: 3 representative cases)",
+        "--slugs",
+        default="strong_baseline_done_right,fabricated_claims,broken_repro,overengineered_but_honest",
+        help="comma-separated submission slugs to render (default: 4 representative cases "
+             "-- clean control, an evidence flag, a repro flag, and the ambiguous mid-band case)",
     )
     args = ap.parse_args()
 

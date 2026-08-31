@@ -1,0 +1,54 @@
+{
+  "agent": "src/docsync.py",
+  "release": "v2.4.0",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "ast_symbols.extract_changed",
+      "input": "git diff v2.3.1..v2.4.0",
+      "output": "changed: ['Client.request(timeout=)', 'retry_policy'], removed: ['Client.send_raw'], added: ['Client.stream']",
+      "note": "AST-based, not regex - catches the decorator-wrapped Client.stream a regex pass missed in Iteration 1."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "retrieve_docs.pages_for_symbols",
+      "input": "changed/removed/added symbol list",
+      "output": "docs/api/client.md (matches 3/4), docs/guides/retries.md (matches retry_policy)",
+      "note": "Client.stream returned no doc page -> flagged as undocumented-new."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "classify_mismatches",
+      "input": "symbol signatures + retrieved doc snippets",
+      "output": "[stale_signature: Client.request timeout default 30->60], [removed_symbol_documented: Client.send_raw], [undocumented_new: Client.stream]",
+      "note": "First-pass classification."
+    },
+    {
+      "step": 4,
+      "actor": "tool",
+      "action": "verify_mismatch.reparse_cited_line",
+      "input": "each flagged doc line + the new signature",
+      "output": "3/3 confirmed; one earlier candidate (retry_policy rename) dropped - the doc line already used the new name",
+      "note": "The re-parse verification step from Iteration 2 - removes the false positive before it reaches the writer."
+    },
+    {
+      "step": 5,
+      "actor": "agent",
+      "action": "emit_docs_patch",
+      "input": "3 confirmed mismatches",
+      "output": "docs.patch (3 hunks), held for review",
+      "note": "No push. The technical writer reviews and merges."
+    },
+    {
+      "step": 6,
+      "actor": "human_checkpoint",
+      "action": "review_and_merge",
+      "input": "docs.patch",
+      "output": "2 hunks merged as-is, 1 reworded before merge",
+      "note": "Human retains control of what lands in the docs repo."
+    }
+  ]
+}

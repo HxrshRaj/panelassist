@@ -1,0 +1,25 @@
+{
+  "slug": "good_project_bad_writeup",
+  "label_for_eval": "good_project_bad_writeup",
+  "seeded_issues": [
+    "readme_reads_as_obvious_unedited_ai_draft_despite_solid_substance",
+    "end_to_end_quality_flaw_is_localized_to_the_writeup_not_the_work"
+  ],
+  "files": [
+    "requirements.txt",
+    "baseline/prompt_only.py",
+    "src/docsync.py",
+    "src/ast_symbols.py",
+    "src/retrieve_docs.py",
+    "src/verify_mismatch.py",
+    "data/release_diffs/LICENSE",
+    "data/release_diffs/",
+    "data/docs_snapshot/",
+    "eval/labeled_mismatches.json",
+    "eval/writer_time_log.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/baseline.json",
+    "results/agent.json"
+  ]
+}

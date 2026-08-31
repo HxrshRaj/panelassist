@@ -9,3 +9,4 @@ cleanvenv/
 results/*.tmp
 *.log
 _*.py
+_*.sh

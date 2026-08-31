@@ -22,7 +22,18 @@ EXPECTED_FLAGS = {
     "broken_repro": "repro_paths_exist",
     "thin_hot_take": "hot_take_grounded",
 }
-EXPECTED_CLEAN = ["strong_baseline_done_right"]  # should trip none of the above
+# Submissions whose weaknesses (if any) are NOT of a kind the deterministic
+# verification layer targets -- so every check should pass. Used to measure
+# false-positive rate. The four mid-band cases are honest and runnable; their
+# flaws (AI-slop write-up, missing changelog, heavy architecture, thin user
+# value) are all outside what verify.py checks.
+EXPECTED_CLEAN = [
+    "strong_baseline_done_right",
+    "good_project_bad_writeup",
+    "real_gains_no_changelog",
+    "overengineered_but_honest",
+    "scope_mismatch",
+]
 
 
 def load(path):

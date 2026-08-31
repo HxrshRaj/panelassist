@@ -1,0 +1,54 @@
+{
+  "agent": "src/grantmatch.py",
+  "call": "NSF-24-560 (Cyber-Physical Systems)",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "call_parser.extract_brief",
+      "input": "NSF-24-560 call text (6 pages)",
+      "output": "hard: {institution: US non-profit, PI: tenure-track+, ceiling: $1.2M}, soft: [real-time control, safety verification, medical devices, transportation]",
+      "note": "Constraints made explicit instead of left implicit in a mega-prompt (Iteration 1)."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "faculty_researcher.summarize (x60)",
+      "input": "each faculty research statement + 5 recent titles",
+      "output": "60 one-paragraph active-area summaries",
+      "note": "Summarize-then-match, added in Iteration 2. 60 short calls, one per faculty."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "matcher.score",
+      "input": "brief + 60 summaries",
+      "output": "ranked list; 4 flagged as hard-constraint fails (not tenure-track); soft scores 0.0-0.9 + one-line reason each",
+      "note": "Hard fails separated from soft fit, not blended into one number."
+    },
+    {
+      "step": 4,
+      "actor": "agent",
+      "action": "checker.verify_top10",
+      "input": "top 10 + their stated reasons + the call text",
+      "output": "2 demoted: reason cited 'autonomous vehicles' but the faculty summary only shows battery modeling",
+      "note": "The checker step (Iteration 3). Catches invented-but-plausible fit reasons."
+    },
+    {
+      "step": 5,
+      "actor": "agent",
+      "action": "emit_shortlist",
+      "input": "verified top 10",
+      "output": "shortlist.md - ranked, with reason + any hard-constraint flag per row",
+      "note": "No email sent. The RD officer decides who to contact."
+    },
+    {
+      "step": 6,
+      "actor": "human_checkpoint",
+      "action": "officer_review",
+      "input": "shortlist.md",
+      "output": "contacted 6 of the top 8; skipped 2 as 'known not interested this cycle'",
+      "note": "Final contact decision stays with the officer."
+    }
+  ]
+}

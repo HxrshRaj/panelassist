@@ -39,6 +39,10 @@
     "data/submissions/fabricated_claims/README.md",
     "data/submissions/broken_repro/README.md",
     "data/submissions/thin_hot_take/README.md",
-    "data/submissions/cosmetic_orchestration/README.md"
+    "data/submissions/cosmetic_orchestration/README.md",
+    "data/submissions/good_project_bad_writeup/README.md",
+    "data/submissions/real_gains_no_changelog/README.md",
+    "data/submissions/overengineered_but_honest/README.md",
+    "data/submissions/scope_mismatch/README.md"
   ]
 }

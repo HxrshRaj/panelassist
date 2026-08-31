@@ -1,0 +1,62 @@
+{
+  "agent": "src/runbookrunner.py",
+  "incident": "INC-0007 (disk filling on primary db host)",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "stepgraph.parse",
+      "input": "runbooks/db-disk-pressure.md",
+      "output": "9 steps, 2 branch points (df threshold; WAL vs. logs as top consumer)",
+      "note": "Runbook parsed into an explicit graph so the agent tracks position instead of the human."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "sandbox.run",
+      "input": "df -h /var/lib/postgresql  (read-only)",
+      "output": "/var/lib/postgresql 94% used",
+      "note": "Read-only command, auto-run. Output shown to responder."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "branch_eval.evaluate",
+      "input": "df output vs. 'if >90% go to step 5'",
+      "output": "condition true -> next step is 5 (identify top consumer)",
+      "note": "Branch decided against real output, not the responder's guess."
+    },
+    {
+      "step": 4,
+      "actor": "tool",
+      "action": "sandbox.run",
+      "input": "du -sh /var/lib/postgresql/*/pg_wal  (read-only)",
+      "output": "pg_wal 41G",
+      "note": "Read-only, auto-run."
+    },
+    {
+      "step": 5,
+      "actor": "agent",
+      "action": "propose_state_change",
+      "input": "step 6: 'checkpoint then archive old WAL segments'",
+      "output": "Proposed command: `psql -c \"CHECKPOINT;\"` then archive script. BLOCKED pending approval.",
+      "note": "State-changing - the agent will not run it until the responder types yes."
+    },
+    {
+      "step": 6,
+      "actor": "human_checkpoint",
+      "action": "approve_state_change",
+      "input": "responder reviews the proposed commands",
+      "output": "typed 'yes'; agent ran the checkpoint + archive; disk to 71%",
+      "note": "Enforced approval gate on every mutating step."
+    },
+    {
+      "step": 7,
+      "actor": "agent",
+      "action": "write_handoff_log",
+      "input": "full step trace",
+      "output": "incident-INC-0007-log.md written for the next responder",
+      "note": "Handoff is a document, not the previous responder's memory."
+    }
+  ]
+}

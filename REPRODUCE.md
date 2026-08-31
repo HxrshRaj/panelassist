@@ -92,7 +92,7 @@ python baseline/baseline_scorer.py
 ```
 
 Writes `results/baseline_scores.json` - one score object per mock
-submission (`data/submissions/`, 6 synthetic cases) plus a call log with
+submission (`data/submissions/`, 10 synthetic cases) plus a call log with
 per-call token counts and latency. ~5 minutes.
 
 ## 4. Run PanelAssist (the agent)
@@ -109,7 +109,7 @@ Writes:
 - `trajectories/panelassist_runs.json` - the machine-readable trajectory
   for every run.
 
-~8-10 minutes (7 LLM calls per submission x 6, ~10-15s each via the gateway).
+~13-16 minutes (7 LLM calls per submission x 10, ~10-15s each via the gateway).
 
 ## 5. Compare baseline vs. PanelAssist vs. the human panel
 
@@ -184,7 +184,7 @@ produced) for three representative submissions. No LLM calls. Pass
 
 `eval/RESULTS.md`, specifically:
 
-1. **Seeded-issue detection.** Three of the six mock submissions each
+1. **Seeded-issue detection.** Three of the ten mock submissions each
    contain one deliberately planted, rubric-violating defect (an
    evidence-free headline claim; a reproduction guide that points at files
    that do not exist; a hot take that is generic filler). PanelAssist's

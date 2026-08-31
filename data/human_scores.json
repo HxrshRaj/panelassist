@@ -1,5 +1,5 @@
 {
-  "_note": "Ground-truth panel scores for the 6 synthetic mock submissions, scored against the exact rubric in rubric.py by Harsh (acting as the qualified human reviewer, per ground rule 5) with an initial draft from Claude that Harsh reviewed and confirmed/adjusted. Used only to evaluate baseline vs. PanelAssist agreement -- never seen by either scorer at inference time.",
+  "_note": "Ground-truth panel scores for the 10 synthetic mock submissions, scored against the exact rubric in rubric.py by Harsh (acting as the qualified human reviewer, per ground rule 5) with an initial draft from Claude that Harsh reviewed and confirmed/adjusted. Used only to evaluate baseline vs. PanelAssist agreement -- never seen by either scorer at inference time. The last four (good_project_bad_writeup, real_gains_no_changelog, overengineered_but_honest, scope_mismatch) were added to reach the challenge PDF's '10 or more cases' target and fill the mid-band the first six left thin.",
   "scored_by": "Harsh (human panel), draft assisted by Claude",
   "submissions": {
     "strong_baseline_done_right": {
@@ -61,6 +61,46 @@
       "hot_take_insights": 1,
       "total": 38,
       "rationale": "Six labeled 'agents' but the trajectory shows an unused sentiment score, a pass-through intake step, and a consensus step with nothing to reconcile -- 5.8x the cost and ~1 point of accuracy over baseline. Vague user description. Honestly reproducible, to its credit, and honestly discloses the cost blowup -- but the hot take draws the opposite conclusion its own data supports."
+    },
+    "good_project_bad_writeup": {
+      "problem_user_value": 13,
+      "agent_solution_engineering": 25,
+      "end_to_end_quality": 10,
+      "measured_improvement": 13,
+      "reproducibility": 13,
+      "hot_take_insights": 4,
+      "total": 78,
+      "rationale": "Substantively a strong project: AST-based symbol extraction, retrieval, a re-parse verification step each tied to an observed failure, a fair same-cases baseline, an F1 0.52 -> 0.81 changelog with a removed experiment, working reproduction. The flaw is localized to End to End Quality: the README reads as an obvious unedited AI draft ('in today's fast-paced landscape', 'leverage the power of', Firstly/Secondly/Furthermore/Moreover, 'it is important to note') -- not something a person would sign their name to, which that criterion explicitly weighs. Tests whether a scorer's E2E-Quality judgement bites when the underlying work is good."
+    },
+    "real_gains_no_changelog": {
+      "problem_user_value": 13,
+      "agent_solution_engineering": 24,
+      "end_to_end_quality": 17,
+      "measured_improvement": 6,
+      "reproducibility": 14,
+      "hot_take_insights": 4,
+      "total": 78,
+      "rationale": "Specific user (3am on-call SRE), enforced approval gate on state-changing commands, sandboxed replay, strong fair baseline-vs-agent table (11 -> 4.5 min, 4 -> 0 wrong branches, 3 -> 0 unguarded destructive commands), clean reproduction, genuine hot take. The gap: there is NO improvement changelog at all -- no iteration entries, no 'tried X, got Y, kept/removed' story -- only a final comparison. The Measured Improvement criterion and Deliverable 1 both explicitly require the iteration story, so that criterion cannot be more than half-awarded."
+    },
+    "overengineered_but_honest": {
+      "problem_user_value": 12,
+      "agent_solution_engineering": 22,
+      "end_to_end_quality": 17,
+      "measured_improvement": 14,
+      "reproducibility": 14,
+      "hot_take_insights": 5,
+      "total": 84,
+      "rationale": "The deliberately ambiguous / challenging case. Genuinely good: pre-registered officer rankings as a fair baseline, an exemplary 5-entry changelog that includes a removed 5th agent (+35% cost, no nDCG gain, cut), honest cost/latency disclosure, an against-the-grain hot take ('every agent had to earn its place in the metric, not the diagram'). The only soft spot is proportionality -- four agents and ~5x latency for +0.18 nDCG -- reflected in a 22/30 on Agent Solution rather than a penalty elsewhere. A reflexive scorer is likely to either over-penalize the agent count (landing well below 84) or over-reward the polished changelog."
+    },
+    "scope_mismatch": {
+      "problem_user_value": 5,
+      "agent_solution_engineering": 23,
+      "end_to_end_quality": 17,
+      "measured_improvement": 13,
+      "reproducibility": 14,
+      "hot_take_insights": 4,
+      "total": 76,
+      "rationale": "Strong on almost everything: content-aware classification, a dry-run preview, an undo log, human approval before any file moves, a fair extension-rules baseline, a 0.44 -> 0.86 changelog, and near-perfect reproducibility (a fixture generator plus exact commands). But Problem & User Value is thin: the stated user is 'Me', the bottleneck is 'it's annoying to find things', and there is no real account of who else this matters to or what it costs. Tests whether the six criteria score independently or just track an overall impression."
     }
   }
 }

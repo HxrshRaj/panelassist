@@ -1,0 +1,24 @@
+{
+  "slug": "scope_mismatch",
+  "label_for_eval": "scope_mismatch",
+  "seeded_issues": [
+    "problem_and_user_value_is_thin_a_personal_convenience_script_who_else_and_why_it_matters_barely_addressed",
+    "strong_on_agent_engineering_end_to_end_quality_and_reproducibility_which_tests_whether_the_criteria_score_independently"
+  ],
+  "files": [
+    "requirements.txt",
+    "baseline/by_extension.py",
+    "src/tidydrop.py",
+    "src/classify.py",
+    "src/content_sample.py",
+    "src/undo_log.py",
+    "eval/make_fixtures.py",
+    "eval/fixtures.tar.gz",
+    "data/messy_folder/",
+    "eval/handsort.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/baseline.json",
+    "results/agent.json"
+  ]
+}

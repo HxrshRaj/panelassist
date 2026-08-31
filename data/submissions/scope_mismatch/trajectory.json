@@ -1,0 +1,46 @@
+{
+  "agent": "src/tidydrop.py",
+  "run": "data/messy_folder/ (200 files, --plan-only)",
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "scan_folder",
+      "input": "data/messy_folder/",
+      "output": "200 files: 88 pdf, 42 jpg/png, 20 zip, 15 dmg/exe, 35 other",
+      "note": "Name, type, size collected for all; content sample only for the ambiguous types."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "content_sample.extract",
+      "input": "88 PDFs + 12 generic-named text files",
+      "output": "first ~500 chars each; image captions for 42 images",
+      "note": "The Iteration 2 change - lets finance vs. travel vs. reading be decided on content, not extension."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "classify.propose_destinations",
+      "input": "file metadata + content samples + the 9-folder taxonomy",
+      "output": "200 (path -> destination, reason) pairs; 6 marked low-confidence -> misc",
+      "note": "One-line reason per file, e.g. 'statement_mar.pdf -> documents/finance (contains account summary, sort code)'."
+    },
+    {
+      "step": 4,
+      "actor": "agent",
+      "action": "render_dry_run_plan",
+      "input": "200 proposed moves",
+      "output": "plan.txt - grouped by destination, printed for approval. NOTHING MOVED (--plan-only).",
+      "note": "In a real run the agent stops here until the user types y."
+    },
+    {
+      "step": 5,
+      "actor": "human_checkpoint",
+      "action": "review_plan",
+      "input": "plan.txt",
+      "output": "(eval mode) plan scored against eval/handsort.csv: 0.86 agreement; (real mode) user edits then approves",
+      "note": "The move + undo-log steps only run after approval; skipped in --plan-only."
+    }
+  ]
+}

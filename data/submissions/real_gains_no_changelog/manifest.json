@@ -1,0 +1,24 @@
+{
+  "slug": "real_gains_no_changelog",
+  "label_for_eval": "real_gains_no_changelog",
+  "seeded_issues": [
+    "no_improvement_changelog_at_all_only_a_final_baseline_comparison",
+    "measured_improvement_criterion_cannot_be_fully_awarded_without_the_iteration_story"
+  ],
+  "files": [
+    "requirements.txt",
+    "baseline/manual_replay.py",
+    "src/runbookrunner.py",
+    "src/stepgraph.py",
+    "src/sandbox.py",
+    "src/branch_eval.py",
+    "data/incidents/",
+    "data/runbooks/",
+    "eval/rubric.md",
+    "eval/score.py",
+    "eval/results.md",
+    "eval/transcripts/",
+    "results/baseline.json",
+    "results/agent.json"
+  ]
+}

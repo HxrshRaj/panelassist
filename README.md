@@ -46,7 +46,7 @@ see REPRODUCE.md). The rubric text is micro1's, not ours.
 this repo. The single-prompt baseline; the four-stage agent (extract →
 verify → score → aggregate); the shared evidence ledger and the
 cross-criterion running memory; the deterministic verification checks; the
-six synthetic mock submissions and their hand-scored ground truth; the
+ten synthetic mock submissions and their hand-scored ground truth; the
 eval, ablation, and trajectory-rendering harnesses. No code was carried in
 from a prior project.
 
@@ -114,21 +114,30 @@ python agent/render_trajectories.py       # -> trajectories/TRAJECTORIES.md
 
 ## Evaluation setup
 
-Six **fully synthetic** mock submissions ([`data/submissions/`](data/submissions/)),
-written for this project to span the failure space a real judge faces:
+**Ten fully synthetic** mock submissions ([`data/submissions/`](data/submissions/)),
+written for this project to span the failure space a real judge faces.
+Human totals span 25-92 with the mid-band deliberately populated:
 
-| Slug | What it is | Planted defect |
-|---|---|---|
-| `strong_baseline_done_right` | genuinely strong entry | none (control) |
-| `thin_hot_take` | strong everywhere except the insight | hot take is generic boilerplate |
-| `broken_repro` | good design, unrunnable | REPRODUCE.md references files not in the submission; wrong key env var |
-| `fabricated_claims` | confident tone, no evidence | headline numbers with no eval data or script, baseline only asserted |
-| `cosmetic_orchestration` | 6 "agents", ~1 pt gain over baseline at 5.8x cost | orchestration adds cost/latency with no real accuracy gain |
-| `weak_single_prompt` | one prompt, no evaluation | no baseline comparison, no data, vague user |
+| Slug | Human total | What it is | Weakness (if any) |
+|---|---|---|---|
+| `strong_baseline_done_right` | 92 | genuinely strong entry | none (control) |
+| `overengineered_but_honest` | 84 | disciplined 4-agent pipeline, exemplary changelog | proportionality of the architecture is a judgement call (**the challenging case**) |
+| `thin_hot_take` | 82 | strong everywhere except the insight | hot take is generic boilerplate |
+| `good_project_bad_writeup` | 78 | solid agent + real eval + real gains | README reads as an obvious unedited AI draft |
+| `real_gains_no_changelog` | 78 | strong solution, real fair-baseline comparison | no improvement changelog at all |
+| `scope_mismatch` | 76 | well-built agent, near-perfect reproduction | problem & user value is thin ("my Downloads folder") |
+| `broken_repro` | 63 | good design, unrunnable | REPRODUCE.md references files not in the submission |
+| `cosmetic_orchestration` | 38 | 6 "agents", ~1 pt gain at 5.8x cost | orchestration adds cost/latency, no real gain |
+| `fabricated_claims` | 36 | confident tone, no evidence | headline numbers with no eval data or script |
+| `weak_single_prompt` | 25 | one prompt, no evaluation | no baseline, no data, vague user |
 
-Ground truth: [`data/human_scores.json`](data/human_scores.json), scored by
-the author as the qualified human reviewer, never shown to either scorer.
-No real people's data appears anywhere in the set (ground rule 6-7).
+Only three carry a defect the deterministic verification layer targets
+(`fabricated_claims` -> unbacked claims, `broken_repro` -> missing repro
+paths, `thin_hot_take` -> generic hot take); the other seven should trip
+nothing. Ground truth: [`data/human_scores.json`](data/human_scores.json),
+scored by the author as the qualified human reviewer, never shown to either
+scorer. No real people's data appears anywhere in the set (ground rule
+6-7).
 
 ## Results
 
@@ -290,7 +299,7 @@ that, and it says no.
 5. **Qualified human in the loop** - the output is advisory by
    construction; `orchestrate.py` returns a `disclaimer` and a
    `needs_human_attention` list and never a decision.
-6-7. **Legal / ethical / synthetic data** - all six eval submissions are
+6-7. **Legal / ethical / synthetic data** - all ten eval submissions are
    synthetic and written for this project; no real customer or personal
    data.
 8. **No credentials in the submission** - `.env` is git-ignored; the repo
@@ -321,7 +330,7 @@ agent/panelassist/verify_llm.py    REMOVED experiment: LLM verification (off the
 eval/run_eval.py                   baseline vs. agent vs. human ground truth
 eval/run_ablation.py               the measured improvement changelog
 eval/run_removed_experiment.py     deterministic vs. LLM verification, head-to-head
-data/submissions/                  6 synthetic mock submissions
+data/submissions/                  10 synthetic mock submissions
 data/human_scores.json             human-panel ground truth
 dogfood/panelassist_self/          this project packaged as its own input, for the self-review
 ```

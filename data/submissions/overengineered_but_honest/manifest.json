@@ -1,0 +1,27 @@
+{
+  "slug": "overengineered_but_honest",
+  "label_for_eval": "overengineered_but_honest",
+  "note_for_verifier": "This is the deliberately AMBIGUOUS / challenging case. It is a genuinely good submission - clean fair baseline, exemplary changelog that includes a removed component, honest cost disclosure, grounded hot take. The only contestable point is proportionality: four agents and 5x cost/latency for a +0.18 nDCG gain. A reflexive scorer may over-penalize the agent count or over-reward the polished changelog; the human ground truth treats it as a strong (~81) submission whose one soft weakness is whether the architecture is heavier than the problem needs.",
+  "seeded_issues": [
+    "proportionality_of_a_4_agent_pipeline_to_a_modest_measured_gain_is_a_judgement_call",
+    "challenging_case_where_baseline_and_agent_are_most_likely_to_diverge_from_the_human"
+  ],
+  "files": [
+    "requirements.txt",
+    "baseline/one_shot_rank.py",
+    "src/grantmatch.py",
+    "src/call_parser.py",
+    "src/faculty_researcher.py",
+    "src/matcher.py",
+    "src/checker.py",
+    "data/calls/",
+    "data/calls/SOURCES.md",
+    "data/faculty.json",
+    "eval/officer_rankings.json",
+    "eval/score.py",
+    "eval/results.md",
+    "results/baseline.json",
+    "results/agent.json",
+    "results/agent_trace/"
+  ]
+}
