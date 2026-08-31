@@ -127,13 +127,14 @@ section.
 > One thing I tried and cut: doing the verification step with an LLM
 > instead of plain Python - ask a model "does this claim have evidence"
 > rather than checking `path in file_list`. Here's the honest result: it
-> caught the same three of three defects, with the same zero false alarms.
-> It didn't fail. I cut it anyway - it costs an extra call per submission,
-> and its answer is only *probably* the same run to run, because it's a
-> sampled model. A flag a judge acts on has to be one they can re-derive by
-> hand. The code's still in the repo, off the pipeline. That's the whole
-> idea - the cheap deterministic check was just as good, and I only know
-> that because I measured it instead of assuming the LLM was the upgrade.
+> caught the same three of three defects, with the same zero false alarms,
+> and across three runs per submission no verdict changed. It didn't fail.
+> I cut it anyway - it costs an extra call per submission, and "stable
+> across three runs" is not "reproducible"; it's a sampled model. A flag a
+> judge acts on has to be one they can re-derive by hand. The code's still
+> in the repo, off the pipeline. That's the whole idea - the cheap
+> deterministic check was just as good, and I only know that because I
+> measured it instead of assuming the LLM was the upgrade.
 
 **Take:** `REMOVED_EXPERIMENT.md` -> `verify_llm.py` docstring. ~25s.
 
