@@ -3,7 +3,7 @@
     "broken_repro": {
       "slug": "broken_repro",
       "evidence_ledger": {
-        "target_user": "Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet but still need some way to sort incoming tickets by urgency before they start replying.",
+        "target_user": "Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet",
         "bottleneck": "Without any tooling, a 2-person team just replies to tickets in the order they arrive, which means an angry churn-risk ticket can sit behind five routine password resets for hours.",
         "agent_capabilities_used": [],
         "changelog_entries": [
@@ -30,12 +30,12 @@
             "supporting_file": "data/manual_ranking.json"
           },
           {
-            "claim": "Batch-level re-ranking increased agreement to 81%",
+            "claim": "Batch-level re-ranking achieved 81% agreement with manual ranking",
             "has_supporting_evidence_file": true,
             "supporting_file": "data/manual_ranking.json"
           },
           {
-            "claim": "Justifications per ticket were rated 'useful' by 4/5 reviewers",
+            "claim": "Justifications rated 'useful' by 4/5 reviewers",
             "has_supporting_evidence_file": false,
             "supporting_file": ""
           }
@@ -77,9 +77,9 @@
           "check": "claims_have_evidence",
           "passed": false,
           "unsupported_claims": [
-            "Justifications per ticket were rated 'useful' by 4/5 reviewers"
+            "Justifications rated 'useful' by 4/5 reviewers"
           ],
-          "detail": "1 claim(s) have no specific file/dataset a judge could check: [\"Justifications per ticket were rated 'useful' by 4/5 reviewers\"]. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value."
+          "detail": "1 claim(s) have no specific file/dataset a judge could check: [\"Justifications rated 'useful' by 4/5 reviewers\"]. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value."
         },
         {
           "check": "hot_take_grounded",
@@ -90,70 +90,88 @@
       "per_criterion": {
         "problem_user_value": {
           "score": 15,
-          "rationale": "The submission excels at defining a highly specific target user and a practical, real-world bottleneck where delayed response directly risks customer churn.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission clearly defines a specific target user (2-3 person support teams at early-stage startups) and a concrete, impactful bottleneck (FIFO ticket ordering causing urgent churn-risk tickets to sit behind routine requests). No weaknesses were identified for this criterion.",
           "evidence_citations": [
             "README.md: 'Small support teams (2-3 people) at early-stage startups who can't justify buying a full helpdesk platform yet'",
             "README.md: 'Without any tooling, a 2-person team just replies to tickets in the order they arrive, which means an angry churn-risk ticket can sit behind five routine password resets for hours.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "User and bottleneck framing are exceptionally clear and well-scoped for a 2-3 person startup team.",
+          "note_for_other_criteria": "",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 23,
-          "rationale": "The agent design purposefully uses a batch-level re-ranking pass to capture relative urgency across tickets rather than isolated scoring, raising evaluation agreement from 68% to 81%. However, missing files like config/reranker.yaml prevent clean reproduction of the agent's run.",
+          "score": 21,
+          "weaknesses_deducted_for": [
+            "The configuration file 'config/reranker.yaml' required to run the batch reranker agent script is missing from the repository.",
+            " The agent architecture relies on a static two-pass sequential prompt without verification loops, tool integration, or error handling mechanisms."
+          ],
+          "rationale": "The design choice to use batch context rather than per-ticket isolated scoring is purposeful and well-motivated for relative ticket urgency. However, points were deducted because the required 'config/reranker.yaml' file is missing from the submission repo, and the agent framework remains minimal with no verification or dynamic tools.",
           "evidence_citations": [
-            "agent/batch_reranker.py",
-            "Agent trajectory log step 2: batch_rerank_with_full_context",
-            "[FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']."
+            "FLAGGED repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']",
+            "REPRODUCE.md: python agent/batch_reranker.py --input data/batch1.json --config config/reranker.yaml",
+            "Agent trajectory log: step 1 (score_each_ticket_independently) -> step 2 (batch_rerank_with_full_context)"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The batch re-ranking architectural decision directly drove the reported performance improvements.",
+          "note_for_other_criteria": "The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
-          "score": 12,
-          "rationale": "While the agent produces usable outputs in theory (a re-ranked ticket list with justifications), critical dependencies and configuration files required to run the pipeline are missing from the submission.",
+          "score": 6,
+          "weaknesses_deducted_for": [
+            "Missing essential execution path files (config/reranker.yaml and requirements.txt) breaks end-to-end execution of the agent script.",
+            "No output files or generated justifications were provided in the submission for judges to inspect the final user-facing result quality."
+          ],
+          "rationale": "End to End Quality is largely unmet because key execution dependencies like 'config/reranker.yaml' are missing from the repository listing, making it impossible to complete a clean execution of the agent script. Furthermore, no sample output predictions or saved justifications are provided to evaluate if the end result is something a user could directly consume.",
           "evidence_citations": [
             "[FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']."
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The lack of `config/reranker.yaml` prevents executing the command specified in the reproduction guide.",
+          "note_for_other_criteria": "The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
-          "score": 13,
-          "rationale": "The project clearly demonstrates a strong gain over a fair baseline, improving manual ranking agreement from 68% to 81% through batch-level re-ranking as tracked in the changelog. However, the final qualitative claim that justifications were rated 'useful' by 4/5 reviewers lacks supporting evidence in the repo.",
+          "score": 9,
+          "weaknesses_deducted_for": [
+            "The qualitative claim that justifications were rated 'useful' by 4/5 reviewers lacks supporting evidence files or survey data in the submission repository.",
+            "The claimed improvement from baseline (68%) to agent (81%) cannot be independently verified via evaluation scripts due to missing configuration files."
+          ],
+          "rationale": "While the project presents a clear baseline and iterative improvement from 68% to 81% agreement using batch re-ranking, the qualitative human evaluation claim is unsupported by files and the evaluation code cannot be run to verify results.",
           "evidence_citations": [
-            "data/manual_ranking.json",
-            "README.md Improvement Changelog table",
-            "[FLAGGED] claims_have_evidence: 1 claim(s) have no specific file/dataset a judge could check: [\"Justifications per ticket were rated 'useful' by 4/5 reviewers\"]"
+            "FLAGGED claims_have_evidence: 1 claim(s) have no specific file/dataset a judge could check: [\"Justifications rated 'useful' by 4/5 reviewers\"]",
+            "FLAGGED repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']",
+            "=== README.md === Improvement Changelog"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The quantitative gain from 68% to 81% agreement is well-documented and directly tied to the batch re-ranking step in the changelog.",
+          "note_for_other_criteria": "",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
           "score": 4,
-          "rationale": "Although a clear reproduction guide is provided in REPRODUCE.md, execution fails from a clean environment because critical referenced files like requirements.txt and config/reranker.yaml are missing from the submission.",
+          "weaknesses_deducted_for": [
+            "The reproduction guide relies on missing files (`requirements.txt` and `config/reranker.yaml`), preventing setup and execution of the main agent solution from a clean environment."
+          ],
+          "rationale": "A judge attempting to reproduce the submission from a clean environment cannot install dependencies or run the agent script due to missing referenced files (`requirements.txt` and `config/reranker.yaml`). Per rubric rules, severe failure in runnable paths triggers the <35% score band.",
           "evidence_citations": [
-            "[FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json']."
+            "[FLAGGED] repro_paths_exist: The reproduction guide references 3 path(s) not present anywhere in the submission: ['requirements.txt', 'config/reranker.yaml', 'out/predictions.json'].",
+            "REPRODUCE.md: pip install -r requirements.txt",
+            "REPRODUCE.md: python agent/batch_reranker.py --input data/batch1.json --config config/reranker.yaml"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The missing config/reranker.yaml file blocks execution of the agent re-ranking script and evaluation step.",
+          "note_for_other_criteria": "Reproducibility fails immediately at setup due to missing requirements.txt and config/reranker.yaml.",
           "criterion_id": "reproducibility",
           "max_points": 15
         },
         "hot_take_insights": {
           "score": 5,
-          "rationale": "The hot take articulates a clear, non-generic architectural insight derived directly from their experiment: urgency is relative to queue state, so batch context outperforms individual ticket prompt engineering.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The hot take offers a sharp, practical lesson directly tied to the experiment's findings, highlighting that ticket urgency is relative to queue context rather than an absolute property of individual ticket text.",
           "evidence_citations": [
-            "README.md: 'Scoring tickets independently throws away information \u2014 urgency is relative to what else is in the queue right now, not an absolute property of the ticket text. Batch context mattered more than better per-ticket prompting.'",
-            "DETERMINISTIC VERIFICATION FLAGS: [OK] hot_take_grounded"
+            "README.md: 'Scoring tickets independently throws away information \u2014 urgency is relative to what else is in the queue right now, not an absolute property of the ticket text. Batch context mattered more than better per-ticket prompting.'"
           ],
           "confidence": "high",
           "note_for_other_criteria": "",
@@ -161,7 +179,7 @@
           "max_points": 5
         }
       },
-      "total": 72,
+      "total": 60,
       "needs_human_attention": true,
       "low_confidence_criteria": [],
       "flagged_checks": [
@@ -169,11 +187,9 @@
         "claims_have_evidence"
       ],
       "review_notes": [
-        "(Problem & User Value) User and bottleneck framing are exceptionally clear and well-scoped for a 2-3 person startup team.",
-        "(Agent Solution & Engineering) The batch re-ranking architectural decision directly drove the reported performance improvements.",
-        "(End to End Quality) The lack of `config/reranker.yaml` prevents executing the command specified in the reproduction guide.",
-        "(Measured Improvement) The quantitative gain from 68% to 81% agreement is well-documented and directly tied to the batch re-ranking step in the changelog.",
-        "(Reproducibility) The missing config/reranker.yaml file blocks execution of the agent re-ranking script and evaluation step."
+        "(Agent Solution & Engineering) The missing configuration file config/reranker.yaml prevents executing the agent script per REPRODUCE.md instructions.",
+        "(End to End Quality) The missing configuration file config/reranker.yaml prevents running the agent script as documented in REPRODUCE.md.",
+        "(Reproducibility) Reproducibility fails immediately at setup due to missing requirements.txt and config/reranker.yaml."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     },
@@ -209,17 +225,7 @@
         ],
         "claimed_results": [
           {
-            "claim": "Baseline single prompt achieves 82% accuracy on 20-ticket dataset",
-            "has_supporting_evidence_file": true,
-            "supporting_file": "eval/score.py"
-          },
-          {
-            "claim": "6-agent swarm achieves 83% accuracy",
-            "has_supporting_evidence_file": true,
-            "supporting_file": "eval/score.py"
-          },
-          {
-            "claim": "Swarm consumes 5.8x more tokens per ticket with 4.1x higher latency",
+            "claim": "83% accuracy with 6-agent swarm classification (vs 82% baseline)",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/score.py"
           }
@@ -270,78 +276,99 @@
       ],
       "per_criterion": {
         "problem_user_value": {
-          "score": 6,
-          "rationale": "While the target user is identified as support teams triaging tickets, the bottleneck description is minimal ('Doing it manually takes time') and lacks any operational depth, business context, or urgency analysis. Furthermore, the 6-agent swarm delivers virtually no additional value over a single prompt (1% accuracy gain at 4.1x latency and 5.8x token cost).",
+          "score": 10,
+          "weaknesses_deducted_for": [
+            "Vague and superficial problem definition ('Doing it manually takes time') that lacks specific operational context on why solving ticket triage matters."
+          ],
+          "rationale": "While the target user ('Support teams triaging incoming tickets') is identified, the bottleneck statement is extremely generic and fails to articulate specific user pain points, operational impact, or context on why solving it matters.",
           "evidence_citations": [
-            "README.md: 'Who has this problem: Support teams triaging incoming tickets.'",
-            "README.md: 'The bottleneck: Doing it manually takes time.'",
-            "Changelog: '83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency'"
+            "README.md: '## The bottleneck\\nDoing it manually takes time.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The target user and bottleneck statements consist of single superficial sentences.",
+          "note_for_other_criteria": "The 6-agent system increases execution time from 40s to 11 minutes for 20 tickets, significantly worsening the manual speed bottleneck for virtually zero accuracy improvement (+1%).",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 8,
-          "rationale": "The 6-agent swarm is heavily over-engineered and unpurposeful, yielding only a 1% accuracy gain over a single prompt baseline (83% vs 82%) while inflating token usage by 5.8x and latency by 4.1x. Trajectory logs reveal that several agent steps are purely performative or unused, such as a consensus agent voting on non-overlapping single outputs and an unreferenced sentiment score.",
+          "score": 10,
+          "weaknesses_deducted_for": [
+            "Unpurposeful and over-engineered multi-agent architecture featuring redundant and unused agent steps (e.g., Sentiment Agent output is never referenced downstream, Consensus Agent votes on non-overlapping inputs, Intake Agent is a trivial pass-through).",
+            "Orchestration design choices failed to improve problem-solving capability, adding massive token (5.8x) and latency (4.1x) overhead for negligible accuracy gain (83% vs 82% single-prompt baseline)."
+          ],
+          "rationale": "The solution fails to use agents purposefully, constructing a 6-agent pipeline where 4 of the agents perform useless or pass-through tasks rather than sound engineering choices that improve performance.",
           "evidence_citations": [
-            "swarm/controller.py",
-            "Agent trajectory log (step 2: 'Sentiment score is computed but never referenced' and step 5: 'Consensus step has nothing to reconcile')",
-            "Final changelog entry: '83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency'"
+            "Agent trajectory log (Step 2: 'Sentiment score is computed but never referenced...', Step 5: 'Consensus step has nothing to reconcile...')",
+            "README.md Improvement Changelog ('Final: 83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency')",
+            "DETERMINISTIC VERIFICATION FLAG: hot_take_grounded"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The architecture trades 5.8x tokens and 4.1x latency for a 1% gain while adding non-functional agent steps.",
+          "note_for_other_criteria": "The multi-agent pipeline adds 5 LLM calls per ticket, 4 of which contribute no structural value to the final classification outcome.",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
           "score": 6,
-          "rationale": "The solution provides negligible end-to-end quality gains (83% vs 82% baseline accuracy) while introducing severe latency (11 minutes for 20 tickets) and running fluff agents whose outputs (like sentiment scores) are completely unused in the final result.",
+          "weaknesses_deducted_for": [
+            "Reproduction workflow fails out-of-the-box in a clean environment due to missing output paths/directories referenced in REPRODUCE.md.",
+            "Unusable end-to-end performance with 11-minute execution latency for just 20 support tickets, rendering the final output impractical for real support triage."
+          ],
+          "rationale": "The solution fails basic end-to-end execution standards because clean reproduction breaks on missing output paths ('out/baseline.json', 'out/swarm.json'). Furthermore, an 11-minute runtime for 20 tickets creates an impractical result that a support team could not realistically rely on.",
           "evidence_citations": [
-            "Final entry in Changelog: '83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency'",
-            "Agent trajectory log Step 2 note: 'Sentiment score is computed but never referenced by any downstream agent's output or the final classification.'",
-            "Agent trajectory log Step 5 note: 'Consensus step has nothing to reconcile since only one agent produced each field'"
+            "[FLAGGED] repro_paths_exist",
+            "REPRODUCE.md: '~11 minutes end-to-end for the swarm run (6 agents x 20 tickets = 120 calls)'",
+            "README.md: '83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The solution adds massive latency and token overhead for a single additional correct ticket classification out of 20.",
+          "note_for_other_criteria": "The reproduction setup flag directly prevents running the scripts end-to-end in clean environments.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
-          "score": 3,
-          "rationale": "The changelog documents a negligible 1% accuracy gain (82% to 83% on a 20-ticket sample) at the expense of 5.8x token overhead and 4.1x higher latency, yet iterations with zero or negative returns were retained for 'architectural completeness'.",
+          "score": 4,
+          "weaknesses_deducted_for": [
+            "Negligible performance gain (+1% accuracy on a 20-ticket set) accompanied by massive regressions in efficiency (5.8x tokens, severe latency increase).",
+            "Iteration decisions were not driven by empirical evidence (keeping Iteration 2 despite accuracy dropping from 83% to 82% 'for architectural completeness').",
+            "Hot take is generic AI hype ungrounded in project findings (FLAGGED hot_take_grounded)."
+          ],
+          "rationale": "The project demonstrates virtually no measurable improvement over baseline (+1% accuracy on 20 tickets) while introducing severe cost and latency regressions. Furthermore, iteration decisions explicitly prioritized complexity over empirical gains ('Kept for architectural completeness').",
           "evidence_citations": [
-            "82% accuracy vs. our 20-ticket labeled set",
-            "83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency",
-            "Kept for architectural completeness"
+            "README.md Improvement Changelog ('82% accuracy' -> '83% accuracy, 5.8x more tokens per ticket than baseline, 4.1x higher latency')",
+            "README.md Improvement Changelog Iteration 2 Decision ('Kept for architectural completeness')",
+            "[FLAGGED] hot_take_grounded: Hot take reads as generic AI-hype rather than a lesson tied to an observed failure in this specific project"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The iteration decisions explicitly prioritized agent count and architectural complexity over empirical performance gains.",
+          "note_for_other_criteria": "The lack of empirical gains despite adding 5 LLM calls directly undermines the engineering justification for the multi-agent design.",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
-          "score": 12,
-          "rationale": "REPRODUCE.md provides explicit step-by-step setup commands, datasets, expected execution times, costs, and evaluation scripts, but references output paths ('out/baseline.json', 'out/swarm.json') that do not pre-exist in the repository.",
+          "score": 4,
+          "weaknesses_deducted_for": [
+            "The reproduction guide references non-existent output paths ('out/baseline.json', 'out/swarm.json') and an uncreated output directory, causing reproduction to fail when executed from a clean environment."
+          ],
+          "rationale": "The submission fails directly on basic execution path verification because the instructions in REPRODUCE.md rely on output paths ('out/baseline.json', 'out/swarm.json') whose directory does not exist in the submission repository.",
           "evidence_citations": [
-            "REPRODUCE.md",
-            "[FLAGGED] repro_paths_exist: The reproduction guide references 2 path(s) not present anywhere in the submission: ['out/baseline.json', 'out/swarm.json']."
+            "[FLAGGED] repro_paths_exist: The reproduction guide references 2 path(s) not present anywhere in the submission: ['out/baseline.json', 'out/swarm.json']. A judge following this guide from a clean environment would fail here.",
+            "REPRODUCE.md"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "",
+          "note_for_other_criteria": "The uncreated output directory issue directly blocks execution in clean environments.",
           "criterion_id": "reproducibility",
           "max_points": 15
         },
         "hot_take_insights": {
-          "score": 0,
-          "rationale": "The hot take claims multi-agent swarms are 'inherently more powerful and represents best practice,' which directly contradicts their own empirical evidence showing a 5.8x token increase and 4.1x latency penalty for a negligible 1% accuracy gain.",
+          "score": 1,
+          "weaknesses_deducted_for": [
+            "The provided hot take relies on generic AI hype and directly contradicts the project's empirical evidence, which showed a 6-agent swarm added 4.1x latency and 5.8x cost for a negligible 1% accuracy gain.",
+            "Verification flag [FLAGGED] hot_take_grounded indicates the insight is not grounded in observed failure modes or practical lessons learned."
+          ],
+          "rationale": "The hot take claims multi-agent swarms are 'inherently more powerful and represents best practice', completely failing to extract a practical insight from their own failure mode where 5 extra LLM calls degraded latency and cost for virtually zero gain.",
           "evidence_citations": [
-            "FLAGGED: hot_take_grounded",
+            "[FLAGGED] hot_take_grounded",
             "README.md: 'More specialized agents working together is inherently more powerful and represents best practice in agentic system design.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The team drew no practical lessons from their clear empirical failure of multi-agent overhead.",
+          "note_for_other_criteria": "The hot take contradicts the experimental findings documented in the changelog.",
           "criterion_id": "hot_take_insights",
           "max_points": 5
         }
@@ -354,11 +381,12 @@
         "hot_take_grounded"
       ],
       "review_notes": [
-        "(Problem & User Value) The target user and bottleneck statements consist of single superficial sentences.",
-        "(Agent Solution & Engineering) The architecture trades 5.8x tokens and 4.1x latency for a 1% gain while adding non-functional agent steps.",
-        "(End to End Quality) The solution adds massive latency and token overhead for a single additional correct ticket classification out of 20.",
-        "(Measured Improvement) The iteration decisions explicitly prioritized agent count and architectural complexity over empirical performance gains.",
-        "(Hot Take / Insights) The team drew no practical lessons from their clear empirical failure of multi-agent overhead."
+        "(Problem & User Value) The 6-agent system increases execution time from 40s to 11 minutes for 20 tickets, significantly worsening the manual speed bottleneck for virtually zero accuracy improvement (+1%).",
+        "(Agent Solution & Engineering) The multi-agent pipeline adds 5 LLM calls per ticket, 4 of which contribute no structural value to the final classification outcome.",
+        "(End to End Quality) The reproduction setup flag directly prevents running the scripts end-to-end in clean environments.",
+        "(Measured Improvement) The lack of empirical gains despite adding 5 LLM calls directly undermines the engineering justification for the multi-agent design.",
+        "(Reproducibility) The uncreated output directory issue directly blocks execution in clean environments.",
+        "(Hot Take / Insights) The hot take contradicts the experimental findings documented in the changelog."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     },
@@ -395,17 +423,7 @@
         ],
         "claimed_results": [
           {
-            "claim": "94.7% classification accuracy",
-            "has_supporting_evidence_file": false,
-            "supporting_file": ""
-          },
-          {
-            "claim": "12.4x speedup over manual triage (3.6s/ticket)",
-            "has_supporting_evidence_file": false,
-            "supporting_file": ""
-          },
-          {
-            "claim": "63% reduction in support costs",
+            "claim": "94.7% classification accuracy (+33% increase over 71% baseline)",
             "has_supporting_evidence_file": false,
             "supporting_file": ""
           }
@@ -435,11 +453,9 @@
           "check": "claims_have_evidence",
           "passed": false,
           "unsupported_claims": [
-            "94.7% classification accuracy",
-            "12.4x speedup over manual triage (3.6s/ticket)",
-            "63% reduction in support costs"
+            "94.7% classification accuracy (+33% increase over 71% baseline)"
           ],
-          "detail": "3 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy', '12.4x speedup over manual triage (3.6s/ticket)', '63% reduction in support costs']. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value."
+          "detail": "1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% increase over 71% baseline)']. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value."
         },
         {
           "check": "hot_take_grounded",
@@ -450,79 +466,101 @@
       "per_criterion": {
         "problem_user_value": {
           "score": 13,
-          "rationale": "The project clearly defines a specific target user\u2014support operations leads at high-growth B2B companies processing over 500 tickets/day\u2014and clearly explains why slow, inconsistent manual triage is a meaningful bottleneck. However, the specific financial impact and cost reduction figures lack supporting evidence files in the repo.",
+          "weaknesses_deducted_for": [
+            "The financial impact claim ($2.3M estimated annual loss) and problem scope rely on uncited stats without grounding from user interviews or domain references."
+          ],
+          "rationale": "The submission clearly defines a specific target user (Support operations leads at B2B companies processing >500 tickets/day) and a clear operational bottleneck (slow, inconsistent manual ticket triage). However, the stated financial magnitude ($2.3M lost annually) is asserted without supporting domain citations or user research.",
           "evidence_citations": [
-            "README.md: \"Support operations leads at high-growth B2B companies lose an estimated $2.3M annually to mis-routed tickets and delayed escalations.\"",
-            "[FLAGGED] claims_have_evidence: 3 claim(s) have no specific file/dataset a judge could check"
+            "README.md: 'Support operations leads at high-growth B2B companies lose an estimated $2.3M annually to mis-routed tickets and delayed escalations. Any team processing more than 500 tickets/day faces this exact bottleneck.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The evaluation dataset and labeled per-ticket benchmark results were omitted from the repository for confidentiality reasons.",
+          "note_for_other_criteria": "The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 12,
-          "rationale": "The solution implements a basic pipeline of four sequential prompts labeled as separate agents, but lacks dynamic orchestration, external tools, or substantive verification mechanisms. Additionally, key claims around 94.7% accuracy lack benchmark evaluation scripts or datasets in the repository to verify technical performance.",
+          "score": 17,
+          "weaknesses_deducted_for": [
+            "Multi-agent architecture consists of simple sequential prompt calls without tools, dynamic routing, or distinct capabilities.",
+            "The QA verification agent performs no structured verification or grounded checks, merely re-prompting the LLM for confidence."
+          ],
+          "rationale": "Although the submission organizes agent roles into dedicated modules, the technical engineering is shallow. The pipeline relies on four static sequential prompts without tool integration or dynamic planning, and the QA verification step lacks rigorous checks.",
           "evidence_citations": [
-            "[FLAGGED] claims_have_evidence: 3 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy', '12.4x speedup over manual triage (3.6s/ticket)', '63% reduction in support costs']",
-            "Agent trajectory log: Step 2 note: 'Single LLM call per role; 'multi-agent' here means four sequential prompts, not four independently useful capabilities.'"
+            "Agent trajectory log step 2: 'Single LLM call per role; 'multi-agent' here means four sequential prompts, not four independently useful capabilities.'",
+            "Agent trajectory log step 3: 'The QA step does not verify anything against ground truth or re-derived evidence -- it just re-asks the model if it's confident.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The architecture uses sequential prompting across four roles rather than tool-augmented or memory-enabled agents.",
+          "note_for_other_criteria": "The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
-          "score": 5,
-          "rationale": "The submission lacks evaluation datasets or verifiable outputs, and the execution trajectory shows a shallow pipeline where the QA agent merely returns 'looks good' without structured verification. Without sample outputs, test data, or proof for its benchmark claims, the solution feels like an unverified draft rather than a finished end-to-end product.",
+          "score": 6,
+          "weaknesses_deducted_for": [
+            "No verifiable execution outputs or sample evaluation results are provided in the repository, making it impossible for a user to inspect or rely on the final output.",
+            "The documentation displays raw text encoding artifacts (e.g., '\u00e2\u20ac\u201d') and generic AI-hype framing, giving the submission the polish of an unreviewed draft rather than a production-ready deliverable."
+          ],
+          "rationale": "The submission fails to demonstrate end-to-end quality because evaluation outputs and sample ticket runs were omitted entirely, and the project documentation retains visible encoding glitches and generic AI claims.",
           "evidence_citations": [
-            "[FLAGGED] claims_have_evidence",
-            "REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'",
-            "Agent trajectory log: 'output: \"'looks good' (no structured check, no evidence citation, no comparison against any label)\"'"
+            "REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons'",
+            "README.md: 'TriageX \u00e2\u20ac\u201d enterprise-grade agentic support triage'",
+            "[FLAGGED] claims_have_evidence: 1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% increase over 71% baseline)']",
+            "[FLAGGED] hot_take_grounded: Hot take reads as generic AI-hype rather than a lesson tied to an observed failure in this specific project"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "No test datasets, evaluation logs, or sample ticket output files were included in the submission.",
+          "note_for_other_criteria": "The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
-          "score": 4,
-          "rationale": "While the submission presents a structured changelog mapping iterations to accuracy gains (71% to 89% to 94.7%), none of the baseline or final metrics are supported by evidence, test datasets, or log files in the submission. As acknowledged in REPRODUCE.md, all benchmark data was omitted, rendering the reported improvements unverified.",
+          "score": 3,
+          "weaknesses_deducted_for": [
+            "No supporting evaluation dataset or benchmark files were provided to substantiate the reported baseline (71%) or iteration gains (89%, 94.7%).",
+            "Verification flag [FLAGGED] claims_have_evidence triggered due to zero backing files for the headline accuracy claims."
+          ],
+          "rationale": "Although the submission lists an iteration changelog, all accuracy gains are purely claimed text with no evaluation scripts or test datasets submitted in the repo to verify them.",
           "evidence_citations": [
             "[FLAGGED] claims_have_evidence",
             "REPRODUCE.md: 'the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "All accuracy and speedup claims in the changelog lack supporting dataset files or evaluation logs.",
+          "note_for_other_criteria": "The lack of evaluation dataset and test results directly undermines all reported quantitative accuracy improvements.",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
           "score": 4,
-          "rationale": "While basic execution commands are provided in REPRODUCE.md, a reviewer cannot reproduce the baseline or reach the main result because the evaluation dataset and benchmark code were intentionally omitted ('the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons').",
+          "weaknesses_deducted_for": [
+            "Evaluation dataset and labeled test results are explicitly omitted, making it impossible to verify or reproduce the reported 94.7% classification accuracy result.",
+            "No baseline code or script is provided to execute and reproduce the 71% baseline performance metric."
+          ],
+          "rationale": "The criterion is largely unmet because a reviewer cannot reproduce the baseline or main accuracy findings from a clean environment. REPRODUCE.md explicitly notes that the evaluation set and test results were omitted for confidentiality reasons, leaving no dataset or test harness to replicate the claimed results.",
           "evidence_citations": [
-            "REPRODUCE.md",
-            "[FLAGGED] claims_have_evidence: 3 claim(s) have no specific file/dataset a judge could check"
+            "REPRODUCE.md: 'Note: the 94.7% accuracy figure and the 500-ticket benchmark referenced in the README were measured internally; the labeled evaluation set and per-ticket results are not included in this submission for confidentiality reasons.'",
+            "FLAGGED: claims_have_evidence (1 claim(s) have no specific file/dataset a judge could check: ['94.7% classification accuracy (+33% increase over 71% baseline)'])"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The lack of bundled evaluation datasets or scripts prevents verification of any benchmark or baseline results.",
+          "note_for_other_criteria": "The evaluation dataset and baseline execution scripts are completely absent from the repository.",
           "criterion_id": "reproducibility",
           "max_points": 15
         },
         "hot_take_insights": {
           "score": 1,
-          "rationale": "The hot take provides generic AI hype rather than a specific, practical lesson derived from an observed failure mode in the project. It fails to articulate concrete learnings or how the experience would change future agent design.",
+          "weaknesses_deducted_for": [
+            "The hot take is generic AI hype rather than a practical lesson grounded in a specific observed failure mode."
+          ],
+          "rationale": "The hot take lacks any practical learning from failure modes, offering only generic AI hype that multi-agent systems are superior. This directly violates the criterion guidelines and triggers the deterministic verification flag for ungrounded hot takes.",
           "evidence_citations": [
             "[FLAGGED] hot_take_grounded",
             "README.md: 'Multi-agent orchestration is clearly superior to single-prompt approaches. The data speaks for itself \u2014 more agents working together produces dramatically better outcomes across the board.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The lack of reflection aligns with the absence of real evaluation data and test results noted across other criteria.",
+          "note_for_other_criteria": "The submission offers no specific failure analysis or empirical insights from building the system.",
           "criterion_id": "hot_take_insights",
           "max_points": 5
         }
       },
-      "total": 39,
+      "total": 44,
       "needs_human_attention": true,
       "low_confidence_criteria": [],
       "flagged_checks": [
@@ -530,20 +568,20 @@
         "hot_take_grounded"
       ],
       "review_notes": [
-        "(Problem & User Value) The evaluation dataset and labeled per-ticket benchmark results were omitted from the repository for confidentiality reasons.",
-        "(Agent Solution & Engineering) The architecture uses sequential prompting across four roles rather than tool-augmented or memory-enabled agents.",
-        "(End to End Quality) No test datasets, evaluation logs, or sample ticket output files were included in the submission.",
-        "(Measured Improvement) All accuracy and speedup claims in the changelog lack supporting dataset files or evaluation logs.",
-        "(Reproducibility) The lack of bundled evaluation datasets or scripts prevents verification of any benchmark or baseline results.",
-        "(Hot Take / Insights) The lack of reflection aligns with the absence of real evaluation data and test results noted across other criteria."
+        "(Problem & User Value) The evaluation dataset and test results were intentionally omitted for confidentiality, which directly impacts evidence-backed accuracy claims.",
+        "(Agent Solution & Engineering) The minimal verification layer and static sequential prompts support concerns regarding unverified accuracy gains.",
+        "(End to End Quality) The missing evaluation dataset directly compromises end-to-end quality as there are no verifiable end-user outputs to review.",
+        "(Measured Improvement) The lack of evaluation dataset and test results directly undermines all reported quantitative accuracy improvements.",
+        "(Reproducibility) The evaluation dataset and baseline execution scripts are completely absent from the repository.",
+        "(Hot Take / Insights) The submission offers no specific failure analysis or empirical insights from building the system."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     },
-    "strong_baseline_done_right": {
-      "slug": "strong_baseline_done_right",
+    "good_project_bad_writeup": {
+      "slug": "good_project_bad_writeup",
       "evidence_ledger": {
-        "target_user": "Mara, who runs a 4-person support team at a mid-size SaaS company handling roughly 140 tickets a day.",
-        "bottleneck": "Triage is hard at volume without a senior person doing it. Junior agents under-flag urgency because they don't yet know which phrases correlate with churn risk, leading to mis-triaged tickets taking 3.1x longer for first response.",
+        "target_user": "A technical writer or developer advocate responsible for keeping a library's public API documentation in sync with the actual codebase.",
+        "bottleneck": "Manually diffing the changelog against the docs site and hunting for changed function signatures, spending roughly 6 hours per release.",
         "agent_capabilities_used": [
           "tool_use",
           "verification",
@@ -553,72 +591,68 @@
         "changelog_entries": [
           {
             "stage": "Baseline",
-            "evidence": "61% urgency accuracy vs. our 40-ticket labeled set (`eval/labels.csv`)",
-            "decision": "Established starting point"
+            "evidence": "0.52 F1 vs. our 30-item labeled set (eval/labeled_mismatches.json)",
+            "decision": "Starting point"
           },
           {
             "stage": "Iteration 1",
-            "evidence": "74% urgency accuracy",
-            "decision": "Kept \u2014 biggest single jump"
+            "evidence": "0.68 F1",
+            "decision": "Kept"
           },
           {
             "stage": "Iteration 2",
-            "evidence": "89% urgency accuracy; P0/P1 recall went from 71% to 96%",
-            "decision": "Kept \u2014 this is the change that mattered most for the metric Mara actually cares about (missed urgent tickets)"
+            "evidence": "0.81 F1; precision 0.74 -> 0.91",
+            "decision": "Kept - biggest single gain"
           },
           {
             "stage": "Iteration 3 (removed)",
-            "evidence": "No measurable change to urgency accuracy (88% vs 89%), added ~40% more cost per ticket",
-            "decision": "Removed \u2014 sentiment score didn't correlate with our actual urgency labels, it just felt like it should help"
+            "evidence": "No F1 change on the signature task, doubled cost, and the rewrites drifted in tone",
+            "decision": "Removed - out of scope for the metric that matters here"
           },
           {
             "stage": "Final",
-            "evidence": "89% urgency accuracy, 96% P0/P1 recall, $0.006/ticket, ~2.1s/ticket",
-            "decision": "\u2014"
+            "evidence": "0.81 F1, precision 0.91, recall 0.73, ~$0.02 per release, ~40s",
+            "decision": "-"
           }
         ],
         "claimed_results": [
           {
-            "claim": "Median time-to-first-response on initially mis-triaged tickets is 3.1x longer than tickets triaged correctly on first pass",
-            "has_supporting_evidence_file": true,
-            "supporting_file": "data/historical_triage_delay.csv"
-          },
-          {
-            "claim": "Baseline single prompt achieved 61% urgency accuracy on the labeled evaluation set",
-            "has_supporting_evidence_file": true,
-            "supporting_file": "eval/labels.csv"
-          },
-          {
-            "claim": "Adding category-specific few-shot examples improved urgency accuracy to 74%",
+            "claim": "F1 score on labeled mismatch set improved from 0.52 to 0.81",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/results.md"
           },
           {
-            "claim": "Adding red-flag phrase verification pass improved urgency accuracy to 89% and P0/P1 recall from 71% to 96%",
+            "claim": "Precision improved from 0.61 to 0.91",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/results.md"
           },
           {
-            "claim": "Final agent achieves 89% urgency accuracy, 96% P0/P1 recall at $0.006/ticket and ~2.1s/ticket",
+            "claim": "Recall improved from 0.45 to 0.73",
             "has_supporting_evidence_file": true,
             "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "Writer time per release reduced from ~6 hr to ~1.5 hr",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/writer_time_log.csv"
           }
         ],
         "repro_referenced_paths": [
           "requirements.txt",
-          "baseline/baseline_triage.py",
-          "data/tickets.jsonl",
-          "results/baseline.jsonl",
-          "src/agent_triage.py",
-          "results/agent.jsonl",
-          "eval/score_against_labels.py",
-          "eval/labels.csv",
+          "baseline/prompt_only.py",
+          "data/release_diffs/",
+          "data/docs_snapshot/",
+          "results/baseline.json",
+          "src/docsync.py",
+          "results/agent.json",
+          "eval/score.py",
+          "eval/labeled_mismatches.json",
           "eval/results.md"
         ],
         "repro_referenced_env_vars": [
           "ANTHROPIC_API_KEY"
         ],
-        "hot_take_text": "The agent still misses tickets where urgency is implied by *what's missing* rather than what's said \u2014 e.g. a customer who used to email daily and has gone silent for a week after a billing dispute. Nothing in the ticket text itself is urgent-sounding. Our hot take: verification passes built to catch *wrong tone* won't catch *wrong silence* \u2014 if the real signal lives outside the artifact you're reviewing (ticket history, not ticket text), no amount of re-reading the same ticket harder will find it. The next version needs a tool call out to ticket history, not a better prompt.",
+        "hot_take_text": "retrieval quality set the ceiling here, not the model. Once the right doc page was in context the model was reliable; when retrieval missed the page, no amount of prompting recovered it. The verification step was worth more than any prompt change because it let us be aggressive on recall and clean up precision afterward, instead of trading one for the other in a single pass.",
         "hot_take_is_generic": false,
         "human_approval_gate_present": true
       },
@@ -649,62 +683,70 @@
       "per_criterion": {
         "problem_user_value": {
           "score": 15,
-          "rationale": "The submission clearly identifies a specific user persona (Mara and her 4-person support team) and grounds the urgency bottleneck with concrete quantitative data (3.1x longer response times on mis-triaged tickets, backed by data/historical_triage_delay.csv).",
+          "weaknesses_deducted_for": [],
+          "rationale": "The project identifies a clearly defined target user (technical writers / developer advocates) and a well-quantified bottleneck (~6 hours per release manually diffing code diffs against documentation), with no identifiable weakness on this criterion.",
           "evidence_citations": [
-            "Mara, who runs a 4-person support team at a mid-size SaaS company handling roughly 140 tickets a day.",
-            "data/historical_triage_delay.csv",
-            "median time-to-first-response on tickets that were initially mis-triaged is 3.1x longer than tickets triaged correctly"
+            "README.md: 'The target user for DocSync AI is a technical writer or developer advocate who is responsible for keeping a library's public API documentation in sync with the actual codebase.'",
+            "README.md: 'spent roughly 6 hours per release manually diffing the changelog against the docs site and hunting for function signatures that changed.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The target user's core pain point (missed P0/P1 urgency and churn risk) directly drove the key architectural decisions in Iteration 2.",
+          "note_for_other_criteria": "The submission references real user timing logs in eval/writer_time_log.csv showing reduction from ~6 hr to ~1.5 hr per release.",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 29,
-          "rationale": "The solution employs a well-structured agent architecture with deterministic tool verification, trajectory revision, and human-in-the-loop approval, backed by methodical iteration that pruned wasteful LLM calls while boosting P0/P1 recall from 71% to 96%.",
+          "score": 26,
+          "weaknesses_deducted_for": [
+            "The doc retrieval tool (`src/retrieve_docs.py`) relies on symbol-name matching and fails to retrieve documentation sections where API parameters or default values are discussed solely in prose (accounting for 4 of the 8 remaining recall misses)."
+          ],
+          "rationale": "The agent design is technically sound, utilizing AST-based code parsing (`src/ast_symbols.py`), post-classification verification (`src/verify_mismatch.py`), and a human review gate. A minor weakness is that retrieval is limited to symbol-based matching, leaving prose-based documentation mismatches unhandled.",
           "evidence_citations": [
-            "src/verify_urgency.py",
-            "README.md Improvement Changelog (Iteration 2 & Iteration 3)",
-            "Agent trajectory log steps 2-3"
+            "src/docsync.py",
+            "src/verify_mismatch.py",
+            "README.md: 'Four of the eight misses in the final eval were this pattern.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The architectural decision to introduce the red-flag verification tool was explicitly driven by the user's primary business metric (preventing missed urgent tickets).",
+          "note_for_other_criteria": "The AST parsing + verification design directly accounts for the precision boost from 0.74 to 0.91 noted in Iteration 2.",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
-          "score": 20,
-          "rationale": "The solution completes a realistic, end-to-end workflow from ticket classification and deterministic phrase verification to drafting a customer response held behind a human approval gate. The trajectory and output schema (`verification_flag`, `evidence_quote`) produce actionable, high-quality results tailored to Mara's team rather than an obvious unrefined draft.",
+          "score": 17,
+          "weaknesses_deducted_for": [
+            "The agent struggles to detect doc mismatches embedded purely in prose text (e.g., numbers spelled out as English words), leaving recall at 0.73 and requiring manual effort to catch non-code-block doc drift."
+          ],
+          "rationale": "The system delivers a highly usable end-to-end workflow producing standard git patches (`docs.patch`) with high precision (0.91) and a human approval gate. One minor weakness is that recall is limited to 0.73 because the pipeline misses mismatches located within prose descriptions.",
           "evidence_citations": [
-            "src/agent_triage.py",
-            "Agent trajectory log (Step 4 & Step 5 human_checkpoint)",
-            "[OK] claims_have_evidence"
+            "README.md: 'The main failure mode is recall on symbols that are documented only in prose (\"the timeout defaults to thirty seconds\") rather than in a code block.'",
+            "Agent trajectory log Step 5 & 6: 'emit_docs_patch', 'docs.patch (3 hunks), held for review'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The end-to-end pipeline includes clear human-in-the-loop review guardrails before any customer response is dispatched.",
+          "note_for_other_criteria": "The human approval gate in src/docsync.py ensures no patch is auto-merged without technical writer verification.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
           "score": 15,
-          "rationale": "The submission demonstrates exceptional measured improvement, progressing from a 61% baseline to 89% urgency accuracy (and 96% P0/P1 recall) across documented iterations. Crucially, the changelog details both successful additions and a discarded iteration (Iteration 3) that added 40% cost without metric gain.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission shows exemplary tracking of measured gains over a clear prompt-only baseline, documenting metric improvements at each iteration step (from 0.52 to 0.81 F1) as well as justifying discarded iterations with empirical evidence.",
           "evidence_citations": [
-            "README.md changelog table",
-            "Iteration 3 (removed): 'No measurable change to urgency accuracy (88% vs 89%), added ~40% more cost per ticket'",
-            "eval/results.md"
+            "Improvement Changelog table in README.md",
+            "eval/results.md",
+            "eval/writer_time_log.csv",
+            "[OK] claims_have_evidence"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The explicit evaluation and removal of unprofitable features (Iteration 3 sentiment scoring) highlights rigorous measurement practices.",
+          "note_for_other_criteria": "",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
           "score": 15,
-          "rationale": "The submission provides an exemplary reproduction guide with step-by-step setup commands, explicit CLI instructions for running baseline, agent, and evaluation scripts, and accurate cost/time estimates. All referenced file paths exist in the submission.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The reproduction guide in REPRODUCE.md provides comprehensive, step-by-step setup and execution commands for the baseline, agent, and evaluation script. All referenced files and scripts exist in the repository, environment variables are clearly declared, and cost/runtime expectations are explicitly documented.",
           "evidence_citations": [
             "REPRODUCE.md",
-            "[OK] repro_paths_exist: Every path the reproduction guide references is present in the submission's file listing."
+            "DETERMINISTIC VERIFICATION FLAG: [OK] repro_paths_exist"
           ],
           "confidence": "high",
           "note_for_other_criteria": "",
@@ -713,28 +755,815 @@
         },
         "hot_take_insights": {
           "score": 5,
-          "rationale": "The submission delivers an exceptional, highly specific hot take that converts an observed edge-case failure into an actionable architectural lesson ('wrong tone' vs 'wrong silence'). It clearly articulates how this insight alters future design by identifying that signal lives outside the artifact, requiring external tool calls rather than deeper prompt tuning.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The hot take provides a sharp, non-generic insight that connects observed failure modes (prose matching and retrieval misses) directly to architectural lessons on decoupling precision and recall using dedicated verification steps rather than prompt tweaking.",
           "evidence_citations": [
-            "README.md: 'verification passes built to catch *wrong tone* won't catch *wrong silence* \u2014 if the real signal lives outside the artifact you're reviewing (ticket history, not ticket text), no amount of re-reading the same ticket harder will find it.'",
-            "README.md: 'The next version needs a tool call out to ticket history, not a better prompt.'",
-            "[OK] hot_take_grounded"
+            "README.md ('Main Failure Mode and Hot Take')",
+            "DETERMINISTIC VERIFICATION FLAGS: [OK] hot_take_grounded"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The insight directly justifies their decision in Iteration 3 to cut sentiment scoring rather than over-engineering prompt logic.",
+          "note_for_other_criteria": "",
           "criterion_id": "hot_take_insights",
           "max_points": 5
         }
       },
-      "total": 99,
+      "total": 93,
       "needs_human_attention": false,
       "low_confidence_criteria": [],
       "flagged_checks": [],
       "review_notes": [
-        "(Problem & User Value) The target user's core pain point (missed P0/P1 urgency and churn risk) directly drove the key architectural decisions in Iteration 2.",
-        "(Agent Solution & Engineering) The architectural decision to introduce the red-flag verification tool was explicitly driven by the user's primary business metric (preventing missed urgent tickets).",
-        "(End to End Quality) The end-to-end pipeline includes clear human-in-the-loop review guardrails before any customer response is dispatched.",
-        "(Measured Improvement) The explicit evaluation and removal of unprofitable features (Iteration 3 sentiment scoring) highlights rigorous measurement practices.",
-        "(Hot Take / Insights) The insight directly justifies their decision in Iteration 3 to cut sentiment scoring rather than over-engineering prompt logic."
+        "(Problem & User Value) The submission references real user timing logs in eval/writer_time_log.csv showing reduction from ~6 hr to ~1.5 hr per release.",
+        "(Agent Solution & Engineering) The AST parsing + verification design directly accounts for the precision boost from 0.74 to 0.91 noted in Iteration 2.",
+        "(End to End Quality) The human approval gate in src/docsync.py ensures no patch is auto-merged without technical writer verification."
+      ],
+      "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
+    },
+    "overengineered_but_honest": {
+      "slug": "overengineered_but_honest",
+      "evidence_ledger": {
+        "target_user": "Research-development officers at small university departments",
+        "bottleneck": "A funding call is 3-8 pages of eligibility rules, scope language, and priorities. Matching it to a faculty member means holding the call's constraints in your head while reading someone's publication list and deciding whether the fit is real or superficial. It's a comparison task across two long, messy documents, done 60 times per call, and the officer's attention degrades after the first fifteen.",
+        "agent_capabilities_used": [
+          "verification",
+          "orchestration",
+          "human_checkpoint"
+        ],
+        "changelog_entries": [
+          {
+            "stage": "Baseline",
+            "evidence": "0.58 nDCG@10 vs. the officer's own ranking on 8 past calls (`eval/officer_rankings.json`)",
+            "decision": "Starting point"
+          },
+          {
+            "stage": "Iteration 1",
+            "evidence": "0.64 nDCG@10; hard-constraint violations in the top 10 went 1.4 -> 0.5 per call",
+            "decision": "Kept"
+          },
+          {
+            "stage": "Iteration 2",
+            "evidence": "0.71 nDCG@10",
+            "decision": "Kept"
+          },
+          {
+            "stage": "Iteration 3",
+            "evidence": "0.76 nDCG@10; \"unsupported reason\" rate in top 10 fell from 22% to 6%",
+            "decision": "Kept"
+          },
+          {
+            "stage": "Iteration 4 (removed)",
+            "evidence": "No nDCG change (0.76 -> 0.76), +35% cost, and it mostly re-surfaced candidates the checker then re-demoted",
+            "decision": "Removed - it added a loop, not information"
+          },
+          {
+            "stage": "Final",
+            "evidence": "0.76 nDCG@10, 0.5 hard-constraint violations/call, ~$0.14 per call, ~3 min",
+            "decision": "-"
+          }
+        ],
+        "claimed_results": [
+          {
+            "claim": "nDCG@10 vs. officer ranking improved from 0.58 (baseline) to 0.76 (GrantMatch) across 8 calls",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/officer_rankings.json"
+          },
+          {
+            "claim": "Hard-constraint violations in top 10 reduced from 1.4 to 0.5 per call",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/score.py"
+          },
+          {
+            "claim": "Unsupported fit reasons in top 10 reduced from 22% to 6%",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/score.py"
+          }
+        ],
+        "repro_referenced_paths": [
+          "requirements.txt",
+          "baseline/one_shot_rank.py",
+          "data/calls/",
+          "data/faculty.json",
+          "results/baseline.json",
+          "src/grantmatch.py",
+          "results/agent.json",
+          "eval/score.py",
+          "eval/officer_rankings.json",
+          "eval/results.md",
+          "data/calls/SOURCES.md"
+        ],
+        "repro_referenced_env_vars": [
+          "ANTHROPIC_API_KEY"
+        ],
+        "hot_take_text": "The remaining errors are near-misses on interdisciplinary faculty: someone whose work genuinely spans two areas gets a middling score in both instead of a high score for the combination, because each step evaluates fit one dimension at a time. The checker doesn't help here - the reason is supported, it's just underweight. Hot take: every agent in this pipeline had to earn its place in the metric, not the diagram. Three of the four steps moved nDCG or the constraint-violation count; the fourth (the removed advocate) moved neither and we cut it even though it made the architecture diagram look more thorough. The lesson we're taking forward: add the step, measure, and be willing to delete it the same day if the number doesn't move - 'it seems like it should help' is how you end up paying 35% more for a loop.",
+        "hot_take_is_generic": false,
+        "human_approval_gate_present": true
+      },
+      "verification_flags": [
+        {
+          "check": "repro_paths_exist",
+          "passed": true,
+          "missing_paths": [],
+          "detail": "Every path the reproduction guide references is present in the submission's file listing."
+        },
+        {
+          "check": "env_var_consistency",
+          "passed": true,
+          "detail": "No env-var/provider mismatch detected."
+        },
+        {
+          "check": "claims_have_evidence",
+          "passed": true,
+          "unsupported_claims": [],
+          "detail": "Every headline claim points to a specific, checkable file."
+        },
+        {
+          "check": "hot_take_grounded",
+          "passed": true,
+          "detail": "Hot take connects to a specific failure mode observed in this project."
+        }
+      ],
+      "per_criterion": {
+        "problem_user_value": {
+          "score": 14,
+          "weaknesses_deducted_for": [
+            "User evaluation relies on synthetic faculty profiles rather than real-world department faculty data, slightly limiting validation context."
+          ],
+          "rationale": " calculated deduction for using synthetic faculty profiles instead of live department data. Otherwise, the project defines an extremely clear, real-world user persona and concrete bottleneck with high impact.",
+          "evidence_citations": [
+            "README.md: 'Research-development officers at small university departments.'",
+            "README.md: 'The officer we worked with spends about 90 minutes per call cross-referencing the call text against faculty pages and past awards.'",
+            "REPRODUCE.md: 'data/faculty.json - 60 synthetic faculty profiles we generated'"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.",
+          "criterion_id": "problem_user_value",
+          "max_points": 15
+        },
+        "agent_solution_engineering": {
+          "score": 26,
+          "weaknesses_deducted_for": [
+            "The multi-agent pipeline is strictly linear and processes candidates along isolated dimensions, lacking dynamic tool use or iterative synthesis to handle interdisciplinary faculty profiles."
+          ],
+          "rationale": "GrantMatch demonstrates strong engineering with a purposeful four-agent pipeline (parser, researcher, matcher, checker) featuring verification and explicit human-in-the-loop checkpoints. A minor weakness is the reliance on a fixed sequential workflow that evaluates candidates independently along isolated dimensions, limiting its ability to resolve complex interdisciplinary fits.",
+          "evidence_citations": [
+            "README.md: 'The remaining errors are near-misses on interdisciplinary faculty... because each step evaluates fit one dimension at a time.'",
+            "Agent trajectory log: steps 1-5 detail a static pipeline (call_parser -> faculty_researcher -> matcher -> checker)."
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.",
+          "criterion_id": "agent_solution_engineering",
+          "max_points": 30
+        },
+        "end_to_end_quality": {
+          "score": 17,
+          "weaknesses_deducted_for": [
+            "Interdisciplinary faculty fit is systematically under-scored in the final shortlist output because the matcher evaluates fit strictly one dimension at a time, resulting in middling scores for candidates whose work spans multiple program areas."
+          ],
+          "rationale": "The pipeline delivers a complete, highly practical, and self-contained workflow that generates clean, actionable shortlists (`shortlist.md`) with explicit verification checks and reasonings tailored directly for research-development officers. A minor deduction is made because the output degrades on interdisciplinary candidates, who receive suboptimal rankings due to single-dimension scoring logic.",
+          "evidence_citations": [
+            "README.md: 'The remaining errors are near-misses on interdisciplinary faculty: someone whose work genuinely spans two areas gets a middling score in both instead of a high score for the combination, because each step evaluates fit one dimension at a time.'"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "end_to_end_quality",
+          "max_points": 20
+        },
+        "measured_improvement": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission provides an exemplary evaluation with a fair baseline, granular iteration tracking across multiple quantitative metrics (nDCG@10, hard-constraint violations, unsupported reason rate), full trade-off reporting (cost and latency), and empirical justification for removing an unproductive agent step.",
+          "evidence_citations": [
+            "eval/officer_rankings.json",
+            "eval/score.py",
+            "README.md (Improvement Changelog)"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "measured_improvement",
+          "max_points": 15
+        },
+        "reproducibility": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission provides an exemplary, complete reproduction guide in REPRODUCE.md, including exact environment dependencies, cost/runtime expectations, clean step-by-step commands for running the baseline, agent, and evaluation script, and all referenced files and paths exist.",
+          "evidence_citations": [
+            "REPRODUCE.md",
+            "[OK] repro_paths_exist",
+            "[OK] env_var_consistency",
+            "[OK] claims_have_evidence"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "reproducibility",
+          "max_points": 15
+        },
+        "hot_take_insights": {
+          "score": 5,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission articulates an exemplary insight grounded in empirical observation: analyzing why interdisciplinary faculty are mis-scored and deriving a concrete architectural rule that every agent step must empirically move metrics rather than just populate architecture diagrams.",
+          "evidence_citations": [
+            "README.md: 'Hot take: every agent in this pipeline had to earn its place in the metric, not the diagram.'",
+            "README.md: 'The remaining errors are near-misses on interdisciplinary faculty... because each step evaluates fit one dimension at a time.'",
+            "DETERMINISTIC VERIFICATION FLAGS: [OK] hot_take_grounded"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The pruning of the 5th 'advocate' agent (Iteration 4) serves as both an iteration win and the basis for a strong hot take.",
+          "criterion_id": "hot_take_insights",
+          "max_points": 5
+        }
+      },
+      "total": 92,
+      "needs_human_attention": false,
+      "low_confidence_criteria": [],
+      "flagged_checks": [],
+      "review_notes": [
+        "(Problem & User Value) The submission highlights high human-in-the-loop control with an explicitly defined officer review step in the workflow trace.",
+        "(Agent Solution & Engineering) The iteration log shows exemplary engineering discipline by pruning an ineffective 5th agent (advocate) after empirical testing.",
+        "(Hot Take / Insights) The pruning of the 5th 'advocate' agent (Iteration 4) serves as both an iteration win and the basis for a strong hot take."
+      ],
+      "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
+    },
+    "real_gains_no_changelog": {
+      "slug": "real_gains_no_changelog",
+      "evidence_ledger": {
+        "target_user": "On-call SREs at a mid-size infrastructure team",
+        "bottleneck": "A runbook is a program written for a human interpreter. The human is slow, loses their place, and under stress will skip the 'check X before you do Y' line. Mean time from alert-ack to correct-first-action on the three runbooks we timed was 11 minutes, and two of six trial runs took a wrong branch that had to be backed out.",
+        "agent_capabilities_used": [
+          "tool_use",
+          "verification",
+          "memory",
+          "orchestration",
+          "human_checkpoint"
+        ],
+        "changelog_entries": [],
+        "claimed_results": [
+          {
+            "claim": "Median time alert-ack -> correct first action reduced from 11.0 min to 4.5 min (-6.5 min)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "Wrong-branch events reduced from 4 to 0 out of 12 incidents (-4)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "Mean steps skipped vs. runbook reduced from 1.8 to 0.1 (-1.7)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "State-changing commands run without the guard check reduced from 3 to 0 (-3)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "Responder-rated 'I knew what to do next' score improved from 2.8 to 4.4 out of 5 (+1.6)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          }
+        ],
+        "repro_referenced_paths": [
+          "requirements.txt",
+          "baseline/manual_replay.py",
+          "data/incidents/",
+          "results/baseline.json",
+          "src/runbookrunner.py",
+          "results/agent.json",
+          "eval/score.py",
+          "eval/results.md",
+          "data/runbooks/",
+          "eval/rubric.md"
+        ],
+        "repro_referenced_env_vars": [
+          "ANTHROPIC_API_KEY"
+        ],
+        "hot_take_text": "The guard on state-changing commands mattered more than the speed-up. The time saved is nice, but the thing the responders actually commented on was never again running a destructive command before the check, because the agent structurally won't let the step proceed until the check has been shown. Enforced sequencing beat faster typing.",
+        "hot_take_is_generic": false,
+        "human_approval_gate_present": true
+      },
+      "verification_flags": [
+        {
+          "check": "repro_paths_exist",
+          "passed": true,
+          "missing_paths": [],
+          "detail": "Every path the reproduction guide references is present in the submission's file listing."
+        },
+        {
+          "check": "env_var_consistency",
+          "passed": true,
+          "detail": "No env-var/provider mismatch detected."
+        },
+        {
+          "check": "claims_have_evidence",
+          "passed": true,
+          "unsupported_claims": [],
+          "detail": "Every headline claim points to a specific, checkable file."
+        },
+        {
+          "check": "hot_take_grounded",
+          "passed": true,
+          "detail": "Hot take connects to a specific failure mode observed in this project."
+        }
+      ],
+      "per_criterion": {
+        "problem_user_value": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission clearly identifies a precise target user (on-call SREs at mid-size infrastructure teams) and articulates a high-stakes, realistic bottleneck (human confusion, missed guard checks, and slow execution when interpreting complex conditional runbooks under 3am stress).",
+          "evidence_citations": [
+            "README.md: 'On-call SREs at a mid-size infrastructure team.'",
+            "README.md: 'The human is slow, loses their place, and under stress will skip the \"check X before you do Y\" line.'"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The explicit human-approval gate on mutating commands is highlighted in the hot take as providing more user value than pure execution speed.",
+          "criterion_id": "problem_user_value",
+          "max_points": 15
+        },
+        "agent_solution_engineering": {
+          "score": 26,
+          "weaknesses_deducted_for": [
+            "The agent architecture lacks error recovery or adaptive fallback mechanisms when encountering unhandled step execution errors (such as stale CLI flags in runbooks), causing execution to halt rather than offering suggestions to the responder."
+          ],
+          "rationale": "RunbookRunner exhibits strong agent engineering with clear separation of step parsing, sandboxed command execution, automated conditional branching, and explicit human-in-the-loop gates for state-changing commands. However, points were deducted for the agent's inability to gracefully recover or propose remedies when encountering execution steps not covered by the runbook's explicit branches.",
+          "evidence_citations": [
+            "README.md: 'On one incident the runbook itself had a stale command (a renamed CLI flag); the agent ran it, surfaced the error, and then had no branch for \"the runbook is wrong\" - it just stopped and waited.'",
+            "Agent trajectory log: step 2 (sandbox.run), step 3 (branch_eval.evaluate), and step 5-6 (propose_state_change / approve_state_change)"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The structural enforcement of state-changing command approval gates directly supports the safety claims validated in the evaluation results.",
+          "criterion_id": "agent_solution_engineering",
+          "max_points": 30
+        },
+        "end_to_end_quality": {
+          "score": 17,
+          "weaknesses_deducted_for": [
+            "Halts without fallback or recovery guidance when encountering unexpected command errors or unhandled runbook step failures (e.g., stale CLI flags)."
+          ],
+          "rationale": "RunbookRunner executes a clean, end-to-end incident remediation flow with robust safety gates and structured handoff log generation, though it lacks an automated fallback mechanism when execution encounters unhandled runbook errors.",
+          "evidence_citations": [
+            "README.md ('On one incident the runbook itself had a stale command... it just stopped and waited')",
+            "Agent trajectory log (INC-0007 step trace)"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "End-to-end quality is strong with complete sandbox execution and clear output logs, but unhandled command errors require manual human intervention.",
+          "criterion_id": "end_to_end_quality",
+          "max_points": 20
+        },
+        "measured_improvement": {
+          "score": 10,
+          "weaknesses_deducted_for": [
+            "The submission lacks a changelog or iteration history connecting specific incremental changes to measured performance improvements over time."
+          ],
+          "rationale": "While the submission provides a strong, reproducible baseline comparison across 12 incidents detailed in `eval/results.md`, it completely omits changelog entries, making it impossible to trace how specific iterative modifications improved outcomes.",
+          "evidence_citations": [
+            "changelog_entries: []",
+            "eval/results.md"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "Evaluation clearly demonstrates final gains over the baseline, but contains no recorded iteration history.",
+          "criterion_id": "measured_improvement",
+          "max_points": 15
+        },
+        "reproducibility": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The project provides a comprehensive and verified reproduction guide in REPRODUCE.md, including setup commands, cost/time estimates, environment requirements, and commands for baseline replay, agent execution, and evaluation script invocation with all referenced files present in the repo.",
+          "evidence_citations": [
+            "REPRODUCE.md",
+            "verification flag: [OK] repro_paths_exist",
+            "verification flag: [OK] env_var_consistency"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "reproducibility",
+          "max_points": 15
+        },
+        "hot_take_insights": {
+          "score": 5,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission provides an exemplary insight grounded directly in observed user behavior and failure modes, concluding that structural safety ('enforced sequencing') mattered more than raw execution speed, and identifying how to evolve the agent when runbook steps fail.",
+          "evidence_citations": [
+            "README.md: 'Hot take: the guard on state-changing commands mattered more than the speed-up... Enforced sequencing beat faster typing.'",
+            "README.md: 'We now think the agent should be allowed to say \"this step failed in a way the runbook doesn't cover, here's what I'd try\" as a suggestion the responder can accept, rather than halting.'",
+            "hot_take_grounded: True"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The insight regarding fallback suggestions for unhandled command errors directly relates to the failure mode identified in End to End Quality.",
+          "criterion_id": "hot_take_insights",
+          "max_points": 5
+        }
+      },
+      "total": 88,
+      "needs_human_attention": false,
+      "low_confidence_criteria": [],
+      "flagged_checks": [],
+      "review_notes": [
+        "(Problem & User Value) The explicit human-approval gate on mutating commands is highlighted in the hot take as providing more user value than pure execution speed.",
+        "(Agent Solution & Engineering) The structural enforcement of state-changing command approval gates directly supports the safety claims validated in the evaluation results.",
+        "(End to End Quality) End-to-end quality is strong with complete sandbox execution and clear output logs, but unhandled command errors require manual human intervention.",
+        "(Measured Improvement) Evaluation clearly demonstrates final gains over the baseline, but contains no recorded iteration history.",
+        "(Hot Take / Insights) The insight regarding fallback suggestions for unhandled command errors directly relates to the failure mode identified in End to End Quality."
+      ],
+      "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
+    },
+    "scope_mismatch": {
+      "slug": "scope_mismatch",
+      "evidence_ledger": {
+        "target_user": "People with messy Downloads folders containing thousands of unorganized files",
+        "bottleneck": "Sorting a downloads folder by hand is boring and time-consuming, while rule-based sorters (by extension) place all PDFs into a single pile regardless of whether they are bank statements, boarding passes, or research papers.",
+        "agent_capabilities_used": [
+          "tool_use",
+          "orchestration",
+          "human_checkpoint"
+        ],
+        "changelog_entries": [
+          {
+            "stage": "Baseline",
+            "evidence": "0.44 agreement with my hand-sort of 200 files",
+            "decision": "Starting point"
+          },
+          {
+            "stage": "Iteration 1",
+            "evidence": "0.63 agreement; still bad on generic names like scan_0421.pdf",
+            "decision": "Kept"
+          },
+          {
+            "stage": "Iteration 2",
+            "evidence": "0.86 agreement; the finance/travel/reading split on PDFs went from near-random to 0.9",
+            "decision": "Kept - the change that mattered"
+          },
+          {
+            "stage": "Iteration 3",
+            "evidence": "Agreement unchanged; recovered a bad run in one command",
+            "decision": "Kept - safety, not accuracy"
+          },
+          {
+            "stage": "Final",
+            "evidence": "0.86 agreement with hand-sort, ~$0.05 per 200 files, ~90s",
+            "decision": "-"
+          }
+        ],
+        "claimed_results": [
+          {
+            "claim": "Agreement with hand-sort (n=200) improved from 0.44 to 0.86",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "PDF sub-type accuracy (finance/travel/reading, n=70) improved from 0.19 to 0.90",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "Files needing manual fix after the run reduced from 112 to 28",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          }
+        ],
+        "repro_referenced_paths": [
+          "requirements.txt",
+          "eval/make_fixtures.py",
+          "eval/fixtures.tar.gz",
+          "data/messy_folder/",
+          "eval/handsort.csv",
+          "baseline/by_extension.py",
+          "results/baseline.json",
+          "src/tidydrop.py",
+          "results/agent.json",
+          "eval/score.py",
+          "eval/results.md",
+          ".tidydrop_undo.json"
+        ],
+        "repro_referenced_env_vars": [
+          "ANTHROPIC_API_KEY"
+        ],
+        "hot_take_text": "the dry-run step changed how I felt about the tool more than the accuracy did. At 86% agreement, one run still misplaces ~28 of 200 files - that's only acceptable because I see the whole plan first and can fix it in the preview, and because undo is one command. An agent that moves your files is a different trust proposition than one that suggests where to move them, and the preview is what bridges it.",
+        "hot_take_is_generic": false,
+        "human_approval_gate_present": true
+      },
+      "verification_flags": [
+        {
+          "check": "repro_paths_exist",
+          "passed": false,
+          "missing_paths": [
+            ".tidydrop_undo.json"
+          ],
+          "detail": "The reproduction guide references 1 path(s) not present anywhere in the submission: ['.tidydrop_undo.json']. A judge following this guide from a clean environment would fail here."
+        },
+        {
+          "check": "env_var_consistency",
+          "passed": true,
+          "detail": "No env-var/provider mismatch detected."
+        },
+        {
+          "check": "claims_have_evidence",
+          "passed": true,
+          "unsupported_claims": [],
+          "detail": "Every headline claim points to a specific, checkable file."
+        },
+        {
+          "check": "hot_take_grounded",
+          "passed": true,
+          "detail": "Hot take connects to a specific failure mode observed in this project."
+        }
+      ],
+      "per_criterion": {
+        "problem_user_value": {
+          "score": 13,
+          "weaknesses_deducted_for": [
+            "Target user specification is somewhat informal ('Me... Probably other people too') and relies on a pre-defined static 9-category taxonomy rather than supporting existing or user-customized folder structures."
+          ],
+          "rationale": "The project clearly articulates a relatable bottleneck\u2014semantic content-aware file sorting versus naive extension sorting\u2014scoring high on problem clarity, though deducting slightly for assuming a generic fixed taxonomy for all users.",
+          "evidence_citations": [
+            "README.md: 'Who has this problem: Me. My Downloads folder has 3,400 files in it. Probably other people too.'",
+            "README.md: 'The bottleneck: Sorting a downloads folder by hand is boring and I never do it... Rule-based sorters (by extension) put every PDF in one pile whether it's a bank statement, a boarding pass, or a paper.'"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The flagged missing path `.tidydrop_undo.json` is a runtime log created upon moving files, relevant to reproducibility check.",
+          "criterion_id": "problem_user_value",
+          "max_points": 15
+        },
+        "agent_solution_engineering": {
+          "score": 25,
+          "weaknesses_deducted_for": [
+            "The agent lacks persistent memory or a learning mechanism to record user corrections from preview edits, preventing it from adapting to user-specific naming conventions over time."
+          ],
+          "rationale": "The agent design purposefully integrates content extraction tools, structured taxonomy reasoning, and a human approval gate with dry-run/undo functionality. However, it lacks a memory mechanism to retain and learn from user corrections across runs, which is acknowledged as the primary remaining failure mode.",
+          "evidence_citations": [
+            "README.md: 'A per-user memory of past corrections would fix most of these; I didn't build it.'",
+            "Agent trajectory log: 'Step 5: (eval mode) plan scored against eval/handsort.csv... (real mode) user edits then approves'"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The missing `.tidydrop_undo.json` file is generated dynamically at runtime when executing without `--plan-only`.",
+          "criterion_id": "agent_solution_engineering",
+          "max_points": 30
+        },
+        "end_to_end_quality": {
+          "score": 17,
+          "weaknesses_deducted_for": [
+            "The reproduction guide references `.tidydrop_undo.json` prior to execution, which triggers a path verification flag because it is only dynamically generated at runtime after approval.",
+            "At 86% accuracy, approximately 28 out of 200 files are still misplaced, requiring manual review and correction during the preview step."
+          ],
+          "rationale": "The solution offers a highly usable, polished CLI workflow with dry-run planning, reasoned file placements, and robust undo capabilities. Points were deducted due to the 14% misclassification rate requiring human preview intervention and the static verification flag on the dynamically created `.tidydrop_undo.json` path.",
+          "evidence_citations": [
+            "FLAGGED: repro_paths_exist for [.tidydrop_undo.json]",
+            "README.md: 'At 86% agreement, one run still misplaces ~28 of 200 files'"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The missing `.tidydrop_undo.json` file is expected behavior for clean repos as it is generated dynamically at runtime.",
+          "criterion_id": "end_to_end_quality",
+          "max_points": 20
+        },
+        "measured_improvement": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission demonstrates exemplary measured improvement, featuring a fair extension-based baseline (0.44 agreement), clear quantitative progression across documented iteration stages in the changelog, and complete backing files for all metrics including cost and latency trade-offs.",
+          "evidence_citations": [
+            "README.md: 'Improvement Changelog' section",
+            "README.md: 'Results' table",
+            "eval/results.md"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "measured_improvement",
+          "max_points": 15
+        },
+        "reproducibility": {
+          "score": 5,
+          "weaknesses_deducted_for": [
+            "The reproduction guide references `.tidydrop_undo.json`, which is a path not present in the clean submission repository prior to execution."
+          ],
+          "rationale": "Deducted because the submission triggered a verification flag (`repro_paths_exist`) for referencing `.tidydrop_undo.json` in the reproduction guide. Per judging rules, verification flags on a criterion are treated as direct deductions placing the score in the <35% band.",
+          "evidence_citations": [
+            "[FLAGGED] repro_paths_exist: The reproduction guide references 1 path(s) not present anywhere in the submission: ['.tidydrop_undo.json']. A judge following this guide from a clean environment would fail here."
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The reproduction guide is otherwise complete and clear with explicit setup, execution commands, and eval scripts.",
+          "criterion_id": "reproducibility",
+          "max_points": 15
+        },
+        "hot_take_insights": {
+          "score": 5,
+          "weaknesses_deducted_for": [],
+          "rationale": "The hot take provides an exceptionally strong, practical insight directly derived from the project's empirical results (86% accuracy leaving 28 misplaced files), explaining how dry-run previews and reversible execution alter the trust model for mutating agents. No concrete weaknesses were found.",
+          "evidence_citations": [
+            "README.md: 'Hot take: the dry-run step changed how I felt about the tool more than the accuracy did...'",
+            "Deterministic verification flag: [OK] hot_take_grounded"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "hot_take_insights",
+          "max_points": 5
+        }
+      },
+      "total": 80,
+      "needs_human_attention": true,
+      "low_confidence_criteria": [],
+      "flagged_checks": [
+        "repro_paths_exist"
+      ],
+      "review_notes": [
+        "(Problem & User Value) The flagged missing path `.tidydrop_undo.json` is a runtime log created upon moving files, relevant to reproducibility check.",
+        "(Agent Solution & Engineering) The missing `.tidydrop_undo.json` file is generated dynamically at runtime when executing without `--plan-only`.",
+        "(End to End Quality) The missing `.tidydrop_undo.json` file is expected behavior for clean repos as it is generated dynamically at runtime.",
+        "(Reproducibility) The reproduction guide is otherwise complete and clear with explicit setup, execution commands, and eval scripts."
+      ],
+      "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
+    },
+    "strong_baseline_done_right": {
+      "slug": "strong_baseline_done_right",
+      "evidence_ledger": {
+        "target_user": "Mara runs a 4-person support team at a mid-size SaaS company.",
+        "bottleneck": "Triage is difficult at volume consistently without senior staff; junior agents under-flag urgency because they don't know phrases correlating with churn risk, resulting in mis-triaged tickets taking 3.1x longer time-to-first-response.",
+        "agent_capabilities_used": [
+          "tool_use",
+          "verification",
+          "human_checkpoint"
+        ],
+        "changelog_entries": [
+          {
+            "stage": "Baseline",
+            "evidence": "61% urgency accuracy vs. our 40-ticket labeled set (eval/labels.csv)",
+            "decision": "Established starting point"
+          },
+          {
+            "stage": "Iteration 1",
+            "evidence": "74% urgency accuracy",
+            "decision": "Kept \u2014 biggest single jump"
+          },
+          {
+            "stage": "Iteration 2",
+            "evidence": "89% urgency accuracy; P0/P1 recall went from 71% to 96%",
+            "decision": "Kept \u2014 this is the change that mattered most for the metric Mara actually cares about (missed urgent tickets)"
+          },
+          {
+            "stage": "Iteration 3 (removed)",
+            "evidence": "No measurable change to urgency accuracy (88% vs 89%), added ~40% more cost per ticket",
+            "decision": "Removed \u2014 sentiment score didn't correlate with our actual urgency labels, it just felt like it should help"
+          },
+          {
+            "stage": "Final",
+            "evidence": "89% urgency accuracy, 96% P0/P1 recall, $0.006/ticket, ~2.1s/ticket",
+            "decision": "\u2014"
+          }
+        ],
+        "claimed_results": [
+          {
+            "claim": "89% urgency accuracy (up from 61% baseline)",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "P0/P1 recall increased from 71% to 96%",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "eval/results.md"
+          },
+          {
+            "claim": "Mis-triaged tickets have a 3.1x longer median time-to-first-response",
+            "has_supporting_evidence_file": true,
+            "supporting_file": "data/historical_triage_delay.csv"
+          }
+        ],
+        "repro_referenced_paths": [
+          "requirements.txt",
+          "baseline/baseline_triage.py",
+          "data/tickets.jsonl",
+          "results/baseline.jsonl",
+          "src/agent_triage.py",
+          "results/agent.jsonl",
+          "eval/score_against_labels.py",
+          "eval/labels.csv",
+          "eval/results.md"
+        ],
+        "repro_referenced_env_vars": [
+          "ANTHROPIC_API_KEY"
+        ],
+        "hot_take_text": "The agent still misses tickets where urgency is implied by what's missing rather than what's said \u2014 e.g. a customer who used to email daily and has gone silent for a week after a billing dispute. Nothing in the ticket text itself is urgent-sounding. Our hot take: verification passes built to catch wrong tone won't catch wrong silence \u2014 if the real signal lives outside the artifact you're reviewing (ticket history, not ticket text), no amount of re-reading the same ticket harder will find it. The next version needs a tool call out to ticket history, not a better prompt.",
+        "hot_take_is_generic": false,
+        "human_approval_gate_present": true
+      },
+      "verification_flags": [
+        {
+          "check": "repro_paths_exist",
+          "passed": true,
+          "missing_paths": [],
+          "detail": "Every path the reproduction guide references is present in the submission's file listing."
+        },
+        {
+          "check": "env_var_consistency",
+          "passed": true,
+          "detail": "No env-var/provider mismatch detected."
+        },
+        {
+          "check": "claims_have_evidence",
+          "passed": true,
+          "unsupported_claims": [],
+          "detail": "Every headline claim points to a specific, checkable file."
+        },
+        {
+          "check": "hot_take_grounded",
+          "passed": true,
+          "detail": "Hot take connects to a specific failure mode observed in this project."
+        }
+      ],
+      "per_criterion": {
+        "problem_user_value": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission identifies a highly specific target user (Mara, a support team lead at a mid-size SaaS company) and articulates a clear, quantified bottleneck (junior agents under-flagging urgency leading to a 3.1x response delay on mis-triaged tickets) with no identifiable weaknesses in problem definition or user value.",
+          "evidence_citations": [
+            "README.md: 'Mara runs a 4-person support team at a mid-size SaaS company.'",
+            "README.md: 'the median time-to-first-response on tickets that were initially mis-triaged is 3.1x longer than tickets triaged correctly'",
+            "data/historical_triage_delay.csv"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.",
+          "criterion_id": "problem_user_value",
+          "max_points": 15
+        },
+        "agent_solution_engineering": {
+          "score": 25,
+          "weaknesses_deducted_for": [
+            "The solution relies on a static, hardcoded linear pipeline (classify -> script check -> revise -> draft) rather than enabling the agent to dynamically select tools or orchestrate execution based on context."
+          ],
+          "rationale": "The solution incorporates effective verification, low latency/cost, and human-in-the-loop safeguards, but deducts slightly because the agent flow is implemented as a rigid sequential script rather than dynamic tool invocation.",
+          "evidence_citations": [
+            "src/agent_triage.py",
+            "src/verify_urgency.py",
+            "Agent trajectory log steps 1-5"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "agent_solution_engineering",
+          "max_points": 30
+        },
+        "end_to_end_quality": {
+          "score": 17,
+          "weaknesses_deducted_for": [
+            "End-to-end pipeline execution and output generation were validated solely on a small, self-authored synthetic dataset of 40 tickets (data/tickets.jsonl) rather than live support inbox data or a larger production corpus."
+          ],
+          "rationale": "The solution completes a fully functional, self-contained execution loop\u2014incorporating automated classification, deterministic red-flag phrase verification (src/verify_urgency.py), response drafting, and a human approval gate. A single minor deduction is made because the execution quality is demonstrated only against a modest 40-ticket synthetic sample written by the creators.",
+          "evidence_citations": [
+            "REPRODUCE.md: 'data/tickets.jsonl \u2014 40 synthetic support tickets we wrote ourselves'",
+            "src/agent_triage.py",
+            "Agent trajectory log steps 1-5"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.",
+          "criterion_id": "end_to_end_quality",
+          "max_points": 20
+        },
+        "measured_improvement": {
+          "score": 13,
+          "weaknesses_deducted_for": [
+            "Evaluations and measured gains rely on a small 40-ticket synthetic test set (eval/labels.csv), which limits the statistical robustness and generalizability of the reported accuracy improvements."
+          ],
+          "rationale": "The submission excels at connecting iteration steps directly to quantitative metric changes, including explicitly removing an iteration that added cost without improvement (Iteration 3). A minor point deduction is applied because the gains are evaluated entirely on a small 40-ticket synthetic set, slightly weakening the statistical robustness of the claimed improvements.",
+          "evidence_citations": [
+            "README.md Improvement Changelog",
+            "eval/labels.csv",
+            "eval/results.md"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "The iteration log provides an exemplary model for showing rejected changes alongside successful ones.",
+          "criterion_id": "measured_improvement",
+          "max_points": 15
+        },
+        "reproducibility": {
+          "score": 15,
+          "weaknesses_deducted_for": [],
+          "rationale": "The project provides exemplary reproduction documentation in REPRODUCE.md, including precise commands for setup, baseline, agent execution, and evaluation, along with cost/time estimates and all required files present in the repository.",
+          "evidence_citations": [
+            "REPRODUCE.md",
+            "[OK] repro_paths_exist"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "reproducibility",
+          "max_points": 15
+        },
+        "hot_take_insights": {
+          "score": 5,
+          "weaknesses_deducted_for": [],
+          "rationale": "The hot take is exemplary: it clearly identifies a subtle failure mode (signals of urgency missing from single-ticket text), derives a practical generalizable lesson ('re-reading the same ticket harder won't find signal outside the artifact'), and outlines a concrete architectural pivot for future versions.",
+          "evidence_citations": [
+            "README.md: 'Our hot take: verification passes built to catch wrong tone won't catch wrong silence \u2014 if the real signal lives outside the artifact you're reviewing (ticket history, not ticket text), no amount of re-reading the same ticket harder will find it.'",
+            "Verification flag: [OK] hot_take_grounded"
+          ],
+          "confidence": "high",
+          "note_for_other_criteria": "",
+          "criterion_id": "hot_take_insights",
+          "max_points": 5
+        }
+      },
+      "total": 90,
+      "needs_human_attention": false,
+      "low_confidence_criteria": [],
+      "flagged_checks": [],
+      "review_notes": [
+        "(Problem & User Value) The problem setup is grounded in a 40-ticket synthetic dataset, which judges evaluating evaluation rigor or dataset scale may wish to note.",
+        "(End to End Quality) The integration of a human approval gate in step 5 directly addresses customer safety concerns before sending drafted responses.",
+        "(Measured Improvement) The iteration log provides an exemplary model for showing rejected changes alongside successful ones."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     },
@@ -746,6 +1575,7 @@
         "agent_capabilities_used": [
           "tool_use",
           "verification",
+          "orchestration",
           "human_checkpoint"
         ],
         "changelog_entries": [
@@ -772,19 +1602,14 @@
         ],
         "claimed_results": [
           {
-            "claim": "70% agreement with team lead's manual sort at baseline (n=35 tickets)",
+            "claim": "88% agreement with team lead's manual sort",
             "has_supporting_evidence_file": true,
-            "supporting_file": "data/manual_sort.json"
+            "supporting_file": "eval/compare_to_manual.py"
           },
           {
-            "claim": "76% agreement by splitting into three separate calls",
+            "claim": "0/35 costly misses (zero red-flag tickets miscategorized as 'can wait')",
             "has_supporting_evidence_file": true,
-            "supporting_file": "data/manual_sort.json"
-          },
-          {
-            "claim": "88% agreement and 0 red-flag tickets miscategorized as 'can wait' (vs 3 misses at baseline)",
-            "has_supporting_evidence_file": true,
-            "supporting_file": "data/manual_sort.json"
+            "supporting_file": "eval/compare_to_manual.py"
           }
         ],
         "repro_referenced_paths": [
@@ -831,64 +1656,72 @@
       "per_criterion": {
         "problem_user_value": {
           "score": 15,
-          "rationale": "The submission clearly identifies a specific, realistic target user and articulates a compelling operational bottleneck with concrete consequences when left unaddressed.",
+          "weaknesses_deducted_for": [],
+          "rationale": "The submission excels at defining a highly specific target user and a concrete, relatable operational bottleneck, leaving no weaknesses to deduct for on this criterion.",
           "evidence_citations": [
-            "README.md: Any 3-6 person support team without a dedicated triage lead",
-            "README.md: That 20-30 minutes is dead time nobody wants to own, so it gets skipped on busy mornings, which is exactly when triage matters most."
+            "README.md: 'Any 3-6 person support team without a dedicated triage lead'",
+            "README.md: 'That 20-30 minutes is dead time nobody wants to own, so it gets skipped on busy mornings, which is exactly when triage matters most.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The project addresses a very clearly scoped practical problem with clear evaluation metrics against a manual baseline.",
+          "note_for_other_criteria": "The FLAGGED hot_take_grounded verification flag pertains to project reflection/learning rather than the target problem/user value.",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 28,
-          "rationale": "The engineering design uses clear orchestration and targeted verification via `agent/red_flag_check.py` to re-scan the high-risk 'can wait' bucket, raising baseline agreement from 70% to 88% while eliminating critical misses. Incorporating a human-in-the-loop checkpoint ensures a safe, sound triage flow.",
+          "score": 26,
+          "weaknesses_deducted_for": [
+            "Verification mechanism ('agent/red_flag_check.py') relies on static deterministic keyword matching rather than contextual or model-based verification, limiting its ability to catch nuanced red flags that omit exact keywords."
+          ],
+          "rationale": "The architecture shows strong purposeful engineering by decomposing the task into targeted bucket passes and adding an explicit verification check on the costliest failure mode ('can wait' tickets). Point deduction is made for relying on static keyword matching in the verification tool rather than a more flexible contextual verification strategy.",
           "evidence_citations": [
-            "agent/red_flag_check.py",
             "agent/three_bucket_sort.py",
-            "Added red-flag re-check specifically on the 'can wait' bucket, since that's where a miss is costliest",
-            "[OK] repro_paths_exist"
+            "agent/red_flag_check.py",
+            "Agent trajectory log step 2: 'Deterministic keyword scan re-applied specifically to the low-urgency bucket'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "Iterative engineering changes are explicitly validated by benchmark evaluations in eval/compare_to_manual.py.",
+          "note_for_other_criteria": "",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
-          "score": 17,
-          "rationale": "The system produces a practical, highly usable result by pre-sorting support tickets into clear buckets with one-line reasons and automated red-flag verification (`out/agent.json`), cutting daily human triage from ~25 minutes to 3. The generic hot take (`[FLAGGED] hot_take_grounded`) slightly lowers overall reflective polish, but the end-to-end core output is realistic and ready for real-world team use.",
+          "score": 16,
+          "weaknesses_deducted_for": [
+            "The README documentation includes generic, boilerplate AI hype text in the 'Hot take' section, giving the submission write-up an unpolished, AI-generated feel."
+          ],
+          "rationale": "The core pipeline is self-contained, fully reproducible, and produces usable ticket bucket assignments with one-line reasons and human checkpoint integration. However, points were deducted because the README text includes generic AI hype in the hot take section rather than specific project reflection.",
           "evidence_citations": [
-            "out/agent.json",
-            "agent/three_bucket_sort.py",
-            "[FLAGGED] hot_take_grounded"
+            "FLAGGED: hot_take_grounded",
+            "README.md: 'AI is transforming how businesses operate and agents represent the future of workplace automation.'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The end-to-end flow includes a concrete human checkpoint where the lead spot-checks only the urgent bucket.",
+          "note_for_other_criteria": "The submission executes a clean end-to-end workflow with real outputs in out/agent.json, but the documentation write-up contains generic AI hot-take text.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
-          "score": 15,
-          "rationale": "The submission clearly demonstrates quantitative gains over a fair manual-sort baseline (n=35 tickets), tracking accuracy improvements from 70% to 76% to 88% across explicit iteration steps in the changelog. Furthermore, it explicitly links specific iteration decisions (adding a red-flag re-check) to eliminating critical misclassifications (0 misses vs 3 at baseline).",
+          "score": 13,
+          "weaknesses_deducted_for": [
+            "Evaluation relies on a small sample size (n=35 tickets in data/overnight_queue.json), limiting confidence in generalizability across varied real-world support queues."
+          ],
+          "rationale": "The submission provides an exemplary iteration log connecting architectural changes (single-pass vs. three-bucket vs. red-flag re-check) to quantitative gains over a documented baseline. A minor deduction is made for the small test set size (n=35).",
           "evidence_citations": [
-            "README.md Improvement Changelog table",
-            "data/manual_sort.json",
-            "eval/compare_to_manual.py",
-            "[OK] claims_have_evidence"
+            "70% agreement with team lead's manual sort (n=35 tickets)",
+            "88% agreement, and zero red-flag tickets miscategorized as 'can wait' (vs. 3 misses at baseline)",
+            "eval/compare_to_manual.py"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The evaluation script eval/compare_to_manual.py directly verifies the changelog's baseline vs agent accuracy numbers against manual gold labels.",
+          "note_for_other_criteria": "The reproduction script cleanly executes baseline vs agent comparison scripts to verify all claimed figures.",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
           "score": 15,
-          "rationale": "The submission provides a flawless reproduction guide in REPRODUCE.md with clean-environment setup instructions, exact CLI commands for baseline, agent, and evaluation scripts, required env vars, and expected runtime/cost metrics. All referenced paths exist in the repository as verified by the repro_paths_exist flag.",
+          "weaknesses_deducted_for": [],
+          "rationale": " clear step-by-step CLI commands, environment specs, estimated run time, cost, and target outputs, with all referenced files verified as present in the repository.",
           "evidence_citations": [
             "REPRODUCE.md",
-            "[OK] repro_paths_exist",
-            "[OK] env_var_consistency"
+            "FLAG [OK]: repro_paths_exist",
+            "FLAG [OK]: env_var_consistency"
           ],
           "confidence": "high",
           "note_for_other_criteria": "",
@@ -897,10 +1730,13 @@
         },
         "hot_take_insights": {
           "score": 1,
-          "rationale": "The submission's hot take consists entirely of generic AI hype rather than offering a concrete lesson learned or actionable insight derived from an observed agent failure mode.",
+          "weaknesses_deducted_for": [
+            "The hot take consists of generic AI hype rather than a practical lesson or insight derived from observed agent failure modes in this specific project."
+          ],
+          "rationale": "The hot take is completely ungrounded and generic, failing to offer any specific lessons learned from building the agent or observing its failure modes, directly triggering the FLAGGED hot_take_grounded verification check.",
           "evidence_citations": [
-            "[FLAGGED] hot_take_grounded",
-            "README.md: 'AI is transforming how businesses operate and agents represent the future of workplace automation.'"
+            "FLAGGED: hot_take_grounded",
+            "README.md: 'AI is transforming how businesses operate and agents represent the future of workplace automation. We learned that agentic AI has huge potential to improve efficiency...'"
           ],
           "confidence": "high",
           "note_for_other_criteria": "",
@@ -908,46 +1744,45 @@
           "max_points": 5
         }
       },
-      "total": 91,
+      "total": 86,
       "needs_human_attention": true,
       "low_confidence_criteria": [],
       "flagged_checks": [
         "hot_take_grounded"
       ],
       "review_notes": [
-        "(Problem & User Value) The project addresses a very clearly scoped practical problem with clear evaluation metrics against a manual baseline.",
-        "(Agent Solution & Engineering) Iterative engineering changes are explicitly validated by benchmark evaluations in eval/compare_to_manual.py.",
-        "(End to End Quality) The end-to-end flow includes a concrete human checkpoint where the lead spot-checks only the urgent bucket.",
-        "(Measured Improvement) The evaluation script eval/compare_to_manual.py directly verifies the changelog's baseline vs agent accuracy numbers against manual gold labels."
+        "(Problem & User Value) The FLAGGED hot_take_grounded verification flag pertains to project reflection/learning rather than the target problem/user value.",
+        "(End to End Quality) The submission executes a clean end-to-end workflow with real outputs in out/agent.json, but the documentation write-up contains generic AI hot-take text.",
+        "(Measured Improvement) The reproduction script cleanly executes baseline vs agent comparison scripts to verify all claimed figures."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     },
     "weak_single_prompt": {
       "slug": "weak_single_prompt",
       "evidence_ledger": {
-        "target_user": "support teams",
-        "bottleneck": "it takes time to manually go through all support tickets",
+        "target_user": "Support teams",
+        "bottleneck": "Going through all customer support tickets manually takes a lot of time",
         "agent_capabilities_used": [],
         "changelog_entries": [
           {
             "stage": "v1",
-            "evidence": "not specified",
-            "decision": "Built the classifier"
+            "evidence": "Built the classifier",
+            "decision": "Built initial classifier"
           },
           {
             "stage": "v2",
-            "evidence": "not specified",
-            "decision": "Improved the prompt a bit"
+            "evidence": "Improved the prompt a bit",
+            "decision": "Iterated on prompt engineering"
           },
           {
             "stage": "v3",
-            "evidence": "not specified",
-            "decision": "Final version, works well"
+            "evidence": "Final version, works well",
+            "decision": "Finalized version for submission"
           }
         ],
         "claimed_results": [
           {
-            "claim": "Correctly identified urgent tickets most of the time and categories made sense",
+            "claim": "Correctly identified urgent tickets most of the time",
             "has_supporting_evidence_file": false,
             "supporting_file": ""
           }
@@ -976,9 +1811,9 @@
           "check": "claims_have_evidence",
           "passed": false,
           "unsupported_claims": [
-            "Correctly identified urgent tickets most of the time and categories made sense"
+            "Correctly identified urgent tickets most of the time"
           ],
-          "detail": "1 claim(s) have no specific file/dataset a judge could check: ['Correctly identified urgent tickets most of the time and categories made sense']. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value."
+          "detail": "1 claim(s) have no specific file/dataset a judge could check: ['Correctly identified urgent tickets most of the time']. Per ground rule 9 ('connect every claim about your results to the evidence you submit'), these should not be taken at face value."
         },
         {
           "check": "hot_take_grounded",
@@ -988,82 +1823,108 @@
       ],
       "per_criterion": {
         "problem_user_value": {
-          "score": 7,
-          "rationale": "The project identifies a clear target user (support teams) and a real bottleneck (time spent manually triaging tickets), but the problem framing remains surface-level and generic without specific workflow insights or concrete user value measurements.",
+          "score": 9,
+          "weaknesses_deducted_for": [
+            "Target user definition is overly broad ('Support teams') and lacks specific operational context or workflow integration detail.",
+            "User value is very limited in practice because the tool exists only as a CLI script running on hardcoded text rather than addressing a real support ticket workflow."
+          ],
+          "rationale": "The submission identifies a real domain problem (manual support ticket triage for support teams), but the problem statement is generic and the prototype delivers minimal end-user value without ticketing system integration.",
           "evidence_citations": [
-            "Support teams get a lot of tickets and it takes time to go through them all."
+            "README.md: 'Support teams get a lot of tickets and it takes time to go through them all.'",
+            "REPRODUCE.md: 'Put your ticket text inside the script and run it to see the classification printed to the console.'",
+            "Agent trajectory log: 'input: ticket text hardcoded in script'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The implementation is a minimal single LLM call script with no dataset or grounding provided for its claims.",
+          "note_for_other_criteria": "The project is a single LLM call script without tools, workflows, or baseline evaluations.",
           "criterion_id": "problem_user_value",
           "max_points": 15
         },
         "agent_solution_engineering": {
-          "score": 4,
-          "rationale": "The submission relies on a single LLM API call in `classify.py` with hardcoded text rather than implementing an agentic solution with tools, memory, verification, or multi-step orchestration. No meaningful agent design choices or engineering techniques were demonstrated beyond basic prompting.",
+          "score": 8,
+          "weaknesses_deducted_for": [
+            "The project lacks any agentic engineering, consisting only of a basic script that makes a single LLM call without tools, memory, orchestration, skills, or verification.",
+            "Input text is hardcoded inside classify.py with no interface, dynamic retrieval, or workflow integration."
+          ],
+          "rationale": "The submission scores under 35% because it does not implement an actual agentic solution, relying instead on a single prompt-completion script with no dynamic tools, memory, or multi-step execution.",
           "evidence_citations": [
-            "classify.py",
-            "README.md: 'The model returns the classification. That's it \u2014 simple and effective.'",
-            "Agent trajectory log: 'No tools, no verification, no memory, no comparison to any baseline or ground truth.'"
+            "README.md: 'It uses GPT-4 style prompting to classify the ticket in one call. That's it \u2014 simple and effective.'",
+            "Agent trajectory log: 'No tools, no verification, no memory, no comparison to any baseline or ground truth. This is the entire trajectory.'",
+            "REPRODUCE.md: 'Put your ticket text inside the script and run it'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The engineering implementation consists entirely of a single LLM API call script without dynamic inputs or tool usage.",
+          "note_for_other_criteria": "The submission is a single LLM API script rather than an agent system.",
           "criterion_id": "agent_solution_engineering",
           "max_points": 30
         },
         "end_to_end_quality": {
-          "score": 3,
-          "rationale": "The submission is a bare-bones single LLM call script (`classify.py`) with hardcoded input that merely prints a category string to stdout, lacking user polish, a usable product wrapper, or evidence of evaluation against real support tickets.",
+          "score": 5,
+          "weaknesses_deducted_for": [
+            "Lacks a complete or usable interface/workflow, requiring users to manually hardcode ticket text directly into classify.py.",
+            "Produces only an unformatted console output rather than a finished, actionable end-result for support teams.",
+            "Relying on unevidenced quality claims ('identified urgent tickets most of the time') without submitting verification dataset or benchmark outputs."
+          ],
+          "rationale": "The project falls into the <35% band because End to End Quality is largely unmet; rather than a polished, self-contained end-to-end solution, it functions as a bare script draft requiring code modification to run.",
           "evidence_citations": [
-            "classify.py",
-            "Agent trajectory log: 'input: ticket text hardcoded in script, output: category and urgency string printed to console'",
-            "[FLAGGED] claims_have_evidence"
+            "REPRODUCE.md: 'Put your ticket text inside the script and run it to see the classification printed to the console.'",
+            "[FLAGGED] claims_have_evidence: 1 claim(s) have no specific file/dataset a judge could check: ['Correctly identified urgent tickets most of the time'].",
+            "Agent trajectory log step 1: 'ticket text hardcoded in script'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The solution lacks any interactive CLI, UI, or evaluation harness, producing only raw console text from hardcoded script values.",
+          "note_for_other_criteria": "The execution is restricted to a single hardcoded Python script call without tools or external workflows.",
           "criterion_id": "end_to_end_quality",
           "max_points": 20
         },
         "measured_improvement": {
-          "score": 0,
-          "rationale": "The submission fails to demonstrate measured improvement, offering no baselines, metrics, or evaluation evidence, and relying on vague changelog entries such as 'Improved the prompt a bit' without supporting data.",
+          "score": 3,
+          "weaknesses_deducted_for": [
+            "No fair baseline comparison or quantitative evaluation dataset is provided to measure performance gains.",
+            "Changelog entries ('v2: Improved the prompt a bit', 'v3: Final version, works well') are vague and lack concrete metrics or evidence connecting prompt adjustments to measured results.",
+            "The sole claim regarding classification accuracy lacks supporting evidence files or logs (FLAGGED: claims_have_evidence)."
+          ],
+          "rationale": "The submission scores below 35% because it provides no baseline evaluation, quantitative benchmarks, or evidence-backed changelog iterations. The performance claims fail verification due to a complete lack of supporting test datasets or measurement logs.",
           "evidence_citations": [
-            "[FLAGGED] claims_have_evidence",
-            "Changelog entry: 'v2: Improved the prompt a bit'",
-            "Changelog entry: 'v3: Final version, works well'"
+            "FLAGGED: claims_have_evidence",
+            "README.md: 'It correctly identified urgent tickets most of the time and the categories made sense.'",
+            "README.md: '- v1: Built the classifier\n- v2: Improved the prompt a bit\n- v3: Final version, works well'"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "There are no quantitative evaluation datasets or performance metrics anywhere in the submission.",
+          "note_for_other_criteria": "No evaluation dataset, baseline metrics, or empirical test logs exist in the repository.",
           "criterion_id": "measured_improvement",
           "max_points": 15
         },
         "reproducibility": {
-          "score": 4,
-          "rationale": "While `REPRODUCE.md` outlines basic setup commands (`pip install openai`, `python classify.py`), it lacks critical setup instructions like API key configuration (`OPENAI_API_KEY`), pinned dependency files, or any evaluation dataset/baseline to verify the claimed results.",
+          "score": 6,
+          "weaknesses_deducted_for": [
+            "Instructions in REPRODUCE.md omit required API key setup (e.g., OPENAI_API_KEY) needed to run classify.py.",
+            "No sample datasets or baseline scripts are provided to reproduce and verify the claimed classification results."
+          ],
+          "rationale": "While REPRODUCE.md lists basic setup commands, it misses crucial environment variable configuration and fails to provide sample ticket data or baseline evaluation scripts to reproduce the claimed results.",
           "evidence_citations": [
-            "REPRODUCE.md",
-            "classify.py",
+            "REPRODUCE.md: 'Install openai package and run the script... Put your ticket text inside the script'",
             "[FLAGGED] claims_have_evidence"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "No environment variable setup is documented in REPRODUCE.md despite using OpenAI API calls.",
+          "note_for_other_criteria": "The project lacks any sample data or baseline code, making claims unverified.",
           "criterion_id": "reproducibility",
           "max_points": 15
         },
         "hot_take_insights": {
-          "score": 0,
-          "rationale": "The hot take consists entirely of generic AI hype rather than turning an observed failure mode into a practical, actionable lesson for building reliable agents.",
+          "score": 1,
+          "weaknesses_deducted_for": [
+            "The hot take is generic AI hype rather than a project-specific insight derived from observed failure modes or empirical testing."
+          ],
+          "rationale": "The score is placed in the <35% band because the hot take consists of high-level generic statements ('AI agents are the future...', 'prompting matters') rather than practical, actionable lessons learned from specific failure modes in this implementation.",
           "evidence_citations": [
-            "FLAGGED: hot_take_grounded",
-            "README.md: 'AI agents are the future of customer support and this project shows that LLMs can understand context and make good decisions. We learned that prompting matters...'"
+            "README.md: 'AI agents are the future of customer support and this project shows that LLMs can understand context and make good decisions. We learned that prompting matters...'",
+            "Deterministic flag [FLAGGED] hot_take_grounded: Hot take reads as generic AI-hype rather than a lesson tied to an observed failure in this specific project"
           ],
           "confidence": "high",
-          "note_for_other_criteria": "The submission lacks any documented failure modes, concrete lessons, or specific insights about agent behavior.",
+          "note_for_other_criteria": "The hot take lacks any grounded failure analysis or actionable architectural takeaways.",
           "criterion_id": "hot_take_insights",
           "max_points": 5
         }
       },
-      "total": 18,
+      "total": 32,
       "needs_human_attention": true,
       "low_confidence_criteria": [],
       "flagged_checks": [
@@ -1071,12 +1932,12 @@
         "hot_take_grounded"
       ],
       "review_notes": [
-        "(Problem & User Value) The implementation is a minimal single LLM call script with no dataset or grounding provided for its claims.",
-        "(Agent Solution & Engineering) The engineering implementation consists entirely of a single LLM API call script without dynamic inputs or tool usage.",
-        "(End to End Quality) The solution lacks any interactive CLI, UI, or evaluation harness, producing only raw console text from hardcoded script values.",
-        "(Measured Improvement) There are no quantitative evaluation datasets or performance metrics anywhere in the submission.",
-        "(Reproducibility) No environment variable setup is documented in REPRODUCE.md despite using OpenAI API calls.",
-        "(Hot Take / Insights) The submission lacks any documented failure modes, concrete lessons, or specific insights about agent behavior."
+        "(Problem & User Value) The project is a single LLM call script without tools, workflows, or baseline evaluations.",
+        "(Agent Solution & Engineering) The submission is a single LLM API script rather than an agent system.",
+        "(End to End Quality) The execution is restricted to a single hardcoded Python script call without tools or external workflows.",
+        "(Measured Improvement) No evaluation dataset, baseline metrics, or empirical test logs exist in the repository.",
+        "(Reproducibility) The project lacks any sample data or baseline code, making claims unverified.",
+        "(Hot Take / Insights) The hot take lacks any grounded failure analysis or actionable architectural takeaways."
       ],
       "disclaimer": "Advisory pre-screen only. Every score above is a starting point with cited evidence for a qualified human judge to confirm, adjust, or override -- this tool does not make a final accept/reject or prize decision."
     }
@@ -1085,296 +1946,492 @@
     {
       "label": "extract:broken_repro",
       "provider": "latentstack",
-      "input_tokens": 1155,
-      "output_tokens": 2350,
-      "seconds": 15.706
+      "input_tokens": 1231,
+      "output_tokens": 3021,
+      "seconds": 19.989
     },
     {
       "label": "score:broken_repro:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 1687,
-      "output_tokens": 799,
-      "seconds": 9.725
+      "input_tokens": 1929,
+      "output_tokens": 919,
+      "seconds": 9.018
     },
     {
       "label": "score:broken_repro:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 1729,
-      "output_tokens": 811,
-      "seconds": 10.78
+      "input_tokens": 1947,
+      "output_tokens": 1633,
+      "seconds": 16.283
     },
     {
       "label": "score:broken_repro:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 1768,
-      "output_tokens": 807,
-      "seconds": 8.615
+      "input_tokens": 1991,
+      "output_tokens": 1283,
+      "seconds": 13.52
     },
     {
       "label": "score:broken_repro:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 1764,
-      "output_tokens": 980,
-      "seconds": 11.736
+      "input_tokens": 1991,
+      "output_tokens": 1468,
+      "seconds": 12.799
     },
     {
       "label": "score:broken_repro:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 1806,
-      "output_tokens": 1109,
-      "seconds": 11.776
+      "input_tokens": 1994,
+      "output_tokens": 1126,
+      "seconds": 9.931
     },
     {
       "label": "score:broken_repro:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 1836,
-      "output_tokens": 661,
-      "seconds": 7.94
+      "input_tokens": 2023,
+      "output_tokens": 802,
+      "seconds": 9.149
     },
     {
       "label": "extract:cosmetic_orchestration",
       "provider": "latentstack",
-      "input_tokens": 1478,
-      "output_tokens": 2451,
-      "seconds": 20.731
+      "input_tokens": 1554,
+      "output_tokens": 2183,
+      "seconds": 14.299
     },
     {
       "label": "score:cosmetic_orchestration:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 1954,
-      "output_tokens": 810,
-      "seconds": 8.601
+      "input_tokens": 2130,
+      "output_tokens": 1088,
+      "seconds": 11.372
     },
     {
       "label": "score:cosmetic_orchestration:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 1987,
-      "output_tokens": 1224,
-      "seconds": 10.961
+      "input_tokens": 2190,
+      "output_tokens": 1808,
+      "seconds": 17.262
     },
     {
       "label": "score:cosmetic_orchestration:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 2042,
-      "output_tokens": 1101,
-      "seconds": 12.49
+      "input_tokens": 2243,
+      "output_tokens": 1482,
+      "seconds": 13.441
     },
     {
       "label": "score:cosmetic_orchestration:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 2038,
-      "output_tokens": 939,
-      "seconds": 9.73
+      "input_tokens": 2236,
+      "output_tokens": 1361,
+      "seconds": 15.475
     },
     {
       "label": "score:cosmetic_orchestration:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 2062,
-      "output_tokens": 1166,
-      "seconds": 13.183
+      "input_tokens": 2269,
+      "output_tokens": 1527,
+      "seconds": 13.313
     },
     {
       "label": "score:cosmetic_orchestration:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 2063,
-      "output_tokens": 620,
-      "seconds": 8.626
+      "input_tokens": 2290,
+      "output_tokens": 890,
+      "seconds": 10.792
     },
     {
       "label": "extract:fabricated_claims",
       "provider": "latentstack",
-      "input_tokens": 1275,
-      "output_tokens": 2284,
-      "seconds": 23.794
+      "input_tokens": 1351,
+      "output_tokens": 1716,
+      "seconds": 12.14
     },
     {
       "label": "score:fabricated_claims:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 1729,
-      "output_tokens": 1120,
-      "seconds": 11.939
+      "input_tokens": 1914,
+      "output_tokens": 1675,
+      "seconds": 14.822
     },
     {
       "label": "score:fabricated_claims:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 1769,
-      "output_tokens": 1001,
-      "seconds": 11.369
+      "input_tokens": 1956,
+      "output_tokens": 1370,
+      "seconds": 12.043
     },
     {
       "label": "score:fabricated_claims:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 1813,
-      "output_tokens": 887,
-      "seconds": 15.642
+      "input_tokens": 1997,
+      "output_tokens": 1439,
+      "seconds": 11.954
     },
     {
       "label": "score:fabricated_claims:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 1806,
-      "output_tokens": 801,
-      "seconds": 9.447
+      "input_tokens": 1996,
+      "output_tokens": 1167,
+      "seconds": 11.116
     },
     {
       "label": "score:fabricated_claims:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 1833,
-      "output_tokens": 783,
-      "seconds": 10.232
+      "input_tokens": 2021,
+      "output_tokens": 1150,
+      "seconds": 11.016
     },
     {
       "label": "score:fabricated_claims:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 1858,
-      "output_tokens": 661,
-      "seconds": 8.854
+      "input_tokens": 2043,
+      "output_tokens": 952,
+      "seconds": 9.497
+    },
+    {
+      "label": "extract:good_project_bad_writeup",
+      "provider": "latentstack",
+      "input_tokens": 2775,
+      "output_tokens": 2174,
+      "seconds": 17.19
+    },
+    {
+      "label": "score:good_project_bad_writeup:problem_user_value",
+      "provider": "latentstack",
+      "input_tokens": 3628,
+      "output_tokens": 1205,
+      "seconds": 10.968
+    },
+    {
+      "label": "score:good_project_bad_writeup:agent_solution_engineering",
+      "provider": "latentstack",
+      "input_tokens": 3681,
+      "output_tokens": 1205,
+      "seconds": 12.207
+    },
+    {
+      "label": "score:good_project_bad_writeup:end_to_end_quality",
+      "provider": "latentstack",
+      "input_tokens": 3737,
+      "output_tokens": 1308,
+      "seconds": 12.252
+    },
+    {
+      "label": "score:good_project_bad_writeup:measured_improvement",
+      "provider": "latentstack",
+      "input_tokens": 3735,
+      "output_tokens": 1170,
+      "seconds": 11.582
+    },
+    {
+      "label": "score:good_project_bad_writeup:reproducibility",
+      "provider": "latentstack",
+      "input_tokens": 3738,
+      "output_tokens": 1176,
+      "seconds": 12.12
+    },
+    {
+      "label": "score:good_project_bad_writeup:hot_take_insights",
+      "provider": "latentstack",
+      "input_tokens": 3739,
+      "output_tokens": 1081,
+      "seconds": 10.199
+    },
+    {
+      "label": "extract:overengineered_but_honest",
+      "provider": "latentstack",
+      "input_tokens": 2887,
+      "output_tokens": 2957,
+      "seconds": 16.698
+    },
+    {
+      "label": "score:overengineered_but_honest:problem_user_value",
+      "provider": "latentstack",
+      "input_tokens": 3967,
+      "output_tokens": 1251,
+      "seconds": 11.735
+    },
+    {
+      "label": "score:overengineered_but_honest:agent_solution_engineering",
+      "provider": "latentstack",
+      "input_tokens": 4012,
+      "output_tokens": 1689,
+      "seconds": 14.276
+    },
+    {
+      "label": "score:overengineered_but_honest:end_to_end_quality",
+      "provider": "latentstack",
+      "input_tokens": 4060,
+      "output_tokens": 1726,
+      "seconds": 14.846
+    },
+    {
+      "label": "score:overengineered_but_honest:measured_improvement",
+      "provider": "latentstack",
+      "input_tokens": 4027,
+      "output_tokens": 1174,
+      "seconds": 12.556
+    },
+    {
+      "label": "score:overengineered_but_honest:reproducibility",
+      "provider": "latentstack",
+      "input_tokens": 4030,
+      "output_tokens": 993,
+      "seconds": 10.691
+    },
+    {
+      "label": "score:overengineered_but_honest:hot_take_insights",
+      "provider": "latentstack",
+      "input_tokens": 4031,
+      "output_tokens": 968,
+      "seconds": 13.998
+    },
+    {
+      "label": "extract:real_gains_no_changelog",
+      "provider": "latentstack",
+      "input_tokens": 2524,
+      "output_tokens": 2632,
+      "seconds": 20.795
+    },
+    {
+      "label": "score:real_gains_no_changelog:problem_user_value",
+      "provider": "latentstack",
+      "input_tokens": 3276,
+      "output_tokens": 1007,
+      "seconds": 10.801
+    },
+    {
+      "label": "score:real_gains_no_changelog:agent_solution_engineering",
+      "provider": "latentstack",
+      "input_tokens": 3322,
+      "output_tokens": 1404,
+      "seconds": 13.08
+    },
+    {
+      "label": "score:real_gains_no_changelog:end_to_end_quality",
+      "provider": "latentstack",
+      "input_tokens": 3368,
+      "output_tokens": 1153,
+      "seconds": 13.516
+    },
+    {
+      "label": "score:real_gains_no_changelog:measured_improvement",
+      "provider": "latentstack",
+      "input_tokens": 3370,
+      "output_tokens": 1034,
+      "seconds": 15.561
+    },
+    {
+      "label": "score:real_gains_no_changelog:reproducibility",
+      "provider": "latentstack",
+      "input_tokens": 3395,
+      "output_tokens": 1087,
+      "seconds": 10.752
+    },
+    {
+      "label": "score:real_gains_no_changelog:hot_take_insights",
+      "provider": "latentstack",
+      "input_tokens": 3396,
+      "output_tokens": 1210,
+      "seconds": 11.957
+    },
+    {
+      "label": "extract:scope_mismatch",
+      "provider": "latentstack",
+      "input_tokens": 2536,
+      "output_tokens": 2829,
+      "seconds": 21.218
+    },
+    {
+      "label": "score:scope_mismatch:problem_user_value",
+      "provider": "latentstack",
+      "input_tokens": 3422,
+      "output_tokens": 1364,
+      "seconds": 12.495
+    },
+    {
+      "label": "score:scope_mismatch:agent_solution_engineering",
+      "provider": "latentstack",
+      "input_tokens": 3470,
+      "output_tokens": 1376,
+      "seconds": 12.694
+    },
+    {
+      "label": "score:scope_mismatch:end_to_end_quality",
+      "provider": "latentstack",
+      "input_tokens": 3520,
+      "output_tokens": 1199,
+      "seconds": 10.753
+    },
+    {
+      "label": "score:scope_mismatch:measured_improvement",
+      "provider": "latentstack",
+      "input_tokens": 3521,
+      "output_tokens": 1455,
+      "seconds": 17.239
+    },
+    {
+      "label": "score:scope_mismatch:reproducibility",
+      "provider": "latentstack",
+      "input_tokens": 3524,
+      "output_tokens": 2001,
+      "seconds": 14.809
+    },
+    {
+      "label": "score:scope_mismatch:hot_take_insights",
+      "provider": "latentstack",
+      "input_tokens": 3551,
+      "output_tokens": 1055,
+      "seconds": 10.567
     },
     {
       "label": "extract:strong_baseline_done_right",
       "provider": "latentstack",
-      "input_tokens": 2465,
-      "output_tokens": 3486,
-      "seconds": 27.284
+      "input_tokens": 2541,
+      "output_tokens": 2162,
+      "seconds": 15.95
     },
     {
       "label": "score:strong_baseline_done_right:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 3347,
-      "output_tokens": 806,
-      "seconds": 8.789
+      "input_tokens": 3451,
+      "output_tokens": 1430,
+      "seconds": 11.357
     },
     {
       "label": "score:strong_baseline_done_right:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 3401,
-      "output_tokens": 1346,
-      "seconds": 12.28
+      "input_tokens": 3500,
+      "output_tokens": 1705,
+      "seconds": 15.276
     },
     {
       "label": "score:strong_baseline_done_right:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 3455,
-      "output_tokens": 696,
-      "seconds": 7.819
+      "input_tokens": 3517,
+      "output_tokens": 1657,
+      "seconds": 13.436
     },
     {
       "label": "score:strong_baseline_done_right:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 3456,
-      "output_tokens": 805,
-      "seconds": 10.423
+      "input_tokens": 3513,
+      "output_tokens": 1030,
+      "seconds": 10.517
     },
     {
       "label": "score:strong_baseline_done_right:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 3485,
-      "output_tokens": 867,
-      "seconds": 9.01
+      "input_tokens": 3537,
+      "output_tokens": 861,
+      "seconds": 8.5
     },
     {
       "label": "score:strong_baseline_done_right:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 3486,
-      "output_tokens": 700,
-      "seconds": 9.563
+      "input_tokens": 3538,
+      "output_tokens": 1138,
+      "seconds": 10.865
     },
     {
       "label": "extract:thin_hot_take",
       "provider": "latentstack",
-      "input_tokens": 1451,
-      "output_tokens": 2466,
-      "seconds": 16.157
+      "input_tokens": 1527,
+      "output_tokens": 2884,
+      "seconds": 19.54
     },
     {
       "label": "score:thin_hot_take:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 2019,
-      "output_tokens": 559,
-      "seconds": 6.865
+      "input_tokens": 2232,
+      "output_tokens": 1351,
+      "seconds": 11.52
     },
     {
       "label": "score:thin_hot_take:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 2058,
-      "output_tokens": 797,
-      "seconds": 8.629
+      "input_tokens": 2280,
+      "output_tokens": 1478,
+      "seconds": 13.969
     },
     {
       "label": "score:thin_hot_take:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 2104,
-      "output_tokens": 930,
-      "seconds": 11.305
+      "input_tokens": 2297,
+      "output_tokens": 1231,
+      "seconds": 14.961
     },
     {
       "label": "score:thin_hot_take:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 2102,
-      "output_tokens": 635,
-      "seconds": 8.329
+      "input_tokens": 2307,
+      "output_tokens": 1478,
+      "seconds": 15.464
     },
     {
       "label": "score:thin_hot_take:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 2140,
-      "output_tokens": 752,
-      "seconds": 9.293
+      "input_tokens": 2332,
+      "output_tokens": 904,
+      "seconds": 10.132
     },
     {
       "label": "score:thin_hot_take:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 2141,
-      "output_tokens": 529,
-      "seconds": 6.983
+      "input_tokens": 2333,
+      "output_tokens": 1049,
+      "seconds": 10.127
     },
     {
       "label": "extract:weak_single_prompt",
       "provider": "latentstack",
-      "input_tokens": 898,
-      "output_tokens": 1499,
-      "seconds": 14.751
+      "input_tokens": 974,
+      "output_tokens": 1619,
+      "seconds": 11.662
     },
     {
       "label": "score:weak_single_prompt:problem_user_value",
       "provider": "latentstack",
-      "input_tokens": 1215,
-      "output_tokens": 708,
-      "seconds": 8.289
+      "input_tokens": 1476,
+      "output_tokens": 1147,
+      "seconds": 11.761
     },
     {
       "label": "score:weak_single_prompt:agent_solution_engineering",
       "provider": "latentstack",
-      "input_tokens": 1256,
-      "output_tokens": 563,
-      "seconds": 6.747
+      "input_tokens": 1515,
+      "output_tokens": 985,
+      "seconds": 9.6
     },
     {
       "label": "score:weak_single_prompt:end_to_end_quality",
       "provider": "latentstack",
-      "input_tokens": 1301,
-      "output_tokens": 647,
-      "seconds": 9.426
+      "input_tokens": 1555,
+      "output_tokens": 1260,
+      "seconds": 14.088
     },
     {
       "label": "score:weak_single_prompt:measured_improvement",
       "provider": "latentstack",
-      "input_tokens": 1300,
-      "output_tokens": 532,
-      "seconds": 10.858
+      "input_tokens": 1548,
+      "output_tokens": 1050,
+      "seconds": 9.589
     },
     {
       "label": "score:weak_single_prompt:reproducibility",
       "provider": "latentstack",
-      "input_tokens": 1323,
-      "output_tokens": 681,
-      "seconds": 18.431
+      "input_tokens": 1573,
+      "output_tokens": 966,
+      "seconds": 10.087
     },
     {
       "label": "score:weak_single_prompt:hot_take_insights",
       "provider": "latentstack",
-      "input_tokens": 1350,
-      "output_tokens": 615,
-      "seconds": 9.051
+      "input_tokens": 1596,
+      "output_tokens": 1081,
+      "seconds": 10.637
     }
   ]
 }

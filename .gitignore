@@ -10,3 +10,4 @@ results/*.tmp
 *.log
 _*.py
 _*.sh
+*.flag

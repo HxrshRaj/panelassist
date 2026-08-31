@@ -3,6 +3,10 @@
     "broken_repro",
     "cosmetic_orchestration",
     "fabricated_claims",
+    "good_project_bad_writeup",
+    "overengineered_but_honest",
+    "real_gains_no_changelog",
+    "scope_mismatch",
     "strong_baseline_done_right",
     "thin_hot_take",
     "weak_single_prompt"
@@ -11,50 +15,62 @@
     "broken_repro": 63,
     "cosmetic_orchestration": 38,
     "fabricated_claims": 36,
+    "good_project_bad_writeup": 78,
+    "overengineered_but_honest": 84,
+    "real_gains_no_changelog": 78,
+    "scope_mismatch": 76,
     "strong_baseline_done_right": 92,
     "thin_hot_take": 82,
     "weak_single_prompt": 25
   },
   "baseline_totals": {
-    "broken_repro": 73,
-    "cosmetic_orchestration": 44,
-    "fabricated_claims": 38,
-    "strong_baseline_done_right": 98,
+    "broken_repro": 72,
+    "cosmetic_orchestration": 42,
+    "fabricated_claims": 34,
+    "good_project_bad_writeup": 97,
+    "overengineered_but_honest": 97,
+    "real_gains_no_changelog": 92,
+    "scope_mismatch": 92,
+    "strong_baseline_done_right": 95,
     "thin_hot_take": 84,
-    "weak_single_prompt": 19
+    "weak_single_prompt": 21
   },
   "agent_totals": {
-    "broken_repro": 72,
+    "broken_repro": 60,
     "cosmetic_orchestration": 35,
-    "fabricated_claims": 39,
-    "strong_baseline_done_right": 99,
-    "thin_hot_take": 91,
-    "weak_single_prompt": 18
+    "fabricated_claims": 44,
+    "good_project_bad_writeup": 93,
+    "overengineered_but_honest": 92,
+    "real_gains_no_changelog": 88,
+    "scope_mismatch": 80,
+    "strong_baseline_done_right": 90,
+    "thin_hot_take": 86,
+    "weak_single_prompt": 32
   },
   "total_score_mae_vs_human": {
-    "baseline_vs_human": 5.33,
-    "agent_vs_human": 6.33
+    "baseline_vs_human": 8.6,
+    "agent_vs_human": 6.4
   },
   "ranking_correlation_vs_human": {
-    "baseline_vs_human_spearman": 1.0,
-    "agent_vs_human_spearman": 0.943
+    "baseline_vs_human_spearman": 0.85,
+    "agent_vs_human_spearman": 0.863
   },
   "per_criterion_mae_vs_human": {
     "baseline": {
-      "problem_user_value": 1.33,
-      "agent_solution_engineering": 1.5,
-      "end_to_end_quality": 1.33,
-      "measured_improvement": 0.83,
-      "reproducibility": 1.17,
-      "hot_take_insights": 0.5
+      "problem_user_value": 2.1,
+      "agent_solution_engineering": 2.2,
+      "end_to_end_quality": 2.2,
+      "measured_improvement": 1.5,
+      "reproducibility": 1.2,
+      "hot_take_insights": 0.6
     },
     "agent": {
-      "problem_user_value": 2.5,
-      "agent_solution_engineering": 2.17,
-      "end_to_end_quality": 1.83,
-      "measured_improvement": 1.33,
-      "reproducibility": 0.67,
-      "hot_take_insights": 0.83
+      "problem_user_value": 3.5,
+      "agent_solution_engineering": 2.5,
+      "end_to_end_quality": 2.1,
+      "measured_improvement": 1.4,
+      "reproducibility": 2.3,
+      "hot_take_insights": 0.6
     }
   },
   "seeded_issue_detection": {
@@ -74,33 +90,55 @@
       "strong_baseline_done_right": {
         "expected_check": null,
         "false_positive_flags": []
+      },
+      "good_project_bad_writeup": {
+        "expected_check": null,
+        "false_positive_flags": []
+      },
+      "real_gains_no_changelog": {
+        "expected_check": null,
+        "false_positive_flags": []
+      },
+      "overengineered_but_honest": {
+        "expected_check": null,
+        "false_positive_flags": []
+      },
+      "scope_mismatch": {
+        "expected_check": null,
+        "false_positive_flags": [
+          "repro_paths_exist"
+        ]
       }
     },
     "agent_recall_on_seeded_issues": 1.0,
-    "agent_precision_on_seeded_issues": 1.0,
+    "agent_precision_on_seeded_issues": 0.75,
     "baseline_recall": 0.0,
     "baseline_note": "Single-prompt baseline has no verification mechanism to catch these by construction."
   },
   "evidence_citations_per_submission": {
-    "broken_repro": 12,
-    "cosmetic_orchestration": 16,
+    "broken_repro": 13,
+    "cosmetic_orchestration": 14,
     "fabricated_claims": 13,
-    "strong_baseline_done_right": 17,
-    "thin_hot_take": 18,
-    "weak_single_prompt": 15
+    "good_project_bad_writeup": 15,
+    "overengineered_but_honest": 16,
+    "real_gains_no_changelog": 14,
+    "scope_mismatch": 12,
+    "strong_baseline_done_right": 16,
+    "thin_hot_take": 15,
+    "weak_single_prompt": 16
   },
   "baseline_cost": {
-    "num_calls": 6,
-    "input_tokens": 9609,
-    "output_tokens": 6082,
-    "seconds": 73.6,
-    "cost_usd": 0.0034
+    "num_calls": 10,
+    "input_tokens": 20561,
+    "output_tokens": 9467,
+    "seconds": 104.4,
+    "cost_usd": 0.0058
   },
   "agent_cost": {
-    "num_calls": 42,
-    "input_tokens": 83205,
-    "output_tokens": 43984,
-    "seconds": 482.2,
-    "cost_usd": 0.0259
+    "num_calls": 70,
+    "input_tokens": 188680,
+    "output_tokens": 99409,
+    "seconds": 905.8,
+    "cost_usd": 0.0586
   }
 }
