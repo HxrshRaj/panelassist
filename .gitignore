@@ -11,3 +11,6 @@ results/*.tmp
 _*.py
 _*.sh
 *.flag
+webapp/data/
+webapp/frontend/node_modules/
+webapp/frontend/dist/

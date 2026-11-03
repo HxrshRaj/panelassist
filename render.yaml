@@ -1,0 +1,31 @@
+# Render blueprint for the PanelAssist API (free tier).
+# Not deployed by the author as of this commit - see webapp/README.md.
+services:
+  - type: web
+    name: panelassist-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r webapp/backend/requirements.txt
+    startCommand: uvicorn webapp.backend.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Set this to the deployed frontend origin, e.g. https://panelassist.vercel.app
+      - key: ALLOWED_ORIGINS
+        value: http://localhost:5173
+      # The free tier has an ephemeral disk: this database is wiped on redeploy
+      # and whenever the service restarts after spinning down.
+      - key: PANELASSIST_DB
+        value: /tmp/panelassist.db
+      - key: MAX_LIVE_REVIEWS_PER_DAY
+        value: "20"
+      # Leave every model key unset to run in offline mode (stored-run replays and
+      # the deterministic write-up check only). Add ONE of these to enable live
+      # reviews; they are never committed.
+      - key: LLM_PROVIDER
+        sync: false
+      - key: LATENTSTACK_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
