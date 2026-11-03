@@ -1,7 +1,7 @@
 {
-  "_note": "Held-out set: scores for 12 synthetic submissions in data/submissions_heldout/. These were DRAFTED BY THE AUTHOR'S ASSISTANT against the exact rubric in rubric.py and have NOT yet been reviewed or confirmed by the human reviewer. Treat every number as a draft until status is changed. The submissions were written after the write-up check (agent/panelassist/writeup.py) was frozen and are never used to tune anything. Each rationale is the justification for the score.",
+  "_note": "Held-out set: scores for 12 synthetic submissions in data/submissions_heldout/. Every score here is a DRAFT with a written justification. None has been reviewed or confirmed by the human reviewer, so none should be treated as ground truth until `status` changes. The submissions were written after the write-up check (agent/panelassist/writeup.py) was frozen and are never used to tune anything.",
   "status": "drafted_pending_human_review",
-  "scored_by": "drafted by the author's assistant; no human review yet",
+  "scored_by": "draft; not yet reviewed or confirmed by the human reviewer",
   "submissions": {
     "polished_unbacked_numbers": {
       "problem_user_value": 10,

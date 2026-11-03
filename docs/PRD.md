@@ -72,9 +72,11 @@ baseline in `baseline/baseline_scorer.py`.
 | Flag usefulness | Flags marked "useful" / flags the judge rated. | **not measured** | `webapp` |
 | Override rate | Criteria where the judge score differs from the advisory score / criteria reviewed. | **not measured** | `webapp` |
 
-Ten cases is a small sample and the human scores are the author's. Differences
-of one or two points are inside the run-to-run spread; the held-out split and
-repeated runs in `eval/` exist to make that visible.
+Ten cases is a small sample. The dev-set human scores were confirmed by the
+reviewer; the held-out scores are unreviewed drafts. Differences of one or two
+points are inside the run-to-run spread (the baseline's MAE moved from 8.6 to 11.2
+between two runs of the same inputs); the held-out split and repeated runs in
+`eval/` exist to make that visible, and report "not run" until a funded run exists.
 
 ## 6. Risks and mitigations
 
@@ -100,13 +102,13 @@ repeated runs in `eval/` exist to make that visible.
 ## 8. Roadmap and prioritisation
 
 Framework: **RICE**, with ordinal 1-5 ratings for Reach, Impact and Confidence
-and person-days for Effort. These are the author's judgement calls, not
-measurements; the "why" column is the part to challenge.
+and person-days for Effort. These are judgement calls, not measurements; the
+"why" column is the part to challenge.
 Score = (Reach x Impact x Confidence) / Effort.
 
 | # | Item | R | I | C | E (days) | RICE | Why this rank |
 |---|---|---|---|---|---|---|---|
-| 1 | Measure lean mode live (single score + flag-triggered re-score) against the 10 dev and held-out cases | 5 | 4 | 4 | 0.5 | 160 | Highest leverage: the ablation says the verification flags are what helped, so the cheap version may match full quality at a fraction of the calls. Code exists; only a funded run is missing |
+| 1 | Measure lean mode live (single score + flag-triggered re-score) on the dev and held-out cases, 3 runs each | 5 | 4 | 4 | 0.5 | 160 | Highest leverage, and now less certain: the offline replay (`eval/LEAN_REPLAY.md`) estimates lean recovers under half of the full pipeline's MAE gain at 2.8 of 7 calls. That is an estimate, not a measurement. Code and the run command exist; only a funded run is missing |
 | 2 | Judge feedback loop (useful / not useful, overrides) in the web app | 5 | 4 | 4 | 2 | 40 | Turns three "not measured" metrics into measured ones; nothing else in the roadmap can be validated without it |
 | 3 | Blind-first review mode | 4 | 4 | 3 | 1.5 | 32 | Directly attacks anchoring, the main product risk; needs the feedback loop to evaluate |
 | 4 | Write-up quality check (deterministic) | 3 | 3 | 3 | 1 | 27 | Targets the documented worst case. Built; effect on scores unmeasured without a live run |
@@ -120,8 +122,10 @@ End-to-End-Quality specialist still gave near-full marks to a filler-prose
 write-up. This upgrade adds a deterministic write-up check that flags filler
 phrases, repeated sentence openers and padding, with each flag explainable in
 one sentence a judge can verify by eye. Whether it moves the *score* needs a
-live re-run; what it does to the *flags* is reported offline in
-`eval/WRITEUP_CHECK.md`, including false alarms on honest submissions.
+live re-run. Offline, against unreviewed draft labels, it caught
+<!--v:writeup.all.caught-->2<!--/v--> of <!--v:writeup.all.filler-->4<!--/v--> filler write-ups across the dev and held-out
+sets with <!--v:writeup.all.false_alarms-->0<!--/v--> false alarms on <!--v:writeup.all.honest-->18<!--/v--> honest ones
+(`eval/WRITEUP_CHECK.md`). It is conservative by design: it needs two signals to flag.
 
 ## 10. What we decided not to build, and why
 

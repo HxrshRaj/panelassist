@@ -81,7 +81,7 @@ def combine(names):
     neg = tot["false_positive"] + tot["true_negative"]
     L = ["# Write-up quality check - summary across sets\n",
          "The check is `agent/panelassist/writeup.py`. It was frozen before the held-out set was written "
-         "and has not been changed since. Labels are one author's subjective calls; counts are tiny.\n",
+         "and has not been changed since. The labels are subjective drafts by one person, not independently reviewed; counts are tiny.\n",
          "| Set | Cases | Labelled filler | Caught | Missed | Honest cases | False alarms |",
          "|---|---|---|---|---|---|---|"]
     for n, p in parts.items():
@@ -118,16 +118,18 @@ def main():
     if not (args.subs and args.labels and args.name):
         ap.error("--subs, --labels and --name are required unless --combine is used")
     with open(args.labels, encoding="utf-8") as f:
-        labels = json.load(f)["labels"]
+        label_file = json.load(f)
+    labels = label_file["labels"]
+    note = args.note or label_file.get("_report_note", "")
     r = evaluate(args.subs, labels)
     safe = args.name.replace(" ", "_")
     out_md = f"eval/WRITEUP_CHECK_{safe}.md"
     out_json = f"eval/writeup_check_{safe}.json"
     with open(out_md, "w", encoding="utf-8") as f:
-        f.write(render(args.name, r, args.note))
+        f.write(render(args.name, r, note))
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(r, f, indent=2)
-    print(render(args.name, r, args.note))
+    print(render(args.name, r, note))
 
 
 if __name__ == "__main__":

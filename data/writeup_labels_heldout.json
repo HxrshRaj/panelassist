@@ -1,6 +1,6 @@
 {
-  "_note": "Author labels for the write-up check, held-out set. Written together with the submissions, BEFORE the check was run on any of them. Subjective, one person, pending independent review.",
-  "labelled_by": "author (drafted before the check was run; pending independent review)",
+  "_note": "Draft labels for the write-up check, held-out set. Written together with the submissions, BEFORE the check was run on any of them. Subjective, one person's judgement, not independently reviewed.",
+  "labelled_by": "draft, written before the check was run; not independently reviewed",
   "labels": {
     "polished_unbacked_numbers": {
       "filler": false,
@@ -50,5 +50,6 @@
       "filler": false,
       "why": "Plain and specific."
     }
-  }
+  },
+  "_report_note": "Held-out set: written after agent/panelassist/writeup.py was frozen (commit 1078676); the check was not changed after seeing these results. Labels are subjective drafts, not independently reviewed. Caveat: the only labelled-filler case (buzzword_pipeline) mixes phrases that are on the check's list with ones that are not."
 }

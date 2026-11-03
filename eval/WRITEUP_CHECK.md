@@ -1,6 +1,6 @@
 # Write-up quality check - summary across sets
 
-The check is `agent/panelassist/writeup.py`. It was frozen before the held-out set was written and has not been changed since. Labels are one author's subjective calls; counts are tiny.
+The check is `agent/panelassist/writeup.py`. It was frozen before the held-out set was written and has not been changed since. The labels are subjective drafts by one person, not independently reviewed; counts are tiny.
 
 | Set | Cases | Labelled filler | Caught | Missed | Honest cases | False alarms |
 |---|---|---|---|---|---|---|

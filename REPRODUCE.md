@@ -171,17 +171,64 @@ pass caught. ~2 minutes (7 LLM calls).
 ## 9. Run the test suite
 
 ```bash
-pip install pytest
-python -m pytest tests/ -q
+pip install pytest fastapi uvicorn httpx python-multipart
+python -m pytest -q
 ```
 
-28 tests over the deterministic code paths - `verify.py` (all four
-checks, including the three seeded-issue catches and the directory /
-`.env` handling), `stats.py` (MAE and Spearman against hand-computed
-values), `loader.py`, and the JSON extractor in `common/llm.py`. No LLM,
-no network; runs in well under a second.
+108 offline tests, no model and no key: the deterministic checks (all five,
+including the write-up check), lean mode and score aggregation with the model
+mocked, the evaluation tooling, `stats.py` against hand-computed values, the
+prompt-injection guard (including a check that none of the 22 bundled samples
+trips it), and the web API (zip limits, offline honesty, feedback and stats,
+the live path with the pipeline mocked).
 
-## 10. Render the readable agent trajectories
+## 10. Offline reports that need no key
+
+```bash
+python eval/run_eval.py                      # dev set: baseline vs full, from saved results
+python eval/replay_lean.py                   # lean-mode ESTIMATE from saved results (not a measurement)
+python eval/writeup_check_eval.py --subs data/submissions --labels data/writeup_labels_dev.json --name dev
+python eval/writeup_check_eval.py --subs data/submissions_heldout --labels data/writeup_labels_heldout.json --name held-out
+python eval/writeup_check_eval.py --combine dev held-out
+python scripts/check_readme_numbers.py       # every number quoted in README / PRD matches these files
+```
+
+## 11. Reports that need a funded model key
+
+These make real model calls (the full pipeline is 7 calls per submission) and are
+**not** pre-filled in the repo; the committed reports for them say "not run".
+
+```bash
+# lean mode, dev set
+python agent/run_agent.py --mode lean
+python eval/run_eval.py
+
+# held-out set: baseline, full, lean, three runs each, then the report
+python eval/run_repeats.py --set held-out --submissions-dir data/submissions_heldout --runs 3
+python baseline/baseline_scorer.py --submissions-dir data/submissions_heldout --out results/heldout/baseline_scores.json
+python agent/run_agent.py --submissions-dir data/submissions_heldout --out results/heldout/agent_scores.json --trajectories-out results/heldout/agent_traj.json
+python agent/run_agent.py --mode lean --submissions-dir data/submissions_heldout --out results/heldout/lean_scores.json --trajectories-out results/heldout/lean_traj.json
+python eval/run_eval.py --human data/human_scores_heldout.json --expected data/expected_checks_heldout.json   --baseline results/heldout/baseline_scores.json --agent results/heldout/agent_scores.json   --lean results/heldout/lean_scores.json --label held-out   --out-json eval/results_heldout.json --out-md eval/RESULTS_heldout.md
+python eval/summarize_runs.py --set held-out --human data/human_scores_heldout.json
+python eval/summarize_runs.py --set dev          # after: python eval/run_repeats.py --set dev
+```
+
+`agent/run_agent.py` runs the write-up check by default; add `--no-writeup-check` to
+reproduce the original four-check pipeline behind the stored dev results. The
+held-out scores are unreviewed drafts, so treat their numbers accordingly until a
+human has confirmed them.
+
+## 12. The web app
+
+```bash
+pip install -r webapp/backend/requirements.txt
+cd webapp/frontend && npm ci && npm run build && cd ../..
+uvicorn webapp.backend.app:app             # http://127.0.0.1:8000
+```
+
+With no model key the server runs in a labelled offline mode. See `webapp/README.md`.
+
+## 13. Render the readable agent trajectories
 
 ```bash
 python agent/render_trajectories.py
