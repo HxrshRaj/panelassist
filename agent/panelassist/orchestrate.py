@@ -28,9 +28,14 @@ DISCLAIMER = (
 )
 
 
-def review_submission(sub: dict) -> dict:
+def review_submission(sub: dict, writeup_check: bool = True) -> dict:
+    """writeup_check=False reproduces the original four-check pipeline that
+    produced the stored dev-set results in results/agent_scores.json."""
     evidence = build_evidence_ledger(sub)
-    verification_flags = run_all_checks(evidence, sub["manifest"])
+    verification_flags = run_all_checks(
+        evidence, sub["manifest"],
+        readme_text=sub.get("readme") if writeup_check else None,
+    )
 
     memory = ReviewMemory()
     per_criterion = {}

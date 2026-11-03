@@ -1,0 +1,16 @@
+{
+  "_note": "Author labels for the write-up quality check, dev set. 'filler' = the README prose is predominantly generic, padded boilerplate (what a reader would call an unedited draft). These are one person's subjective judgements, written before the check was run on any case, and they are the only 'ground truth' the check is scored against. They are not the End-to-End-Quality human scores; a README can read as filler and still sit in a strong project.",
+  "labelled_by": "author (drafted before the check was run; pending independent review)",
+  "labels": {
+    "good_project_bad_writeup": {"filler": true,  "why": "Opens 'In today's fast-paced landscape', 'leverages the power of cutting-edge', Firstly/Secondly/Furthermore/Moreover bullets, 'it is important to note'."},
+    "fabricated_claims":        {"filler": true,  "why": "Hype register throughout: 'enterprise-grade', 'state-of-the-art', 'orchestrated harmony', 'massive ROI', 'the data speaks for itself'."},
+    "weak_single_prompt":       {"filler": true,  "why": "'using the power of LLMs and agentic workflows', 'AI agents are the future' - generic claims, no specifics."},
+    "strong_baseline_done_right": {"filler": false, "why": "Named user, concrete numbers, plain prose."},
+    "real_gains_no_changelog":  {"filler": false, "why": "Plain, specific prose with figures."},
+    "overengineered_but_honest": {"filler": false, "why": "Plain, specific, numbers in tables."},
+    "scope_mismatch":           {"filler": false, "why": "Informal first-person but specific; not padded."},
+    "broken_repro":             {"filler": false, "why": "Short, plain, specific."},
+    "thin_hot_take":            {"filler": false, "why": "Body is specific; only the closing hot take is generic, which hot_take_grounded covers."},
+    "cosmetic_orchestration":   {"filler": false, "why": "Terse and vague rather than padded; ambiguous case, labelled not-filler."}
+  }
+}

@@ -34,6 +34,7 @@ FLAG_TO_CRITERIA = {
     "env_var_consistency": ["reproducibility"],
     "claims_have_evidence": ["measured_improvement"],
     "hot_take_grounded": ["hot_take_insights"],
+    "writeup_quality": ["end_to_end_quality"],
 }
 
 
@@ -46,13 +47,17 @@ def criteria_touched_by(verification_flags: list) -> list:
     return [c["id"] for c in RUBRIC if c["id"] in touched]
 
 
-def review_submission_lean(sub: dict, *, extract=build_evidence_ledger,
+def review_submission_lean(sub: dict, *, writeup_check: bool = True,
+                           extract=build_evidence_ledger,
                            holistic=holistic_score,
                            rescore=score_criterion) -> dict:
     """The three callables are injectable so tests can run with no network."""
     holistic_result = holistic(sub)
     evidence = extract(sub)
-    flags = run_all_checks(evidence, sub["manifest"])
+    flags = run_all_checks(
+        evidence, sub["manifest"],
+        readme_text=sub.get("readme") if writeup_check else None,
+    )
     touched = criteria_touched_by(flags)
 
     memory = ReviewMemory()

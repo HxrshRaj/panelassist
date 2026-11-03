@@ -7,6 +7,8 @@ headline claims backed by something a judge could check?
 """
 import re
 
+from agent.panelassist.writeup import check_writeup_quality  # noqa: F401  (re-exported)
+
 
 # A reproduction guide that says "create a .env with your key" is not
 # referencing a file the submission should ship -- the opposite, per the
@@ -96,11 +98,17 @@ def check_hot_take_is_grounded(hot_take_is_generic: bool, hot_take_text: str) ->
     }
 
 
-def run_all_checks(evidence: dict, manifest: dict) -> list:
+def run_all_checks(evidence: dict, manifest: dict, readme_text=None) -> list:
+    """The four evidence checks always run. The write-up check (writeup.py) runs
+    only when readme_text is given, so callers and stored results that predate
+    it keep their exact behaviour."""
     manifest_files = manifest.get("files", [])
-    return [
+    flags = [
         check_repro_paths_exist(evidence.get("repro_referenced_paths", []), manifest_files),
         check_env_var_consistency(evidence.get("repro_referenced_env_vars", []), manifest_files),
         check_claims_have_evidence(evidence.get("claimed_results", [])),
         check_hot_take_is_grounded(evidence.get("hot_take_is_generic", False), evidence.get("hot_take_text", "")),
     ]
+    if readme_text is not None:
+        flags.append(check_writeup_quality(readme_text))
+    return flags

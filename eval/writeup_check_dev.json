@@ -1,0 +1,87 @@
+{
+  "n": 10,
+  "true_positive": 1,
+  "false_positive": 0,
+  "true_negative": 7,
+  "false_negative": 2,
+  "recall": 0.333,
+  "false_alarm_rate": 0.0,
+  "precision": 1.0,
+  "rows": [
+    {
+      "slug": "broken_repro",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "cosmetic_orchestration",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "fabricated_claims",
+      "label_filler": true,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "good_project_bad_writeup",
+      "label_filler": true,
+      "flagged": true,
+      "signals": [
+        "filler_phrases",
+        "stacked_transitions"
+      ],
+      "detail": "README prose reads as padded boilerplate: 8 stock filler phrases appear (e.g. 'cutting-edge', 'fast-paced', \"in today's\"). 5 sentences open with a stock transition (firstly, furthermore, moreover, secondly, thirdly). This bears on End to End Quality (would a person sign their name to this write-up?)."
+    },
+    {
+      "slug": "overengineered_but_honest",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "real_gains_no_changelog",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "scope_mismatch",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "strong_baseline_done_right",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "thin_hot_take",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "weak_single_prompt",
+      "label_filler": true,
+      "flagged": false,
+      "signals": [
+        "results_without_numbers"
+      ],
+      "detail": "One write-up signal fired, below the flag threshold of 2: The section 'Results' (35 words) describes results but contains no number."
+    }
+  ]
+}

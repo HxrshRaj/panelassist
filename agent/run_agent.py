@@ -26,6 +26,9 @@ def main():
     ap.add_argument("--mode", choices=sorted(REVIEWERS), default="full",
                     help="full = extract, verify, 6 specialist calls (7 calls). "
                          "lean = one holistic score + verify, re-score only flagged criteria (2+k calls).")
+    ap.add_argument("--no-writeup-check", action="store_true",
+                    help="skip the write-up quality check; reproduces the original four-check "
+                         "pipeline behind the stored results/agent_scores.json")
     ap.add_argument("--out", default=None, help="default depends on --mode")
     ap.add_argument("--trajectories-out", default=None, help="default depends on --mode")
     args = ap.parse_args()
@@ -38,7 +41,7 @@ def main():
     results = {}
     for sub in subs:
         print(f"[agent:{args.mode}] reviewing {sub['slug']}...", file=sys.stderr)
-        results[sub["slug"]] = review(sub)
+        results[sub["slug"]] = review(sub, writeup_check=not args.no_writeup_check)
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w") as f:
