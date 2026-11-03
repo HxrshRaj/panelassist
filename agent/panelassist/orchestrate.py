@@ -20,6 +20,14 @@ from agent.panelassist.score import score_criterion
 from agent.panelassist.memory import ReviewMemory
 
 
+DISCLAIMER = (
+    "Advisory pre-screen only. Every score above is a starting "
+    "point with cited evidence for a qualified human judge to "
+    "confirm, adjust, or override -- this tool does not make a "
+    "final accept/reject or prize decision."
+)
+
+
 def review_submission(sub: dict) -> dict:
     evidence = build_evidence_ledger(sub)
     verification_flags = run_all_checks(evidence, sub["manifest"])
@@ -50,10 +58,5 @@ def review_submission(sub: dict) -> dict:
         "low_confidence_criteria": low_confidence,
         "flagged_checks": [f["check"] for f in failed_checks],
         "review_notes": memory.snapshot(),
-        "disclaimer": (
-            "Advisory pre-screen only. Every score above is a starting "
-            "point with cited evidence for a qualified human judge to "
-            "confirm, adjust, or override -- this tool does not make a "
-            "final accept/reject or prize decision."
-        ),
+        "disclaimer": DISCLAIMER,
     }

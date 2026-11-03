@@ -1,0 +1,114 @@
+{
+  "n_cases": 10,
+  "mae_vs_human": {
+    "baseline": 11.2,
+    "full": 7.8,
+    "lean_replay_estimate": 9.6
+  },
+  "spearman_vs_human": {
+    "baseline": 0.857,
+    "full": 0.875,
+    "lean_replay_estimate": 0.845
+  },
+  "llm_calls_per_submission": {
+    "baseline": 1,
+    "full": 7,
+    "lean_expected": 2.8
+  },
+  "per_case": [
+    {
+      "slug": "broken_repro",
+      "human": 63,
+      "baseline": 77,
+      "full": 60,
+      "lean_replay": 73,
+      "criteria_rescored": [
+        "reproducibility"
+      ]
+    },
+    {
+      "slug": "cosmetic_orchestration",
+      "human": 38,
+      "baseline": 48,
+      "full": 35,
+      "lean_replay": 38,
+      "criteria_rescored": [
+        "reproducibility",
+        "hot_take_insights"
+      ]
+    },
+    {
+      "slug": "fabricated_claims",
+      "human": 36,
+      "baseline": 42,
+      "full": 50,
+      "lean_replay": 42,
+      "criteria_rescored": [
+        "measured_improvement",
+        "hot_take_insights"
+      ]
+    },
+    {
+      "slug": "good_project_bad_writeup",
+      "human": 78,
+      "baseline": 98,
+      "full": 94,
+      "lean_replay": 98,
+      "criteria_rescored": []
+    },
+    {
+      "slug": "overengineered_but_honest",
+      "human": 84,
+      "baseline": 98,
+      "full": 92,
+      "lean_replay": 98,
+      "criteria_rescored": []
+    },
+    {
+      "slug": "real_gains_no_changelog",
+      "human": 78,
+      "baseline": 96,
+      "full": 88,
+      "lean_replay": 96,
+      "criteria_rescored": []
+    },
+    {
+      "slug": "scope_mismatch",
+      "human": 76,
+      "baseline": 93,
+      "full": 88,
+      "lean_replay": 93,
+      "criteria_rescored": []
+    },
+    {
+      "slug": "strong_baseline_done_right",
+      "human": 92,
+      "baseline": 97,
+      "full": 95,
+      "lean_replay": 97,
+      "criteria_rescored": []
+    },
+    {
+      "slug": "thin_hot_take",
+      "human": 82,
+      "baseline": 81,
+      "full": 84,
+      "lean_replay": 81,
+      "criteria_rescored": [
+        "hot_take_insights"
+      ]
+    },
+    {
+      "slug": "weak_single_prompt",
+      "human": 25,
+      "baseline": 18,
+      "full": 32,
+      "lean_replay": 20,
+      "criteria_rescored": [
+        "measured_improvement",
+        "hot_take_insights"
+      ]
+    }
+  ],
+  "caveat": "Replay from stored outputs, not a live run of lean mode."
+}

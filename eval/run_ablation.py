@@ -27,6 +27,8 @@ def main():
     ap.add_argument("--human", default="data/human_scores.json")
     ap.add_argument("--baseline", default="results/baseline_scores.json")
     ap.add_argument("--agent-final", default="results/agent_scores.json")
+    ap.add_argument("--lean", default="results/lean_scores.json",
+                    help="optional: adds a lean-mode row if this file exists")
     ap.add_argument("--out", default="eval/ABLATIONS.md")
     args = ap.parse_args()
 
@@ -64,12 +66,27 @@ def main():
         "+ verification (final)": [final[s]["total"] for s in slugs],
     }
 
+    lean_note = None
+    if os.path.exists(args.lean):
+        with open(args.lean, encoding="utf-8") as f:
+            lean = json.load(f)["scores"]
+        if all(sl in lean for sl in slugs):
+            stages["lean (one holistic score + flagged re-score only)"] = [lean[sl]["total"] for sl in slugs]
+        else:
+            lean_note = "Lean results exist but do not cover every case; row omitted."
+    else:
+        lean_note = ("Lean mode: not run (no results/lean_scores.json; needs a working LLM key). "
+                     "See eval/LEAN_REPLAY.md for an offline estimate that is not a measurement.")
+
     lines = ["# Ablation: what each change actually contributed\n"]
     lines.append("| Stage | MAE vs. human (lower better) | Spearman vs. human (higher better) |")
     lines.append("|---|---|---|")
     for name, totals in stages.items():
         lines.append(f"| {name} | {round(mae(totals, human_totals), 2)} | {round(spearman(totals, human_totals), 3)} |")
     lines.append("")
+    if lean_note:
+        lines.append(lean_note)
+        lines.append("")
     lines.append("## Per-submission totals across every stage\n")
     lines.append("| Submission | Human | Baseline | +Ledger | +Split | Final |")
     lines.append("|---|---|---|---|---|---|")
