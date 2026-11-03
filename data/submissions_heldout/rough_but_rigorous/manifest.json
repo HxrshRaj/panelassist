@@ -1,0 +1,20 @@
+{
+  "slug": "rough_but_rigorous",
+  "label_for_eval": "looks rough, is strong",
+  "synthetic": true,
+  "seeded_issues": [],
+  "files": [
+    "requirements.txt",
+    "src/logtriage.py",
+    "src/verify_quote.py",
+    "src/grep_baseline.py",
+    "src/single_prompt.py",
+    "eval/incidents_labeled.jsonl",
+    "eval/score.py",
+    "eval/results.md",
+    "data/oncall_timings.csv",
+    "results/logtriage.jsonl",
+    "results/grep.jsonl",
+    "results/single.jsonl"
+  ]
+}

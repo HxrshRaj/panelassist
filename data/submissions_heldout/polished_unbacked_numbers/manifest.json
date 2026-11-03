@@ -1,0 +1,16 @@
+{
+  "slug": "polished_unbacked_numbers",
+  "label_for_eval": "looks good, is weak",
+  "synthetic": true,
+  "seeded_issues": [
+    "headline_numbers_with_no_evaluation_data_or_script",
+    "baseline_only_described_not_shown"
+  ],
+  "files": [
+    "requirements.txt",
+    "src/invoiceiq.py",
+    "src/extract.py",
+    "src/match.py",
+    "baseline/ocr_rules.py"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "agent": "polished_unbacked_numbers",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "extract.read_invoice",
+      "input": "scanned invoice",
+      "output": "vendor, date, 6 line items",
+      "note": "Model extraction step."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "match.to_purchase_order",
+      "input": "line items + PO",
+      "output": "5 matched, 1 exception",
+      "note": "Rule-based matching."
+    },
+    {
+      "step": 3,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "exception queue",
+      "output": "clerk reviews 1 item",
+      "note": "Nothing is paid without approval."
+    }
+  ]
+}

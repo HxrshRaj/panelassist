@@ -1,0 +1,21 @@
+{
+  "slug": "env_mismatch",
+  "label_for_eval": "looks good, is weak",
+  "synthetic": true,
+  "seeded_issues": [
+    "env_var_names_openai_but_code_uses_anthropic_client"
+  ],
+  "files": [
+    "requirements.txt",
+    "src/quotecheck.py",
+    "src/anthropic_client.py",
+    "src/baseline_exact.py",
+    "data/stories/",
+    "data/editor_timing.csv",
+    "eval/altered_quotes.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/exact.csv",
+    "results/quotecheck.csv"
+  ]
+}

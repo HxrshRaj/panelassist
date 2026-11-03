@@ -1,0 +1,38 @@
+{
+  "agent": "typo_ridden_but_real",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "split_sections",
+      "input": "lease, 24 pages",
+      "output": "9 sections",
+      "note": "Deterministic."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "model.read_section",
+      "input": "section 4",
+      "output": "auto-renew clause, quote p.7",
+      "note": "Must quote."
+    },
+    {
+      "step": 3,
+      "actor": "tool",
+      "action": "verify_quote",
+      "input": "quote + lease",
+      "output": "found",
+      "note": "Deterministic."
+    },
+    {
+      "step": 4,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "flags",
+      "output": "volunteer reviews, union lawyer signs off",
+      "note": "Human decides."
+    }
+  ]
+}

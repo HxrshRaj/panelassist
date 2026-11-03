@@ -1,0 +1,19 @@
+{
+  "slug": "polished_no_baseline",
+  "label_for_eval": "looks good, is weak",
+  "synthetic": true,
+  "seeded_issues": [
+    "baseline_is_random_assignment_not_a_realistic_alternative"
+  ],
+  "files": [
+    "requirements.txt",
+    "src/shiftswap.py",
+    "src/random_baseline.py",
+    "eval/swaps_labeled.csv",
+    "eval/score.py",
+    "results/agent.csv",
+    "results/random.csv",
+    "results/v0.csv",
+    "results/v1.csv"
+  ]
+}

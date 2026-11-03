@@ -1,0 +1,22 @@
+{
+  "_note": "planted: the one original check each defect should trip. honest: submissions that should trip none of the four original checks. writeup_flagged: submissions labelled as filler prose.",
+  "planted": {
+    "polished_unbacked_numbers": "claims_have_evidence",
+    "slick_demo_no_repro": "repro_paths_exist",
+    "buzzword_pipeline": "hot_take_grounded",
+    "env_mismatch": "env_var_consistency"
+  },
+  "honest": [
+    "polished_no_baseline",
+    "rough_but_rigorous",
+    "terse_notebook_style",
+    "typo_ridden_but_real",
+    "spartan_cli_tool",
+    "honest_negative_result",
+    "great_everything",
+    "unsafe_autonomy"
+  ],
+  "writeup_flagged": [
+    "buzzword_pipeline"
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "n": 12,
+  "true_positive": 1,
+  "false_positive": 0,
+  "true_negative": 11,
+  "false_negative": 0,
+  "recall": 1.0,
+  "false_alarm_rate": 0.0,
+  "precision": 1.0,
+  "rows": [
+    {
+      "slug": "buzzword_pipeline",
+      "label_filler": true,
+      "flagged": true,
+      "signals": [
+        "filler_phrases",
+        "results_without_numbers"
+      ],
+      "detail": "README prose reads as padded boilerplate: 3 stock filler phrases appear (e.g. 'seamless', 'the future of', 'transformative'). The section 'Results' (25 words) describes results but contains no number. This bears on End to End Quality (would a person sign their name to this write-up?)."
+    },
+    {
+      "slug": "env_mismatch",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "great_everything",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "honest_negative_result",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "polished_no_baseline",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "polished_unbacked_numbers",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "rough_but_rigorous",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "slick_demo_no_repro",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "spartan_cli_tool",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "terse_notebook_style",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "typo_ridden_but_real",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    },
+    {
+      "slug": "unsafe_autonomy",
+      "label_filler": false,
+      "flagged": false,
+      "signals": [],
+      "detail": "No filler-phrase, stacked-transition or numberless-results signals found in the README."
+    }
+  ]
+}

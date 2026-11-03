@@ -1,0 +1,30 @@
+{
+  "agent": "env_mismatch",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "align.find_span",
+      "input": "quote",
+      "output": "span 412-498 in transcript",
+      "note": "Deterministic."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "model.classify",
+      "input": "quote + span",
+      "output": "paraphrased",
+      "note": "Model."
+    },
+    {
+      "step": 3,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "report",
+      "output": "editor decides",
+      "note": "Tool changes no text."
+    }
+  ]
+}

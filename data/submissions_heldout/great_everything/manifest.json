@@ -1,0 +1,21 @@
+{
+  "slug": "great_everything",
+  "label_for_eval": "strong control",
+  "synthetic": true,
+  "seeded_issues": [],
+  "files": [
+    "requirements.txt",
+    "src/coursecheck.py",
+    "src/baseline_keywords.py",
+    "src/baseline_prompt.py",
+    "data/syllabi/",
+    "data/committee_timing.csv",
+    "eval/gold_maps.json",
+    "eval/inter_rater.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/keywords.json",
+    "results/prompt.json",
+    "results/coursecheck.json"
+  ]
+}

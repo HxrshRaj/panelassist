@@ -1,0 +1,38 @@
+{
+  "agent": "slick_demo_no_repro",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "extract.bookings",
+      "input": "8 emails",
+      "output": "9 bookings",
+      "note": "Model extraction."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "timezones.normalise",
+      "input": "9 bookings",
+      "output": "all in traveller zone",
+      "note": "Tool."
+    },
+    {
+      "step": 3,
+      "actor": "tool",
+      "action": "conflicts.check",
+      "input": "9 bookings",
+      "output": "hotel check-in after last flight",
+      "note": "Deterministic check."
+    },
+    {
+      "step": 4,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "brief",
+      "output": "assistant edits and sends",
+      "note": "Human sends."
+    }
+  ]
+}

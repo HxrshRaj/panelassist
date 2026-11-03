@@ -69,13 +69,54 @@ def render(name: str, r: dict, note: str) -> str:
     return "\n".join(L)
 
 
+def combine(names):
+    """Summary across the per-set JSON files already written by earlier runs."""
+    parts = {}
+    for n in names:
+        with open(f"eval/writeup_check_{n.replace(' ', '_')}.json", encoding="utf-8") as f:
+            parts[n] = json.load(f)
+    tot = {k: sum(p[k] for p in parts.values())
+           for k in ("n", "true_positive", "false_positive", "true_negative", "false_negative")}
+    pos = tot["true_positive"] + tot["false_negative"]
+    neg = tot["false_positive"] + tot["true_negative"]
+    L = ["# Write-up quality check - summary across sets\n",
+         "The check is `agent/panelassist/writeup.py`. It was frozen before the held-out set was written "
+         "and has not been changed since. Labels are one author's subjective calls; counts are tiny.\n",
+         "| Set | Cases | Labelled filler | Caught | Missed | Honest cases | False alarms |",
+         "|---|---|---|---|---|---|---|"]
+    for n, p in parts.items():
+        L.append(f"| {n} | {p['n']} | {p['true_positive'] + p['false_negative']} | {p['true_positive']} | "
+                 f"{p['false_negative']} | {p['false_positive'] + p['true_negative']} | {p['false_positive']} |")
+    L.append(f"| **all** | {tot['n']} | {pos} | {tot['true_positive']} | {tot['false_negative']} | {neg} | {tot['false_positive']} |")
+    L += ["",
+          f"Overall: caught {tot['true_positive']} of {pos} filler write-ups; "
+          f"{tot['false_positive']} false alarms on {neg} honest write-ups.", "",
+          "What this does and does not show:",
+          "- It is conservative: it needs two independent signals, so it rarely fires on a good README. "
+          "The cost is that it misses hype that uses wording outside its list.",
+          "- The dev-set catch (`good_project_bad_writeup`) was the case the check was written against, so it is not independent evidence.",
+          "- The held-out filler case (`buzzword_pipeline`) mixes phrases that are on the list with ones that are not, so one catch there "
+          "is weak evidence too. There is exactly one labelled-filler case in the held-out set.",
+          "- Whether flagging a write-up improves the *score* needs a live run; see the README's status table.", ""]
+    with open("eval/WRITEUP_CHECK.md", "w", encoding="utf-8") as f:
+        f.write("\n".join(L))
+    print("\n".join(L))
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--subs", required=True)
-    ap.add_argument("--labels", required=True)
-    ap.add_argument("--name", required=True)
+    ap.add_argument("--subs")
+    ap.add_argument("--labels")
+    ap.add_argument("--name")
     ap.add_argument("--note", default="")
+    ap.add_argument("--combine", nargs="+", metavar="NAME",
+                    help="write eval/WRITEUP_CHECK.md from earlier per-set runs, e.g. --combine dev held-out")
     args = ap.parse_args()
+    if args.combine:
+        combine(args.combine)
+        return
+    if not (args.subs and args.labels and args.name):
+        ap.error("--subs, --labels and --name are required unless --combine is used")
     with open(args.labels, encoding="utf-8") as f:
         labels = json.load(f)["labels"]
     r = evaluate(args.subs, labels)

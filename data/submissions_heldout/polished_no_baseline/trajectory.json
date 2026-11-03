@@ -1,0 +1,38 @@
+{
+  "agent": "polished_no_baseline",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "rules.rest_hours",
+      "input": "swap request",
+      "output": "ok",
+      "note": "Deterministic rule."
+    },
+    {
+      "step": 2,
+      "actor": "tool",
+      "action": "rules.skill_mix",
+      "input": "swap request",
+      "output": "violates: no ICU-trained nurse on night shift",
+      "note": "Deterministic rule."
+    },
+    {
+      "step": 3,
+      "actor": "agent",
+      "action": "agent.propose",
+      "input": "rule results",
+      "output": "reject, cites skill-mix rule",
+      "note": "Proposal only."
+    },
+    {
+      "step": 4,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "proposal",
+      "output": "manager rejects, as proposed",
+      "note": "Manager decides."
+    }
+  ]
+}

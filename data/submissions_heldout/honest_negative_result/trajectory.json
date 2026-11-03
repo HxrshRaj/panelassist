@@ -1,0 +1,30 @@
+{
+  "agent": "honest_negative_result",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "retrieve.similar",
+      "input": "ticket",
+      "output": "3 similar past tickets",
+      "note": "Retrieval."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "model.route",
+      "input": "ticket + examples",
+      "output": "billing, because similar tickets were billing",
+      "note": "Model."
+    },
+    {
+      "step": 3,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "routing",
+      "output": "lead accepts",
+      "note": "Override available."
+    }
+  ]
+}

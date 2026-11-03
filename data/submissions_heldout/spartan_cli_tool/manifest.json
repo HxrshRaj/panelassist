@@ -1,0 +1,18 @@
+{
+  "slug": "spartan_cli_tool",
+  "label_for_eval": "looks rough, is strong",
+  "synthetic": true,
+  "seeded_issues": [],
+  "files": [
+    "requirements.txt",
+    "src/pr_risk.py",
+    "src/baseline_loc.py",
+    "data/prs/",
+    "data/pr_history.csv",
+    "eval/labels.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/pr_risk.csv",
+    "results/baseline.csv"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "typo_ridden_but_real",
+  "label_for_eval": "looks rough, is strong",
+  "synthetic": true,
+  "seeded_issues": [],
+  "files": [
+    "requirements.txt",
+    "src/leaseflag.py",
+    "src/checklist_baseline.py",
+    "data/leases/",
+    "eval/planted_clauses.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/leaseflag.csv",
+    "results/checklist.csv"
+  ]
+}

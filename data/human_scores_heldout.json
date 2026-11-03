@@ -1,0 +1,127 @@
+{
+  "_note": "Held-out set: scores for 12 synthetic submissions in data/submissions_heldout/. These were DRAFTED BY THE AUTHOR'S ASSISTANT against the exact rubric in rubric.py and have NOT yet been reviewed or confirmed by the human reviewer. Treat every number as a draft until status is changed. The submissions were written after the write-up check (agent/panelassist/writeup.py) was frozen and are never used to tune anything. Each rationale is the justification for the score.",
+  "status": "drafted_pending_human_review",
+  "scored_by": "drafted by the author's assistant; no human review yet",
+  "submissions": {
+    "polished_unbacked_numbers": {
+      "problem_user_value": 10,
+      "agent_solution_engineering": 14,
+      "end_to_end_quality": 10,
+      "measured_improvement": 3,
+      "reproducibility": 5,
+      "hot_take_insights": 3,
+      "total": 45,
+      "rationale": "Polished and specific about the user, with a sensible human approval step, but every number rests on data the reader cannot see: no labelled set, no results file, no baseline script output. A judge cannot reproduce the main result, so Measured Improvement and Reproducibility collapse."
+    },
+    "polished_no_baseline": {
+      "problem_user_value": 12,
+      "agent_solution_engineering": 20,
+      "end_to_end_quality": 15,
+      "measured_improvement": 6,
+      "reproducibility": 13,
+      "hot_take_insights": 3,
+      "total": 69,
+      "rationale": "Well built and reproducible, with a human decision on every request. The comparison is the problem: 'random approve/reject' is not a reasonable way anyone handles the task, so 34% vs 91% overstates the gain. A rules-only or single-prompt baseline was needed. Measured Improvement is docked hard for the unfair baseline."
+    },
+    "slick_demo_no_repro": {
+      "problem_user_value": 12,
+      "agent_solution_engineering": 19,
+      "end_to_end_quality": 14,
+      "measured_improvement": 10,
+      "reproducibility": 3,
+      "hot_take_insights": 4,
+      "total": 62,
+      "rationale": "A real design with a labelled set and a changelog that matches it, and a specific hot take. But the reproduction guide copies a config example, runs a seed script and needs a private .env.production, none of which are in the submission. A judge from a clean checkout cannot run it, so Reproducibility is near the floor."
+    },
+    "buzzword_pipeline": {
+      "problem_user_value": 3,
+      "agent_solution_engineering": 5,
+      "end_to_end_quality": 5,
+      "measured_improvement": 1,
+      "reproducibility": 6,
+      "hot_take_insights": 1,
+      "total": 21,
+      "rationale": "No identifiable user, no problem you could verify, no numbers, no baseline, no data. The prose is padded throughout, and the hot take is the generic 'future of work is agentic'. Reproducibility gets a few points only because the two-line instructions are at least runnable in principle."
+    },
+    "rough_but_rigorous": {
+      "problem_user_value": 11,
+      "agent_solution_engineering": 25,
+      "end_to_end_quality": 13,
+      "measured_improvement": 14,
+      "reproducibility": 13,
+      "hot_take_insights": 5,
+      "total": 81,
+      "rationale": "Rough finish: lowercase notes, typos, an apology. Underneath it is rigorous: two baselines, a changelog with a removed experiment and the reason, a deterministic quote check, a named failure mode, and a human confirmation. A judge who reads past the tone should score it high; the informal finish costs a few End to End Quality points."
+    },
+    "terse_notebook_style": {
+      "problem_user_value": 10,
+      "agent_solution_engineering": 20,
+      "end_to_end_quality": 12,
+      "measured_improvement": 11,
+      "reproducibility": 12,
+      "hot_take_insights": 3,
+      "total": 68,
+      "rationale": "No prose at all - bullets and a table - but every element is present and every number points at a file. Honest about the 6 wrong pairs. A small, narrow problem and a modest baseline, so mid-range scores, not high. A scorer that confuses 'terse' with 'weak' would under-score it."
+    },
+    "typo_ridden_but_real": {
+      "problem_user_value": 13,
+      "agent_solution_engineering": 22,
+      "end_to_end_quality": 12,
+      "measured_improvement": 12,
+      "reproducibility": 12,
+      "hot_take_insights": 4,
+      "total": 75,
+      "rationale": "Broken grammar and lowercase throughout, but a clear user, a sensible human-in-the-loop for something that could affect people, planted-ground-truth evaluation, a real baseline, a changelog with a removed experiment and a stated failure mode. The roughness costs End to End Quality; the substance is strong."
+    },
+    "spartan_cli_tool": {
+      "problem_user_value": 9,
+      "agent_solution_engineering": 19,
+      "end_to_end_quality": 13,
+      "measured_improvement": 10,
+      "reproducibility": 13,
+      "hot_take_insights": 3,
+      "total": 67,
+      "rationale": "Minimal README but every required element is present: user, a measured problem, baseline, results table, what was tried and removed, a specific hot take, and a runnable repro. Narrow scope keeps Problem and Engineering mid-range."
+    },
+    "honest_negative_result": {
+      "problem_user_value": 11,
+      "agent_solution_engineering": 17,
+      "end_to_end_quality": 14,
+      "measured_improvement": 7,
+      "reproducibility": 14,
+      "hot_take_insights": 5,
+      "total": 68,
+      "rationale": "Unusually honest: a fair second baseline, run-to-run spread, a recommendation not to ship. The hackathon asks for a meaningful improvement and this has none over the fair baseline, so Measured Improvement and Engineering are capped; but the reproducibility, honesty and hot take are excellent."
+    },
+    "great_everything": {
+      "problem_user_value": 14,
+      "agent_solution_engineering": 27,
+      "end_to_end_quality": 18,
+      "measured_improvement": 14,
+      "reproducibility": 14,
+      "hot_take_insights": 5,
+      "total": 92,
+      "rationale": "Control: a named user with a measured problem, two baselines, a changelog with a removed experiment, a verifiable-evidence mechanism, a named failure mode, human confirmation on every mapping, and a clean reproduction."
+    },
+    "unsafe_autonomy": {
+      "problem_user_value": 11,
+      "agent_solution_engineering": 13,
+      "end_to_end_quality": 12,
+      "measured_improvement": 11,
+      "reproducibility": 12,
+      "hot_take_insights": 3,
+      "total": 62,
+      "rationale": "Decent evaluation and a clear user, but it sends mail and moves money with no human approval, and the README treats 3 unapproved refunds as acceptable and approval as 'removing the benefit'. Ground rules 4 and 5 ask for controlled actions and a human in the loop; the design choice is the main weakness, so Engineering is docked heavily even though the model quality is good."
+    },
+    "env_mismatch": {
+      "problem_user_value": 12,
+      "agent_solution_engineering": 21,
+      "end_to_end_quality": 14,
+      "measured_improvement": 11,
+      "reproducibility": 6,
+      "hot_take_insights": 4,
+      "total": 68,
+      "rationale": "A solid, honest project, but the reproduction guide asks for OPENAI_API_KEY while the code is built on an Anthropic client, so a judge following the guide would hit an auth error at the first model call. Reproducibility is docked; the rest is good."
+    }
+  }
+}

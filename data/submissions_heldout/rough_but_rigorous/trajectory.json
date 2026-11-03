@@ -1,0 +1,38 @@
+{
+  "agent": "rough_but_rigorous",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "regex.signatures",
+      "input": "200 log lines",
+      "output": "3 error signatures",
+      "note": "Cheap pre-pass."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "model.label",
+      "input": "signatures + lines",
+      "output": "db, quote: 'deadlock detected'",
+      "note": "Must quote a line."
+    },
+    {
+      "step": 3,
+      "actor": "tool",
+      "action": "verify_quote",
+      "input": "quote + logs",
+      "output": "quote found",
+      "note": "Deterministic; would discard label if missing."
+    },
+    {
+      "step": 4,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "label",
+      "output": "engineer confirms, pages db team",
+      "note": "Human pages."
+    }
+  ]
+}

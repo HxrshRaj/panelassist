@@ -1,0 +1,18 @@
+{
+  "slug": "slick_demo_no_repro",
+  "label_for_eval": "looks good, is weak",
+  "synthetic": true,
+  "seeded_issues": [
+    "reproduce_references_files_not_in_submission",
+    "needs_secrets_from_a_private_vault"
+  ],
+  "files": [
+    "requirements.txt",
+    "src/tripbrief.py",
+    "src/conflicts.py",
+    "src/timezones.py",
+    "eval/trips_labeled.json",
+    "eval/score.py",
+    "eval/results.md"
+  ]
+}

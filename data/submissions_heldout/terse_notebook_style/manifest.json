@@ -1,0 +1,18 @@
+{
+  "slug": "terse_notebook_style",
+  "label_for_eval": "looks rough, is strong",
+  "synthetic": true,
+  "seeded_issues": [],
+  "files": [
+    "requirements.txt",
+    "src/dedup_notes.py",
+    "src/baseline_doi.py",
+    "data/sheets/",
+    "data/timing.txt",
+    "eval/true_dupes.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/baseline.csv",
+    "results/tool.csv"
+  ]
+}

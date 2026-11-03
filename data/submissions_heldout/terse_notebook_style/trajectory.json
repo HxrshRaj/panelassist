@@ -1,0 +1,30 @@
+{
+  "agent": "terse_notebook_style",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "normalise",
+      "input": "1,200 rows",
+      "output": "title keys built",
+      "note": "Deterministic."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "model.judge_pairs",
+      "input": "ambiguous pairs",
+      "output": "132 pairs, each with reason",
+      "note": "Model."
+    },
+    {
+      "step": 3,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "pairs",
+      "output": "human accepts 126, rejects 6",
+      "note": "Nothing auto-deleted."
+    }
+  ]
+}

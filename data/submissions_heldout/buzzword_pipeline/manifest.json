@@ -1,0 +1,14 @@
+{
+  "slug": "buzzword_pipeline",
+  "label_for_eval": "looks good, is weak",
+  "synthetic": true,
+  "seeded_issues": [
+    "generic_hot_take",
+    "no_user_no_numbers_no_baseline",
+    "filler_prose_with_varied_wording"
+  ],
+  "files": [
+    "requirements.txt",
+    "platform.py"
+  ]
+}

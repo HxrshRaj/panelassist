@@ -1,0 +1,54 @@
+{
+  "_note": "Author labels for the write-up check, held-out set. Written together with the submissions, BEFORE the check was run on any of them. Subjective, one person, pending independent review.",
+  "labelled_by": "author (drafted before the check was run; pending independent review)",
+  "labels": {
+    "polished_unbacked_numbers": {
+      "filler": false,
+      "why": "Slick but specific; marketing tone without padded stock phrases."
+    },
+    "polished_no_baseline": {
+      "filler": false,
+      "why": "Specific, plain prose."
+    },
+    "slick_demo_no_repro": {
+      "filler": false,
+      "why": "Concise and specific."
+    },
+    "buzzword_pipeline": {
+      "filler": true,
+      "why": "Pure padding in mixed wording: some phrases (seamlessly, transformative, unlock the, the future of) are on the check's list; others (next-generation, empowers, unparalleled, holistic) are not."
+    },
+    "rough_but_rigorous": {
+      "filler": false,
+      "why": "Informal and specific, the opposite of padded."
+    },
+    "terse_notebook_style": {
+      "filler": false,
+      "why": "Terse, not padded."
+    },
+    "typo_ridden_but_real": {
+      "filler": false,
+      "why": "Broken English, not padding."
+    },
+    "spartan_cli_tool": {
+      "filler": false,
+      "why": "Minimal and specific."
+    },
+    "honest_negative_result": {
+      "filler": false,
+      "why": "Plain and specific."
+    },
+    "great_everything": {
+      "filler": false,
+      "why": "Plain and specific."
+    },
+    "unsafe_autonomy": {
+      "filler": false,
+      "why": "Plain prose."
+    },
+    "env_mismatch": {
+      "filler": false,
+      "why": "Plain and specific."
+    }
+  }
+}

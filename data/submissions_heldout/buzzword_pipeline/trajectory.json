@@ -1,0 +1,14 @@
+{
+  "agent": "buzzword_pipeline",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "agent",
+      "action": "platform.run",
+      "input": "user request",
+      "output": "agents collaborate",
+      "note": "No tool calls, data or comparison recorded."
+    }
+  ]
+}

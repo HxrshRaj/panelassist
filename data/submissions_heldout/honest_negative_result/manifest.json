@@ -1,0 +1,22 @@
+{
+  "slug": "honest_negative_result",
+  "label_for_eval": "honest negative result",
+  "synthetic": true,
+  "seeded_issues": [
+    "agent_does_not_meaningfully_beat_a_fair_baseline"
+  ],
+  "files": [
+    "requirements.txt",
+    "src/rules.py",
+    "src/rules_tuned.py",
+    "src/agent.py",
+    "eval/tickets_labeled.csv",
+    "eval/score.py",
+    "eval/results.md",
+    "results/rules.csv",
+    "results/rules_tuned.csv",
+    "results/agent_run1.csv",
+    "results/agent_run2.csv",
+    "results/agent_run3.csv"
+  ]
+}

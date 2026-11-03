@@ -1,0 +1,38 @@
+{
+  "agent": "great_everything",
+  "synthetic": true,
+  "steps": [
+    {
+      "step": 1,
+      "actor": "tool",
+      "action": "split_weeks",
+      "input": "syllabus",
+      "output": "14 weeks",
+      "note": "Deterministic."
+    },
+    {
+      "step": 2,
+      "actor": "agent",
+      "action": "model.map_week",
+      "input": "week 3 text + outcomes",
+      "output": "outcome 2, quote 'students build a regression model'",
+      "note": "Must quote."
+    },
+    {
+      "step": 3,
+      "actor": "tool",
+      "action": "verify_quote",
+      "input": "quote + syllabus",
+      "output": "found",
+      "note": "Deterministic."
+    },
+    {
+      "step": 4,
+      "actor": "human_checkpoint",
+      "action": "human_checkpoint",
+      "input": "map",
+      "output": "member confirms with one edit",
+      "note": "Human confirms."
+    }
+  ]
+}
